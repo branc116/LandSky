@@ -6,114 +6,84 @@ using System.Threading.Tasks;
 
 namespace MultyNetHack
 {
-    class MyRectangle
+    public class Rectangle
     {
-        MyPoint topLeft, topRight, bottomLeft, bottomRight;
-        public int left
-        {
-            get
-            {
-                return topLeft.x;
-            }
-        }
-        public int right
-        {
-            get
-            {
-                return topRight.x;
-            }
-        }
-        public int top
-        {
-            get
-            {
-                return topLeft.y;
-            }
-        }
-        public int bottom
-        {
-            get
-            {
-                return bottomLeft.y;
-            }
-        }
-        public MyRectangle(MyPoint topLeft, MyPoint topRight, MyPoint bottomRight, MyPoint bottomLeft)
-        {
-            this.topLeft = topLeft;
-            this.topRight = topRight;
-            this.bottomRight = bottomRight;
-            this.bottomLeft = bottomLeft;
-        }
 
-    }
-    public class MyPoint
-    {
-        public int x, y;
-        
-
-        public int leftBound
+        public int l;
+        public int r;
+        public int t;
+        public int b;
+        public int width
         {
             get
             {
-                return x-width/2;
+                return this.r - this.l;
             }
         }
-        public int rightBound
+        public int height
         {
             get
             {
-                return x+width/2;
+                return this.t - this.b;
             }
         }
-        public int topBound
+        public Rectangle(int t,int r,int b,int l)
         {
-            get
-            {
-                return y+height/2;
-            }
+            this.l = l;
+            this.r = r;
+            this.t = t;
+            this.b = b;
         }
-        public int bottomBound
+        /// <summary>
+        ///     |
+        ///     | l,t___
+        ///     |   |x,y|
+        ///     |    ---
+        /// -------------------
+        ///     |
+        ///     |
+        ///     |
+        ///     |
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public Point ToTopLeft(int x, int y)
         {
-            get
-            {
-                return y-height/2;
-            }
-        }
-        public int width, height;
-
-        public void SizeOfScreen(int width, int height)
-        {
-            this.width = width;
-            this.height = height;
-        }
-        public MyPoint(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-
-            width = 20;
-            height = 20;
-
-        }
-        public MyPoint GetStandardCoordinat(int x,int y)
-        {
-            MyPoint mP = new MyPoint(Math.Max(1, Math.Min(width - 2, x - leftBound)), Math.Max(1, Math.Min(height - 2, -y + topBound)));
+            int top = Math.Min(this.height-1, Math.Max(1, this.t - y));
+            int left = Math.Min(this.width-1, Math.Max(1, x-this.l));
+            Point mP = new Point(top,left);
             return mP;
 
         }
-        public static MyPoint operator +(MyPoint a, MyPoint b)
-        {
-            return new MyPoint(a.x + b.x, a.y + b.y);
-        }
-        public static bool operator ==(MyPoint a, MyPoint b)
-        {
-            return a.x == b.x && a.y == b.y;
-        }
-        public static bool operator !=(MyPoint a, MyPoint b)
-        {
-            return !(a == b);
-        }
-
     }
-    
+    public class Point
+    {
+        public int x, y;
+        public Point(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        public Point ToTopLeft(Size s, int x, int y)
+        {
+            Point mP = new Point(Math.Max(1, Math.Min(s.width - 1, x - this.x)), Math.Max(1, Math.Min(s.height - 2, -y + this.y)));
+            return mP;
+
+        }
+        public static Point operator -(Point a, Point b)
+        {
+            return new Point(b.x - a.x, b.y - b.y);
+        }
+    }
+    public class Size
+    {
+        public int height, width;
+        public Size(int width, int height)
+        {
+            this.height = height;
+            this.width = width;
+        }
+        
+    }
 }
