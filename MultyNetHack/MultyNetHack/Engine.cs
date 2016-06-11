@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Threading;
+
 namespace MultyNetHack
 {
     class Engine
     {
 
+
         List<List<char>> buff1;
         Dictionary<Material, char> texture ;
         List<List<bool>> updated;
-        Timer renderTimer, updateTimer;
+        System.Timers.Timer renderTimer, updateTimer;
         Point center;
         Size SceenSize;
         Root root;
@@ -58,15 +61,23 @@ namespace MultyNetHack
         }
         int gh;
         bool showHelp;
+        int from;
+        double renderInterval;
+        Queue<String> Message;
         public Engine(int width, int height)
         {
+            
             SceenSize = new Size(width, height);
             center = new Point(0, 0);
             root = new Root();
             Init();
             _r = new Rectangle(0, 0, 0, 0);
-            renderTimer = new Timer(100); // update ~60Hz
-            updateTimer = new Timer(3); // update ~30HZ
+            renderInterval = 100;
+            Console.CursorVisible = false;
+            Message = new Queue<string>();
+
+            renderTimer = new System.Timers.Timer(renderInterval); // update ~60Hz
+            updateTimer = new System.Timers.Timer(3); // update ~30HZ
             renderTimer.Enabled = true;
             updateTimer.Enabled = true;
             updateTimer.Elapsed += OnUpdateFrame;
@@ -131,15 +142,33 @@ namespace MultyNetHack
             //Console.MoveBufferArea(0, top, width, top, 0, 0);
             if (showHelp)
             {
-                Console.WriteLine("Move h/j/k/l");
-                Console.WriteLine("Generate room g");
-                Console.WriteLine("Curent Location:({0},{1})",center.x,center.y );
-                
-                Console.WriteLine("There are {0} rooms!", gh);
-                foreach(string key in root.keys)
+                if (Message.Count > 0)
                 {
-                    Component c = root.controls[key];
-                    Console.WriteLine("{0} is located ({1},{2}) - it's size is {3}x{4} - On The screen? {5} !",new object[] { c.name,c.x,c.y,c.width,c.height, c&bounds});
+
+                    Console.WriteLine("New Message");
+                    Console.WriteLine(new string('-', Console.WindowWidth));
+                    Console.WriteLine();
+                    Console.WriteLine(Message.Peek());
+                    Console.WriteLine();
+                    Console.WriteLine(new string('-', Console.WindowWidth));
+                    Console.WriteLine();
+                    Console.WriteLine("Press 'd' to dismiss messsage");
+                }
+                else
+                {
+                    Console.WriteLine("Move h/j/k/l");
+                    Console.WriteLine("Generate room g");
+                    Console.WriteLine("Curent Location:({0},{1})", center.x, center.y);
+
+                    Console.WriteLine("There are {0} rooms!", root.keys.Count);
+                    Console.WriteLine("Shown rooms {0} - {1}.", new object[2] { from, 20 + from, });
+                    for (int i = from; i < Math.Min(root.controls.Count, (20 + from)); i++)
+                    {
+                        string key = root.keys[i];
+                        Component c = root.controls[key];
+
+                        Console.WriteLine("{0} is located ({1},{2}) - it's size is {3}x{4} - On The screen? {5} !", new object[] { c.name, c.x, c.y, c.width, c.height, c & bounds });
+                    }
                 }
             }
             renderTimer.Start();
@@ -174,6 +203,29 @@ namespace MultyNetHack
                     root.Insert(r);
                     (root.controls["room" + gh] as Room).generatRandom();
                     gh++;
+                    Message.Enqueue("Added 1 new Room at the location " + r.x + "," + r.y);
+                    break;
+                case 'G':
+                    renderTimer.Interval = 20000;
+                    Thread.Sleep(Convert.ToInt32( renderInterval*2));
+                    Console.Clear();
+                    Console.WriteLine("GENERATING ROOMS w8 4 it!!!");
+                    int maxLeft = 10;
+                    Console.Write("|");
+                    Console.CursorLeft = maxLeft;
+                    Console.Write("|");
+                    int genRooms = 1000; ;
+                    for (int i = 0; i < genRooms; i++)
+                    {
+                        Console.CursorLeft = (int)(((float)i / genRooms) * (maxLeft-1)) + 1;
+                        Console.Write("#");
+                        Room R = new Room("room" + gh + '.' + i);
+                        root.Insert(R);
+                        (root.controls["room" + gh + '.' + i] as Room).generatRandom();
+                    }
+                    Message.Enqueue("Added " + genRooms + " new rooms");
+                    renderTimer.Interval = renderInterval;
+                    gh++;
                     break;
                 case 'h':
                     center.x -= 1;
@@ -201,6 +253,16 @@ namespace MultyNetHack
                     break;
                 case '?':
                     showHelp = !showHelp;
+                    break;
+                case 'v':
+                    from = Math.Max(from - 1, 0);
+                    break;
+                case 'V':
+                    from++;
+                    break;
+                case 'd':
+                    if (Message.Count>0)
+                        Message.Dequeue();
                     break;
             }
                 

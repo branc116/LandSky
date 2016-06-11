@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-
+using System.Threading;
 
 namespace MultyNetHack
 {
@@ -95,7 +95,7 @@ namespace MultyNetHack
         public static bool operator &(Component one, Component two)
         {
             return (one.l <= two.r && one.r >= two.l &&
-                one.t <= two.b && one.b >= two.t);
+                one.t >= two.b && one.b <= two.t);
         }
         public static bool operator &(Component one, Player two)
         {
@@ -116,7 +116,7 @@ namespace MultyNetHack
             if (one.t == two.t &&
                 one.b == two.b &&
                 one.l == two.l &&
-                one.r == two.r + two.width &&
+                one.r == two.r &&
                 one.name == two.name) return true;
             return false;
         }
@@ -143,13 +143,13 @@ namespace MultyNetHack
         public void generatRandom()
         {
             genStack++;
-            
-            Random rand = new Random(DateTime.Now.Second);
+            //Thread.Sleep(1);
+            Random rand = new Random(Convert.ToInt32(DateTime.Now.Ticks % Int32.MaxValue));
             if (parent.width < 30 || parent.height < 30) throw new Exception("Can't make room in Component this small (min is 30*30)");
             x = rand.Next(-500, 500);
             y = rand.Next(-500, 500);
-            width = rand.Next(5, 30);
-            height = rand.Next(5, 30);
+            width = rand.Next(5, 40);
+            height = rand.Next(5, 20);
             l = x - width  /2 - width%2;
             t = y + height /2 + height%2;
             r = x + width  /2;
@@ -171,7 +171,7 @@ namespace MultyNetHack
             {
                 if (r == r.parent.controls[key])
                     continue;
-                if (r & (Room)r.parent.controls[key])
+                if (r & r.parent.controls[key])
                     return true;
             }
             return false;

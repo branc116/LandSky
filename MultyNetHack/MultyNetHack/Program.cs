@@ -7,7 +7,7 @@ namespace MultyNetHack
     {
         static void Main(string[] args)
         {
-            Engine e = new Engine(40,40);            
+            Engine e = new Engine(50,20);            
             Thread.Sleep(int.MaxValue - 2);
         }
     }
