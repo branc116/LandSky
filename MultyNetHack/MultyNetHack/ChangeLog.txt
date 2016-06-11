@@ -1,0 +1,9 @@
+﻿MultyNetHack
+
+
+
+--12.6.2016.--
+	Added message qeueing
+	Added option for adding a lot of rooms at a same time
+	Incressed performance
+	Fixed bugs
