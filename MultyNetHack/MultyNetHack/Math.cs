@@ -56,10 +56,20 @@ namespace MultyNetHack
             return mP;
 
         }
+        public static Rectangle operator -(Rectangle rc, Point p)
+        {
+            return new Rectangle(rc.t - p.y, rc.r - p.x, rc.b - p.y, rc.l - p.x);
+        }
+        public static bool operator &(Rectangle one, Rectangle two)
+        {
+            return (one.l < two.r && one.r > two.l &&
+                    one.t > two.b && one.b < two.t);
+        }
     }
     public class Point
     {
         public int x, y;
+        public bool enter;
         public Point(int x, int y)
         {
             this.x = x;
@@ -73,7 +83,7 @@ namespace MultyNetHack
         }
         public static Point operator -(Point a, Point b)
         {
-            return new Point(b.x - a.x, b.y - b.y);
+            return new Point(b.x - a.x, b.y - a.y);
         }
     }
     public class Size

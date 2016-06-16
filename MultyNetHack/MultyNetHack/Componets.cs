@@ -11,7 +11,8 @@ namespace MultyNetHack
     public enum Material
     {
         Path,
-        Wall,
+        HorisontalWall,
+        VerticalWall,
         Trap,
         Player,
         Npc,
@@ -27,6 +28,7 @@ namespace MultyNetHack
         public int l, r, t, b;
         public Dictionary<string, Component> controls;
         public List<string> keys;
+        public List<Sweep> sweep;
         public int height, width, depht;
         public Component parent;
         public Material madeOf;
@@ -36,14 +38,97 @@ namespace MultyNetHack
         {
             controls = new Dictionary<string, Component>();
             keys = new List<string>();
+            sweep = new List<Sweep>();
             this.name = name;
 
         }
+        public struct Sweep
+        {
+            public Component component;
+            public int x;
+            public bool enter;
+
+            public Sweep(Component component, int x, bool enter)
+            {
+                this.component = component;
+                this.x = x;
+                this.enter = enter;
+            }
+
+            public static bool operator <(Sweep a, Sweep b)
+            {
+                return a.x < b.x;
+            }
+            public static bool operator >(Sweep a, Sweep b)
+            {
+                return a.x > b.x;
+            }
+            public static bool operator <=(Sweep a, Sweep b)
+            {
+                return a.x <= b.x;
+            }
+            public static bool operator >=(Sweep a, Sweep b)
+            {
+                return a.x >= b.x;
+            }
+            public static bool operator ==(Sweep a, Sweep b)
+            {
+                return a.x == b.x;
+            }
+            public static bool operator !=(Sweep a, Sweep b)
+            {
+                return a.x != b.x;
+            }
+            public static bool operator <(Sweep a, int b)
+            {
+                return a.x < b;
+            }
+            public static bool operator >(Sweep a, int b)
+            {
+                return a.x > b;
+            }
+            public static bool operator <=(Sweep a, int b)
+            {
+                return a.x <= b;
+            }
+            public static bool operator >=(Sweep a, int b)
+            {
+                return a.x >= b;
+            }
+            public static bool operator ==(Sweep a, int b)
+            {
+                return a.x == b;
+            }
+            public static bool operator !=(Sweep a, int b)
+            {
+                return a.x != b;
+            }
+
+            public static bool operator ==(Sweep a, string b)
+            {
+                return a.component.name == b;
+            }
+            public static bool operator !=(Sweep a, string b)
+            {
+                return a.component.name != b;
+            }
+
+            public static bool operator ==(Sweep a, Component b)
+            {
+                return a.component == b;
+            }
+            public static bool operator !=(Sweep a, Component b)
+            {
+                return a.component != b;
+            }
+        }
+
 
         public void Dispose()
         {
             this.parent.keys.Remove(this.name);
             this.parent.controls.Remove(this.name);
+            sweep = null;
             controls = null;
             parent = null;
 
@@ -51,8 +136,10 @@ namespace MultyNetHack
         public void Insert(Component c)
         {
             if (c.name == null) throw new Exception("Component must have a name");
-            keys.Add(c.name);
-            controls.Add(c.name, c);
+            this.keys.Add(c.name);
+            this.controls.Add(c.name, c);
+
+
             if (c.parent != null)
             {
                 c.parent.keys.Remove(c.name);
@@ -60,12 +147,75 @@ namespace MultyNetHack
             }
             c.parent = this;
         }
+        public void InsertInSweep(Component c)
+        {
+            
+            int lb = 0, ub = sweep.Count;
+            int x1 = c.l;
+            int x2 = c.r;
+            if (sweep.Count == 0)
+            {
+                sweep.InsertRange(0, new Sweep[2] { new Sweep(c, x1, true), new Sweep(c, x2, false) });
+                return;
+            }
+            if (x1 < sweep[0].x)
+            {
+                sweep.Insert(0, new Sweep(c, x1, true));
+            }
+            else
+            {
+                while (ub - lb > 1)
+                {
+                    int mid = (lb + ub) / 2;
+                    if (sweep[mid] < x1)
+                    {
+                        lb = mid;
+                    }
+                    else if (sweep[mid] > x1)
+                    {
+                        ub = mid;
+                    }
+                    else
+                    {
+                        lb = ub = mid;
+                    }
+                }
+                sweep.Insert(ub, new Sweep(c, x1, true));
+            }
+            
+            ub = sweep.Count;
+            while (ub - lb > 1)
+            {
+                int mid = (lb + ub) / 2;
+                if (sweep[mid] < x2)
+                {
+                    lb = mid;
+                }
+                else if (sweep[mid] > x2)
+                {
+                    ub = mid;
+                }
+                else
+                {
+                    lb = ub = mid;
+                }
+            }
+            sweep.Insert(ub, new Sweep(c, x2, false));
+
+        }
         public void Delete(string name)
         {
             Component c = controls[name];
             foreach (string s in c.keys)
             {
                 c.controls[s].Delete(s);
+            }
+            foreach(Sweep s in sweep)
+            {
+                if (s == name)
+                {
+                    sweep.Remove(s);
+                }
             }
             keys.Remove(name);
             controls.Remove(name);
@@ -82,15 +232,103 @@ namespace MultyNetHack
         }
         public Component GetComponentOnLocation(Point point)
         {
-            foreach (string key in this.keys)
-            {
-                if (this.controls[key] & point)
-                    return GetComponentOnLocation(new Point(this.controls[key].x, this.controls[key].x) - point);
+            Point startEnd = GetStartEndEnter(point.x);
+            
+            for (int i = startEnd.x; i < startEnd.y; i++) {
+                if (sweep[i].enter == startEnd.enter)
+                {
+                    Component c = sweep[i].component;
+                    if (c & point)
+                        return c.GetComponentOnLocation(new Point(c.x, c.y) - point);
+                }
             }
             return this;
             
         }
-
+        public Point GetStartEndEnter(int xx)
+        {
+            int lb = 0, ub = sweep.Count;
+            Point startEnd = new Point(0, 0);
+            while (ub - lb > 1)
+            {
+                int mid = (lb + ub) / 2;
+                if (sweep[mid] < xx)
+                {
+                    lb = mid;
+                }
+                else if (sweep[mid] > xx)
+                {
+                    ub = mid;
+                }
+                else
+                {
+                    lb = ub = mid;
+                }
+            }
+            if (sweep.Count-lb < ub)
+            {
+                startEnd.x = ub;
+                startEnd.y = sweep.Count;
+                startEnd.enter = false;
+                return startEnd;
+            }
+            startEnd.x = 0;
+            startEnd.y = ub;
+            startEnd.enter = true;
+            return startEnd;
+        }
+        public Point GetStartEndEnter(int l, int r)
+        {
+            int lb = 0, ub = sweep.Count;
+            Point startEnd = new Point(0,0);
+            if (sweep.Count==0 || l <= sweep[0].x)
+            {
+                startEnd.x = 0;
+            }
+            else
+            {
+                while (ub - lb > 1)
+                {
+                    int mid = (lb + ub) / 2;
+                    if (sweep[mid] < l)
+                    {
+                        lb = mid;
+                    }
+                    else if (sweep[mid] > l)
+                    {
+                        ub = mid;
+                    }
+                    else
+                    {
+                        lb = ub = mid;
+                    }
+                }
+                startEnd.x = ub;
+                ub = sweep.Count;
+            }
+            while (ub - lb > 1)
+            {
+                int mid = (lb + ub) / 2;
+                if (sweep[mid] < r)
+                {
+                    lb = mid;
+                }
+                else if (sweep[mid] > r)
+                {
+                    ub = mid;
+                }
+                else
+                {
+                    lb = ub = mid;
+                }
+            }
+            //if(lb>0)
+            //    startEnd.y = lb;
+            //else
+            //    startEnd.y = Math.Min(sweep.Count-1,ub);
+            startEnd.y = Math.Min(sweep.Count-1, lb);
+            return startEnd;
+        }
         //check for intersection in two rooms
         public static bool operator &(Component one, Component two)
         {
@@ -104,12 +342,12 @@ namespace MultyNetHack
         }
         public static bool operator &(Component one, Point two)
         {
-            return (one.t>two.x &&one.b<two.x && one.l <two.y && one.r>two.y);
+            return (one.t>=two.y && one.b<=two.y && one.l <=two.x && one.r>=two.x);
         }
         public static bool operator &(Component one, Rectangle two)
         {
             return (one.l < two.r && one.r > two.l &&
-    one.t > two.b && one.b < two.t);
+                    one.t > two.b && one.b < two.t);
         }
         public static bool operator ==(Component one, Component two)
         {
@@ -131,50 +369,77 @@ namespace MultyNetHack
                 return false;
             }
         }
-        
+        public static Rectangle operator +(Component c, Point p)
+        {
+            return new Rectangle(c.t + p.y, c.r + p.x, c.b + p.y, c.l + p.x);
+        }
     }
     public class Room : Component
     {
         private int genStack;
+        private Random rand;
+
         public Room(string name) : base(name)
         {
             genStack = 0;
+            rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
         }
-        public void generatRandom()
+        public void GeneratRandom()
         {
+        START:;
             genStack++;
-            //Thread.Sleep(1);
-            Random rand = new Random(Convert.ToInt32(DateTime.Now.Ticks % Int32.MaxValue));
-            if (parent.width < 30 || parent.height < 30) throw new Exception("Can't make room in Component this small (min is 30*30)");
+            
             x = rand.Next(-500, 500);
             y = rand.Next(-500, 500);
-            width = rand.Next(5, 40);
-            height = rand.Next(5, 20);
-            l = x - width  /2 - width%2;
-            t = y + height /2 + height%2;
+            width = rand.Next(15, 40);
+            height = rand.Next(7, 20);
+            l = x - width  /2;
+            t = y + height /2;
             r = x + width  /2;
             b = y - height /2;
-
+            width = r - l;
+            height = t - b;
             madeOf = Material.Air;
             if (CollisionCheck(this) || width * height < 40)
-                if (genStack > 50)
+                if (genStack > 1000)
                 {
                     this.Dispose();
                 }
                 else
-                    this.generatRandom();
-            
+                    goto START;
+            else
+            {
+                parent.InsertInSweep(this);
+                GenerateWall();
+            }
         }
         public bool CollisionCheck(Room r)
         {
-            foreach(string key in r.parent.keys)
+            Point startEnd;
+            startEnd = parent.GetStartEndEnter(r.x);
+            // make it faster!!!
+            for  (int i = 0; i < parent.sweep.Count; i++)
             {
-                if (r == r.parent.controls[key])
-                    continue;
-                if (r & r.parent.controls[key])
+                if (parent.sweep[i].enter==startEnd.enter && parent.sweep[i].component & r)
                     return true;
             }
             return false;
+        }
+        public void GenerateWall()
+        {
+
+            HorisontalWall wT = new HorisontalWall("TopWall" + this.name, new Point(0, t - y), x - l, r - x);
+            HorisontalWall wB = new HorisontalWall("BottomWall" + this.name, new Point(0, b - y), x - l, r - x);
+            VerticalWall wL = new VerticalWall("LeftWall" + this.name,new Point(l - x, 0), t - y - 1, y - b);
+            VerticalWall wR = new VerticalWall("RightWall" + this.name,new Point(r - x - 1, 0), t - y - 1, y - b); 
+            this.Insert(wT);
+            this.Insert(wB);
+            this.Insert(wL);
+            this.Insert(wR);
+            this.InsertInSweep(wT);
+            this.InsertInSweep(wB);
+            this.InsertInSweep(wL);
+            this.InsertInSweep(wR);
         }
 
     }
@@ -239,11 +504,41 @@ namespace MultyNetHack
         }
 
     }
+    public class HorisontalWall : Component
+    {
+        public HorisontalWall(string name, Point centerLoc, int sizeLeft, int sizeRight) : base(name)
+        {
+            x = centerLoc.x;
+            y = centerLoc.y;
+            t = y;
+            b = y - 1;
+            l = -sizeLeft;
+            r = sizeRight;
+            madeOf = Material.HorisontalWall;
+            height = t - b;
+            width = r - l;
+        }
+    }
+    public class VerticalWall : Component
+    {
+        public VerticalWall(string name, Point location, int sizeUp, int sizeDown) : base(name)
+        {
+            x = location.x;
+            y = location.y;
+            l = x;
+            r = x + 1;
+            width = 1;
+            height = sizeUp + sizeDown;
+            t = sizeUp;
+            b = -sizeDown;
+            madeOf = Material.VerticalWall;
+        }
+    }
     public class Root : Component
     {
         public Root() : base("Root")
         {
-            madeOf = Material.Fire;
+            madeOf = Material.Darknes;
             width = int.MaxValue;
             height = int.MaxValue;
         }

@@ -86,7 +86,69 @@ namespace MultyNetHack
             updateTimer.Start();
             
         }
+        private void GenerateRooms(int n)
+        {
+#if DEBUG
+            long startTicks = DateTime.Now.Ticks;
+            long startTime = DateTime.Now.Ticks;
+            int startSec = DateTime.Now.Second + DateTime.Now.Minute*60;
+#endif
+            renderTimer.Interval = 200000;
+            Thread.Sleep(Convert.ToInt32(renderInterval * 2));
+            Console.Clear();
+            Console.WriteLine("GENERATING ROOMS w8 4 it!!!");
+            int maxLeft = 50;
+            Console.Write("|");
+            Console.CursorLeft = maxLeft;
+            Console.Write("|");
+            int genRooms = n;
+#if DEBUG
+            long afterDec = DateTime.Now.Ticks- startTime  , consLeft = 0, consWriteHashtag = 0, newRoom = 0, insertRoom = 0, genRoom = 0;
+#endif
+            for (int i = 0; i < genRooms; i++)
+            {
+#if DEBUG
+                startTime = DateTime.Now.Ticks;
+#endif
+                Console.CursorLeft = (int)(((float)i / genRooms) * (maxLeft - 1)) + 1;
+#if DEBUG
+                consLeft += (DateTime.Now.Ticks - startTime);
+                startTime = DateTime.Now.Ticks;
+#endif
+                Console.Write("#");
+#if DEBUG
+                consWriteHashtag += (DateTime.Now.Ticks - startTime);
+                startTime = DateTime.Now.Ticks;
+#endif
+                Room R = new Room("room" + gh + '.' + i);
+#if DEBUG
+                newRoom += (DateTime.Now.Ticks - startTime);
+                startTime = DateTime.Now.Ticks;
+#endif
+                root.Insert(R);
+#if DEBUG
+                insertRoom += (DateTime.Now.Ticks - startTime);
+                startTime = DateTime.Now.Ticks;
+#endif
+                R.GeneratRandom();
+#if DEBUG
+                genRoom += (DateTime.Now.Ticks - startTime);
+#endif
+            }
+            string s = "Added " + genRooms.ToString() + " new rooms\n";
+#if DEBUG
+            startTicks = DateTime.Now.Ticks - startTicks;
+            string debugL = "----DEBUG---- \n overallTicks: " + startTicks + " \n after declarations: " + afterDec + " \n console Left Comand: " + consLeft + " \n console Write #: " + consWriteHashtag + " \n new Room: " + newRoom + "  \n insert Room: " + insertRoom + " \n generate Room: " + genRoom + "\n";
+            s += debugL;
+            s += " Time taken: " + (DateTime.Now.Second + DateTime.Now.Minute*60 - startSec ) + "s \n ticks/s: " + startTicks / Math.Max(1, (DateTime.Now.Second + DateTime.Now.Minute*60 - startSec)) +"\n";
+#endif
+            Message.Enqueue(s);
 
+
+            renderTimer.Interval = renderInterval;
+            gh++;
+
+        }
         private void Init()
         {
 
@@ -118,18 +180,21 @@ namespace MultyNetHack
             texture.Add(Material.Path, '#');
             texture.Add(Material.Player, '@');
             texture.Add(Material.Trap, '.');
-            texture.Add(Material.Wall, '+');
+            texture.Add(Material.HorisontalWall, '-');
+            texture.Add(Material.VerticalWall, '|');
             texture.Add(Material.Watter, '}');
             texture.Add(Material.Darknes, ' ');
         }
-        private void ZbufferUpdate(Component comp, int parentTop, int parentLeft)
+        private void ZBufferUpdate(Component comp, int parentTop, int parentLeft)
         {
             
-            foreach (string s in comp.keys)
-                ZbufferUpdate(comp.controls[s], parentTop + comp.y, parentLeft + comp.x);    
-            if (comp & bounds)
-                FillBuffer(parentLeft + comp.l, parentTop + comp.t, comp.height, comp.width, comp.madeOf);
-
+            Point startEnd = comp.GetStartEndEnter(bounds.l -parentLeft - comp.x, bounds.r  -parentLeft - comp.x);
+            for (int i = startEnd.x; i <= startEnd.y; i++)
+            {
+                if (comp.sweep[i].component + new Point(parentLeft + comp.x, parentTop + comp.y) & bounds)
+                    ZBufferUpdate(comp.sweep[i].component, parentTop + comp.y, parentLeft + comp.x);
+            }
+            FillBuffer(parentLeft + comp.l, parentTop + comp.t, comp.height, comp.width, comp.madeOf);
         }
         private void FlushBuffer()
         {
@@ -139,7 +204,6 @@ namespace MultyNetHack
             
             foreach (List<char> c in buff1)
                 Console.WriteLine(c.ToArray());
-            //Console.MoveBufferArea(0, top, width, top, 0, 0);
             if (showHelp)
             {
                 if (Message.Count > 0)
@@ -148,7 +212,14 @@ namespace MultyNetHack
                     Console.WriteLine("New Message");
                     Console.WriteLine(new string('-', Console.WindowWidth));
                     Console.WriteLine();
-                    Console.WriteLine(Message.Peek());
+                    try
+                    {
+                        Console.WriteLine(Message.Peek());
+                    }
+                    catch
+                    {
+                        Console.WriteLine("w8");
+                    }
                     Console.WriteLine();
                     Console.WriteLine(new string('-', Console.WindowWidth));
                     Console.WriteLine();
@@ -158,7 +229,7 @@ namespace MultyNetHack
                 {
                     Console.WriteLine("Move h/j/k/l");
                     Console.WriteLine("Generate room g");
-                    Console.WriteLine("Curent Location:({0},{1})", center.x, center.y);
+                    Console.WriteLine("Curent Location:({0},{1}) and That location is ocupied by: {2}!", center.x, center.y, root.GetComponentOnLocation(center).name);
 
                     Console.WriteLine("There are {0} rooms!", root.keys.Count);
                     Console.WriteLine("Shown rooms {0} - {1}.", new object[2] { from, 20 + from, });
@@ -170,6 +241,9 @@ namespace MultyNetHack
                         Console.WriteLine("{0} is located ({1},{2}) - it's size is {3}x{4} - On The screen? {5} !", new object[] { c.name, c.x, c.y, c.width, c.height, c & bounds });
                     }
                 }
+            }else
+            {
+                Console.WriteLine("Press '?' for help");
             }
             renderTimer.Start();
         }
@@ -199,33 +273,10 @@ namespace MultyNetHack
             switch (c)
             {
                 case 'g':
-                    Room r = new Room("room" + gh);
-                    root.Insert(r);
-                    (root.controls["room" + gh] as Room).generatRandom();
-                    gh++;
-                    Message.Enqueue("Added 1 new Room at the location " + r.x + "," + r.y);
+                    GenerateRooms(1);
                     break;
                 case 'G':
-                    renderTimer.Interval = 20000;
-                    Thread.Sleep(Convert.ToInt32( renderInterval*2));
-                    Console.Clear();
-                    Console.WriteLine("GENERATING ROOMS w8 4 it!!!");
-                    int maxLeft = 10;
-                    Console.Write("|");
-                    Console.CursorLeft = maxLeft;
-                    Console.Write("|");
-                    int genRooms = 1000; ;
-                    for (int i = 0; i < genRooms; i++)
-                    {
-                        Console.CursorLeft = (int)(((float)i / genRooms) * (maxLeft-1)) + 1;
-                        Console.Write("#");
-                        Room R = new Room("room" + gh + '.' + i);
-                        root.Insert(R);
-                        (root.controls["room" + gh + '.' + i] as Room).generatRandom();
-                    }
-                    Message.Enqueue("Added " + genRooms + " new rooms");
-                    renderTimer.Interval = renderInterval;
-                    gh++;
+                    GenerateRooms(1000);
                     break;
                 case 'h':
                     center.x -= 1;
@@ -289,7 +340,7 @@ namespace MultyNetHack
                     updated[i].AddRange(updated[0]);
                 }
             }
-            ZbufferUpdate(root, 0, 0);
+            ZBufferUpdate(root, 0, 0);
             FillBuffer(bounds.l, bounds.t, SceenSize.height, SceenSize.width, root.madeOf);
             FlushBuffer();
         }
