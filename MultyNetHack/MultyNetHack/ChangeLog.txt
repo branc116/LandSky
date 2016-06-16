@@ -1,6 +1,9 @@
 ﻿MultyNetHack
 
-
+--16.6.2016--
+	Added walls when generating rooms
+	Made it a lot faster to render all of the rooms
+	Fixed recursive rendering (Now one can display room inside of a room inside of a room...)
 
 --12.6.2016.--
 	Added message qeueing
