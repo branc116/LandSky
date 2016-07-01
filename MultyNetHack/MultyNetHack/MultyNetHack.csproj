@@ -62,14 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Componets.cs" />
-    <Compile Include="Controls.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Math.cs" />
-    <Compile Include="PrintStuff.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TempConsole.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

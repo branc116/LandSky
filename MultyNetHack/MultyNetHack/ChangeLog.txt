@@ -1,13 +1,5 @@
 ﻿MultyNetHack
 
---01.7.2016--
-	Added path generation
-	Reworked text drawing system
-	Generalize keymaping
-	Better colison detection
-	Now when one starts the game, all controls and functions are displyed
-	Now cmd adjusts Widnow width and height
-
 --16.6.2016--
 	Added walls when generating rooms
 	Made it a lot faster to render all of the rooms

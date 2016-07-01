@@ -8,10 +8,23 @@ using System.Threading;
 
 namespace MultyNetHack
 {
-    
+    public enum Material
+    {
+        Path,
+        HorisontalWall,
+        VerticalWall,
+        Trap,
+        Player,
+        Npc,
+        Loot,
+        Watter,
+        Fire,  
+        Air,
+        Darknes
+    }
 
     public abstract class Component {
-        public int x, y, z;
+        public int x, y;
         public int l, r, t, b;
         public Dictionary<string, Component> controls;
         public List<string> keys;
@@ -20,7 +33,6 @@ namespace MultyNetHack
         public Component parent;
         public Material madeOf;
         public string name;
-        public int numOfRooms, numOfWalls, numOfPaths;
 
         public Component(string name)
         {
@@ -126,21 +138,7 @@ namespace MultyNetHack
             if (c.name == null) throw new Exception("Component must have a name");
             this.keys.Add(c.name);
             this.controls.Add(c.name, c);
-            switch (c.GetType().ToString())
-            {
-                case "MultyNetHack.Room":
-                    numOfRooms++;
-                    break;
-                case "MultyNetHack.Path":
-                    numOfPaths++;
-                    break;
-                case "MultyNetHack.HorisontalWall":
-                    numOfWalls++;
-                    break;
-                case "MultyNetHack.VerticalWall":
-                    numOfWalls++;
-                    break;
-            }
+
 
             if (c.parent != null)
             {
@@ -234,7 +232,7 @@ namespace MultyNetHack
         }
         public Component GetComponentOnLocation(Point point)
         {
-            Point startEnd = GetStartEndEnter(point.x +1);
+            Point startEnd = GetStartEndEnter(point.x);
             
             for (int i = startEnd.x; i < startEnd.y; i++) {
                 if (sweep[i].enter == startEnd.enter)
@@ -244,17 +242,8 @@ namespace MultyNetHack
                         return c.GetComponentOnLocation(new Point(c.x, c.y) - point);
                 }
             }
-            Component solution = this;
-            controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
-              {
-                  Path p = i.Value as Path;
-                  int delta = Convert.ToInt32(Math.Abs(point.y - p.Poly.ValueForX(point.x)));
-                  int range = Convert.ToInt32(2 + Math.Abs(p.Poly.DerivativeForX(point.x)));
-                  if (delta <= range)
-                      solution = p;
-                   
-              });
-            return solution;
+            return this;
+            
         }
         public Point GetStartEndEnter(int xx)
         {
@@ -267,17 +256,15 @@ namespace MultyNetHack
                 {
                     lb = mid;
                 }
-                else if (sweep[mid] >= xx)
+                else if (sweep[mid] > xx)
                 {
                     ub = mid;
                 }
                 else
                 {
                     lb = ub = mid;
-                    ub++;
                 }
             }
-
             if (sweep.Count-lb < ub)
             {
                 startEnd.x = ub;
@@ -355,7 +342,7 @@ namespace MultyNetHack
         }
         public static bool operator &(Component one, Point two)
         {
-            return (one.t>=two.y && one.b<two.y && one.l <=two.x && one.r>two.x);
+            return (one.t>=two.y && one.b<=two.y && one.l <=two.x && one.r>=two.x);
         }
         public static bool operator &(Component one, Rectangle two)
         {
@@ -413,7 +400,6 @@ namespace MultyNetHack
             width = r - l;
             height = t - b;
             madeOf = Material.Air;
-            z = parent.z + 2;
             if (CollisionCheck(this) || width * height < 40)
                 if (genStack > 1000)
                 {
@@ -443,13 +429,9 @@ namespace MultyNetHack
         {
 
             HorisontalWall wT = new HorisontalWall("TopWall" + this.name, new Point(0, t - y), x - l, r - x);
-            HorisontalWall wB = new HorisontalWall("BottomWall" + this.name, new Point(0, b - y + 1), x - l, r - x);
-            VerticalWall wL = new VerticalWall("LeftWall" + this.name,new Point(l - x , 0), t - y - 1, y - b -1);
-            VerticalWall wR = new VerticalWall("RightWall" + this.name,new Point(r - x - 1, 0), t - y - 1, y - b);
-            wT.z = z + 1;
-            wB.z = z + 1;
-            wL.z = z + 1;
-            wR.z = z + 1;
+            HorisontalWall wB = new HorisontalWall("BottomWall" + this.name, new Point(0, b - y), x - l, r - x);
+            VerticalWall wL = new VerticalWall("LeftWall" + this.name,new Point(l - x, 0), t - y - 1, y - b);
+            VerticalWall wR = new VerticalWall("RightWall" + this.name,new Point(r - x - 1, 0), t - y - 1, y - b); 
             this.Insert(wT);
             this.Insert(wB);
             this.Insert(wL);
@@ -556,64 +538,10 @@ namespace MultyNetHack
     {
         public Root() : base("Root")
         {
-            numOfPaths = numOfRooms = 0;
-            z = 0;
             madeOf = Material.Darknes;
             width = int.MaxValue;
             height = int.MaxValue;
         }
-    }
-    public class Path : Component
-    {
-        Random rnd;
-        public LinearInterpolator Poly;
-        public List<Component> ConnectedComponent;
-        
-        public Path(string name):base(name)
-        {
-            rnd = new Random(DateTime.Now.Millisecond + (1 + DateTime.Now.Second) * 1009 + (1 + DateTime.Now.Minute) * 62761 + (1 + DateTime.Now.Hour) * 3832999);
-            ConnectedComponent = new List<Component>();
-            Poly = new LinearInterpolator();
-        }
-
-        public void generatePathThrueLocations(List<Point> Points)
-        {
-            Poly.Interpolate(Points, KindOfMonom.Line);
-        }
-
-        public void generatePathThrueRandomChildren(Component c)
-        {
-            if (c.controls.Count < 3) throw new Exception("You can't generate path in component that has less then 3 children... sorry :(");
-            int n = Math.Min(25, rnd.Next(c.controls.Count/25 , c.controls.Count));
-            List<Point> Points = new List<Point>(n+1);
-            int counter = 0;
-            while (n!=0 && counter < c.controls.Count * 3 && Points.Count < 10)
-            {
-                counter++;
-                int index = rnd.Next(0, c.controls.Count);
-                if (c.controls[c.keys[index]].GetType() == typeof(Room))
-                {
-                    Point candidat = new Point(c.controls[c.keys[index]].x, c.controls[c.keys[index]].y);
-                    if (!Points.Contains(candidat) && !CanFindTheSameX(Points, candidat))
-                    {
-                        n--;
-                        Points.Add(candidat);
-                        ConnectedComponent.Add(c.controls[c.keys[index]]);
-                    }
-                }
-            }
-            generatePathThrueLocations(Points);
-        }
-        protected bool CanFindTheSameX(List<Point> Points, Point point)
-        {
-            foreach(Point p in Points)
-            {
-                if (Math.Abs(p.x - point.x) == 0 || Math.Abs((p.y - point.y) / (p.x - point.x)) > 2)
-                    return true;
-            }
-            return false;
-        }
-
     }
     
 }
