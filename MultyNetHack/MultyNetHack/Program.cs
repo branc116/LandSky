@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 namespace MultyNetHack
 {
     class Program
