@@ -1,6 +1,6 @@
 ﻿MultyNetHack
 
---31.7.2016--
+--31.7.2016-- 
 	Generalization of differnt screens
 	Added better support for command decoding
 	Added a lot of commants in the code
