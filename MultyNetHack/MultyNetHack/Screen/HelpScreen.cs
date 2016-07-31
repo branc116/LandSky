@@ -28,4 +28,4 @@ namespace MultyNetHack.Screen
             //}
         }
     }
-}
+} 

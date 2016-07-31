@@ -9,7 +9,7 @@ namespace MultyNetHack.Screen
     /// <summary>
     /// This shuld show all debug info (not implemented yet)
     /// </summary>
-    class DebugScreen : BaseScreen
+    class DebugScreen : BaseScreen 
     {
         public DebugScreen(int Top, int Left) : base (Top, Left, "Debug")
         {

@@ -83,7 +83,7 @@ namespace MultyNetHack.Screen
             {
                 return Height;
             }
-        }
+        } 
         /// <summary>
         /// Wanted Width of the screen
         /// </summary>

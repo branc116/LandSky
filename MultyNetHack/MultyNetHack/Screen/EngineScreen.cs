@@ -42,7 +42,7 @@ namespace MultyNetHack.Screen
             }
         }
         
-        bool ghost;
+        bool ghost; 
         int speed;
         /// <summary>
         /// Create new Engine Screen
