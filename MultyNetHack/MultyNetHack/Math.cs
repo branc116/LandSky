@@ -484,4 +484,4 @@ namespace MultyNetHack
             return soluton;
         }
     }
-}
+} 
