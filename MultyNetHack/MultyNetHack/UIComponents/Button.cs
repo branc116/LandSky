@@ -13,7 +13,7 @@ namespace MultyNetHack.UIComponents
     /// <summary>
     /// Ui element button
     /// </summary>
-    class Button
+    class Button 
     {
         public Comands InvokeCommand;
         public event EventHandler<DateTime> OnPress;
