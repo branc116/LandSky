@@ -4,8 +4,6 @@
 
 MultyNetHack project is an attempt at building multiplayer version of the clasic game Nethack.
 
-[![Build Status](https://travis-ci.org/branc116/MultyNetHack.svg?branch=master)](https://travis-ci.org/branc116/MultyNetHack)
-
 #### Goal include:
 * ***It shuld be multiplayer***
 * ***It shuld be sandbox***
