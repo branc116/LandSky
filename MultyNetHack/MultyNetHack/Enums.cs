@@ -126,4 +126,4 @@ namespace MultyNetHack
         Paused,
         Disposed
     }
-}
+} 
