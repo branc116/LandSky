@@ -8,7 +8,9 @@ using System.Threading;
 
 namespace MultyNetHack.Commands
 {
-
+    /// <summary>
+    /// Command for generating rooms
+    /// </summary>
     class GenerateRoomsCommand : BaseCommand
     {
 
