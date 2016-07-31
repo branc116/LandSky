@@ -20,10 +20,12 @@ Reason for this is that is easier for new developers to get into.I choose C#.
  * Just install [Visual studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx) 
  * open MultyNetHack/MultyNetHack.sln  
  * Build and/or start hacking
+ * Start it inside Visual studio or run MultyNetHack/MultyNetHack/bin/Debug/MultyNetHack.exe
 * ***Linux and OS X (Maybe, maybe most likely will not work, but I'll try to make it work)***
  * Hack with your favorite C# IDE
  * Install [Mono](http://www.mono-project.com/download/)
  * \>xbuild MultyNetHack/MultyNetHack.sln
+ * \>mono MultyNetHack/MultyNetHack/bin/Debug/MultyNetHack.exe
 
 #### Design decisions
 Here are some of the design decisions:
