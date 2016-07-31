@@ -7,10 +7,8 @@ using static System.Math;
 namespace MultyNetHack
 {
     /// <summary>
-    /// What Kinde of monom are you working whith
+    /// This is monom just like in math
     /// </summary>
-   
-
     public class Monom
     {
         KindOfMonom monom;
@@ -172,6 +170,9 @@ namespace MultyNetHack
             }
         }
     }
+    /// <summary>
+    /// Rectangle class
+    /// </summary>
     public class Rectangle
     {
 
@@ -232,6 +233,9 @@ namespace MultyNetHack
                     one.t > two.b && one.b < two.t);
         }
     }
+    /// <summary>
+    /// Point class
+    /// </summary>
     public class Point
     {
         public int x, y;
@@ -252,6 +256,9 @@ namespace MultyNetHack
             return new Point(b.x - a.x, b.y - a.y);
         }
     }
+    /// <summary>
+    /// Size class
+    /// </summary>
     public class Size
     {
         public int height, width;
@@ -262,6 +269,9 @@ namespace MultyNetHack
         }
         
     }
+    /// <summary>
+    /// Used for interpolating polinonm that in on a list of points
+    /// </summary>
     public class LinearInterpolator
     {
         List<Monom> Polinom;

@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Threading;
+using System.Web.Script.Serialization;
 
 namespace MultyNetHack
 {
     
-
+    /// <summary>
+    /// Eveyithing shuld be extened from this
+    /// </summary>
     public abstract class Component {
         public int x, y, z;
         public int l, r, t, b;
@@ -21,12 +24,14 @@ namespace MultyNetHack
         public Material madeOf;
         public string name;
         public int numOfRooms, numOfWalls, numOfPaths;
-
+        public bool isPassable;
+        private Random mRand;
         public Component(string name)
         {
             controls = new Dictionary<string, Component>();
             keys = new List<string>();
             sweep = new List<Sweep>();
+            mRand = new Random();
             this.name = name;
 
         }
@@ -109,6 +114,15 @@ namespace MultyNetHack
             {
                 return a.component != b;
             }
+            public override bool Equals(object obj)
+            {
+                return base.Equals(obj);
+            }
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+
         }
 
 
@@ -342,7 +356,121 @@ namespace MultyNetHack
             startEnd.y = Math.Min(sweep.Count-1, lb);
             return startEnd;
         }
+
+        public async Task GenerateRandomPaths(int n, List<string> names)
+        {
+            List<Path> mRange = new List<Path>();
+            Task[] mTasks = new Task[n];
+            int i = 0;
+            foreach(string name in names)
+            {
+                mTasks[i] = Task.Run(() =>
+                {
+                    Path mP = new Path(name);
+                    mP.generatePathThrueRandomChildren(this);
+                    mRange.Add(mP);
+                });
+                i++;
+            }
+            Task.WaitAll(mTasks);
+            foreach (Task mTask in mTasks)
+            {
+                await mTask;
+            }
+            foreach (Path mPath in mRange)
+            {
+                this.Insert(mPath);
+            }
+            
+        }
+        public async Task GenerateRandomPaths(int n)
+        {
+            List<string> names = new List<string>();
+            for(int i = 0; i < n; i++)
+            {
+                names.Add(string.Format("Room{0}-{1}", i, Guid.NewGuid().ToString().Substring(0, 7)));
+            }
+            await GenerateRandomPaths(n, names);
+        }
+        public async Task GenerateRandomRooms(int n, List<string> names)
+        {
+            Task[] mTasks = new Task[4];
+            List<List<Component>> mQuad = new List<List<Component>>();
+            Quadrant[] quads = new Quadrant[4] { Quadrant.First, Quadrant.Second, Quadrant.Third, Quadrant.Fourth };
+            int i = 0;
+            int pool = 0;
+            int mN = n / 4;
+            int made=0;
+            foreach (Quadrant mQ in quads) {
+                mTasks[i] = Task.Run(() => {
+                    int id = pool++;
+                    if (n % 4 > 0)
+                    {
+                        mN++;
+                        n--;
+                    }
+                    List<Component> mRooms = new List<Component>();
+                    for(int j = 0; j < mN; j++)
+                    {
+                        int breakint = 0;
+                        Room mR = new Room(string.Format("{0}-{1}-{2}", names[j], j, quads[id]));
+                        START:;
+                        breakint++;
+                        mR.GenerateRandom(quads[id], 500);
+                        if (!mCheckCollision(mRooms, mR) && !mCheckCollision(this.controls, mR) && breakint<100)
+                            goto START;
+                        mR.GenerateWall();
+                        made++;
+                        mRooms.Add(mR);
+                    }
+                    mQuad.Add(mRooms);
+                });
+                i++;
+            }
+            Task.WaitAll(mTasks);
+            i = 0;
+            foreach(List<Component> mComps in mQuad)
+            {
+                await mTasks[0];
+                foreach(Room mRoom in mComps)
+                {
+                    this.Insert(mRoom);
+                    this.InsertInSweep(mRoom);
+                }
+            }
+            
+        }
+        public async Task GenerateRandomRooms(int n)
+        {
+            List<string> mNames = new List<string>();
+            for (int i = 0; i < n; i++)
+            {
+                mNames.Add(string.Format("Room-{0}", Guid.NewGuid().ToString().Substring(0, 7)));
+            }
+            await GenerateRandomRooms(n, mNames);
+        }
+
+        private bool mCheckCollision(List<Component> Components, Component NewComponent)
+        {
+            foreach(Component mComponent in Components)
+            {
+                if (mComponent.GetType() != typeof(Path) && mComponent & NewComponent)
+                    return true;
+            }
+            return false;
+        }
+        private bool mCheckCollision(Dictionary<string, Component> Components, Component NewComponent)
+        {
+            bool returnValue = false;
+            Components.ToList().ForEach((i) =>
+            {
+                if (i.Value.GetType() != typeof(Path) && i.Value & NewComponent)
+                    returnValue = true;
+            });
+            return returnValue;
+        }
         //check for intersection in two rooms
+        
         public static bool operator &(Component one, Component two)
         {
             return (one.l <= two.r && one.r >= two.l &&
@@ -386,7 +514,18 @@ namespace MultyNetHack
         {
             return new Rectangle(c.t + p.y, c.r + p.x, c.b + p.y, c.l + p.x);
         }
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
+    /// <summary>
+    /// Passable area
+    /// </summary>
     public class Room : Component
     {
         private int genStack;
@@ -396,6 +535,9 @@ namespace MultyNetHack
         {
             genStack = 0;
             rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
+            isPassable = true;
+            sweep = new List<Sweep>();
+            controls = new Dictionary<string, Component>();
         }
         public void GeneratRandom()
         {
@@ -426,6 +568,40 @@ namespace MultyNetHack
                 parent.InsertInSweep(this);
                 GenerateWall();
             }
+        }
+        public void GenerateRandom(int top, int left, int bottom, int right)
+        {
+            if (top < bottom)
+            {
+                int temp = top; top = bottom; bottom = temp;
+            }
+            if (right < left)
+            {
+                int temp = left; left = right; right = left;
+            }
+
+            x = rand.Next(left, right);
+            y = rand.Next(bottom, top);
+            width = rand.Next(15, 40);
+            height = rand.Next(7, 20);
+            l = x - width / 2;
+            t = y + height / 2;
+            r = x + width / 2;
+            b = y - height / 2;
+            width = r - l;
+            height = t - b;
+            madeOf = Material.Air;    
+        }
+        public void GenerateRandom(Quadrant quadrant, int bound)
+        {
+            if (quadrant == Quadrant.First)
+                GenerateRandom(bound, bound, 0, 0);
+            else if(quadrant == Quadrant.Second)
+                GenerateRandom(bound, 0,0, -bound);
+            else if (quadrant == Quadrant.Second)
+                GenerateRandom(0, 0,-bound, -bound);
+            else if (quadrant == Quadrant.Second)
+                GenerateRandom(0, bound, -bound, 0);
         }
         public bool CollisionCheck(Room r)
         {
@@ -461,6 +637,9 @@ namespace MultyNetHack
         }
 
     }
+    /// <summary>
+    /// Player with the location and texture
+    /// </summary>
     public class Player : Component
     {
         
@@ -520,12 +699,23 @@ namespace MultyNetHack
         {
             return !(a == b);
         }
-
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
+    /// <summary>
+    /// Unpassable wall
+    /// </summary>
     public class HorisontalWall : Component
     {
         public HorisontalWall(string name, Point centerLoc, int sizeLeft, int sizeRight) : base(name)
         {
+            isPassable = false;
             x = centerLoc.x;
             y = centerLoc.y;
             t = y;
@@ -537,10 +727,14 @@ namespace MultyNetHack
             width = r - l;
         }
     }
+    /// <summary>
+    /// Unpassable wall
+    /// </summary>
     public class VerticalWall : Component
     {
         public VerticalWall(string name, Point location, int sizeUp, int sizeDown) : base(name)
         {
+            isPassable = false;
             x = location.x;
             y = location.y;
             l = x;
@@ -552,17 +746,30 @@ namespace MultyNetHack
             madeOf = Material.VerticalWall;
         }
     }
+    /// <summary>
+    /// Don't use!!!
+    /// </summary>
     public class Root : Component
     {
         public Root() : base("Root")
         {
+            isPassable = false;
             numOfPaths = numOfRooms = 0;
             z = 0;
             madeOf = Material.Darknes;
             width = int.MaxValue;
             height = int.MaxValue;
+
+        }
+
+        public string GimeJson()
+        {
+            return new JavaScriptSerializer().Serialize(this);
         }
     }
+    /// <summary>
+    /// Passable object that connects diferent rooms
+    /// </summary>
     public class Path : Component
     {
         Random rnd;
@@ -574,6 +781,7 @@ namespace MultyNetHack
             rnd = new Random(DateTime.Now.Millisecond + (1 + DateTime.Now.Second) * 1009 + (1 + DateTime.Now.Minute) * 62761 + (1 + DateTime.Now.Hour) * 3832999);
             ConnectedComponent = new List<Component>();
             Poly = new LinearInterpolator();
+            isPassable = true;
         }
 
         public void generatePathThrueLocations(List<Point> Points)

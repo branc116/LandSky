@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MultyNetHack
 {
+    /// <summary>
+    /// All supported commands
+    /// </summary>
     public enum Comands
     {
         Left,
@@ -18,13 +21,29 @@ namespace MultyNetHack
         TenStepsDown,
         ScrollLeft,
         ScrollRight,
-        TabLeft,
-        TabRight,
+        LeftScene,
+        RightScene,
         GenerateOneRoom,
         GenerateALotOfRooms,
         GenerateRandomPath,
-        DequeMessage
+        DequeMessage,
+        ShowMessages,
+        ShowDebug,
+        ShowHelp,
+        LastSceen,
+        Option1,
+        Option2,
+        Option3,
+        Option4,
+        Option5,
+        Option6,
+        Option7,
+        Option8,
+        Option9
     }
+    /// <summary>
+    /// All supported monoms
+    /// </summary>
     public enum KindOfMonom
     {
         /// <summary>
@@ -37,6 +56,9 @@ namespace MultyNetHack
         Sine,
         Constant
     }
+    /// <summary>
+    /// All supported material that can be displayed
+    /// </summary>
     public enum Material
     {
         Path,
@@ -51,14 +73,57 @@ namespace MultyNetHack
         Air,
         Darknes
     }
-    enum TextShown
+    /// <summary>
+    /// All of differtent game screens that can be displayed
+    /// </summary>
+    public enum GameSceens
     {
+        Game
+    }
+    /// <summary>
+    /// Different menu screens that can be displayd
+    /// </summary>
+    public enum MenuSceens
+    {
+        MainMenu,
         Help,
+        KeyMap,
         ListRooms,
         ListPaths,
         Message,
-        Debug,
-        Nothing,
-        Max
+        Debug
+    }
+    /// <summary>
+    /// Directions the player can move
+    /// </summary>
+    public enum MoveDirection
+    {
+        Up,
+        UpRight,
+        Right,
+        DownRight,
+        Down,
+        DownLeft,
+        Left,
+        UpLeft   
+    }
+    /// <summary>
+    /// Cartesian coordinate system quadrants
+    /// </summary>
+    public enum Quadrant
+    {
+        First,
+        Second,
+        Third,
+        Fourth
+    }
+    /// <summary>
+    /// Supported states of the screen
+    /// </summary>
+    public enum ScreenState
+    {
+        Active,
+        Paused,
+        Disposed
     }
 }
