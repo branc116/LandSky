@@ -15,13 +15,13 @@ Reason for this is that is easier for new developers to get into.I choose C#.
 #### Get started:
 * \>git clone https://github.com/branc116/MultyNetHack
 * ***Windows***: 
-* * Just install [Visual studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx) 
-* * open MultyNetHack/MultyNetHack.sln  
-* * Build and/or start hacking
+ * Just install [Visual studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx) 
+ * open MultyNetHack/MultyNetHack.sln  
+ * Build and/or start hacking
 * ***Linux and OS X (Maybe, maybe most likely will not work, but I'll try to make it work)***
-* * Hack with your favorite C# IDE
-* * Install [Mono](http://www.mono-project.com/download/)
-* * \>xbuild MultyNetHack/MultyNetHack.sln
+ * Hack with your favorite C# IDE
+ * Install [Mono](http://www.mono-project.com/download/)
+ * \>xbuild MultyNetHack/MultyNetHack.sln
 
 #### Design decisions
 Here are some of the design decisions:
