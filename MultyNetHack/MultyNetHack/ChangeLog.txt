@@ -1,12 +1,18 @@
 ﻿MultyNetHack
 
+--31.7.2016-- 
+	Generalization of differnt screens
+	Added better support for command decoding
+	Added a lot of commants in the code
+	Added Ui components
+
 --01.7.2016--
 	Added path generation
 	Reworked text drawing system
 	Generalize keymaping
 	Better colison detection
 	Now when one starts the game, all controls and functions are displyed
-	Now cmd adjusts Widnow width and height
+	Now cmd adjusts Window width and height
 
 --16.6.2016--
 	Added walls when generating rooms
