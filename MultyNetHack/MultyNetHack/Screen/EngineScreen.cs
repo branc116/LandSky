@@ -28,7 +28,7 @@ namespace MultyNetHack.Screen
         Dictionary<Material, char> texture;
         public event EventHandler<string> Message;
         /// <summary>
-        /// Invoke this when update in the game happends( Played move, npc move...)
+        /// Invoke this when update in the game happens( Played move, npc move...)
         /// </summary>
         public event EventHandler<int> Draw;
         /// <summary>
@@ -47,9 +47,9 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Create new Engine Screen
         /// </summary>
-        /// <param name="Top">Distance from the top of the global console</param>
-        /// <param name="Left">Distance form the left of the global console</param>
-        public EngineSceen(int Top, int Left) : base(Top, Left, "Multy Net Hack")
+        /// <param Name="Top">Distance from the top of the global console</param>
+        /// <param Name="Left">Distance form the left of the global console</param>
+        public EngineSceen(int Top, int Left) : base(Top, Left, "MultyNetHack")
         {
             InitProperties();
             InitBuffer();
@@ -89,7 +89,7 @@ namespace MultyNetHack.Screen
             texture.Add(Material.Trap, '.');
             texture.Add(Material.HorisontalWall, '-');
             texture.Add(Material.VerticalWall, '|');
-            texture.Add(Material.Watter, '}');
+            texture.Add(Material.Water, '}');
             texture.Add(Material.Darknes, ' ');
         }
         private void InitControls()
@@ -119,6 +119,7 @@ namespace MultyNetHack.Screen
             buff1 = new List<List<char>>();
             updated = new List<List<int>>();
             mLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
+            MadeOf = Material.Darknes;
             ghost = true;
             speed = 50; // steep = 1/speed
 
@@ -139,7 +140,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Generate new rooms in this instance of the game
         /// </summary>
-        /// <param name="bc">This shuld be typeof(GenerateRoomsCommand) </param>
+        /// <param Name="bc">This should be typeof(GenerateRoomsCommand) </param>
         private async void GenerateRooms(BaseCommand bc)
         {
             GenerateRoomsCommand gRC = bc as GenerateRoomsCommand;
@@ -156,14 +157,14 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Generate new paths in this instance of the game
         /// </summary>
-        /// <param name="bc">This shuld be typeof(GeneratePathCommand) </param>
+        /// <param Name="bc">This should be typeof(GeneratePathCommand) </param>
         private async void GeneratePath(BaseCommand bc)
         {
-            if (this.numOfRooms < 10)
+            if (this.NumOfRooms < 10)
                 await Task.Run(()=> { GenerateRooms(new GenerateRoomsCommand(100)); });
             for (int i = 0; i < (bc as GeneratePathCommand).NumberOfPaths; i++)
             {
-                Path p = new Path("Path" + this.numOfPaths);
+                Path p = new Path("Path" + this.NumOfPaths);
                 p.generatePathThrueRandomChildren(this);
                 this.Insert(p);
             }
@@ -172,7 +173,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Move played in current game instance
         /// </summary>
-        /// <param name="bc">this shuld be typeof(MoveCommand) </param>
+        /// <param Name="bc">this should be typeof(MoveCommand) </param>
         private void GeneralMove(BaseCommand bc)
         {
             MoveCommand move = bc as MoveCommand;
@@ -184,7 +185,7 @@ namespace MultyNetHack.Screen
                 {
                     if (move.Direction == MoveDirection.Down || move.Direction == MoveDirection.DownLeft || move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.x, this.y - 1).isPassable || ghost)
+                        if (this.GetComponentOnLocation(this.x, this.y - 1).IsPassable || ghost)
                         {
                             this.y--;
                             mSteps--;
@@ -192,7 +193,7 @@ namespace MultyNetHack.Screen
                     }
                     if (move.Direction == MoveDirection.Up || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.UpRight)
                     {
-                        if (this.GetComponentOnLocation(this.x, this.y + 1).isPassable || ghost)
+                        if (this.GetComponentOnLocation(this.x, this.y + 1).IsPassable || ghost)
                         {
                             this.y++;
                             mSteps--;
@@ -200,7 +201,7 @@ namespace MultyNetHack.Screen
                     }
                     if (move.Direction == MoveDirection.Left || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.DownLeft)
                     {
-                        if (this.GetComponentOnLocation(this.x + 1, this.y).isPassable || ghost)
+                        if (this.GetComponentOnLocation(this.x + 1, this.y).IsPassable || ghost)
                         {
                             this.x--;
                             mSteps--;
@@ -208,7 +209,7 @@ namespace MultyNetHack.Screen
                     }
                     if (move.Direction == MoveDirection.Right || move.Direction == MoveDirection.UpRight || move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.x - 1, this.y).isPassable || ghost)
+                        if (this.GetComponentOnLocation(this.x - 1, this.y).IsPassable || ghost)
                         {
                             this.x++;
                             mSteps--;
@@ -249,7 +250,7 @@ namespace MultyNetHack.Screen
                 FillBuffer(this.x, this.y, 1, 1, Material.Player, 15);
                 DrawPaths();
                 ZBufferUpdate(this, 0, 0);
-                FillBuffer(bounds.l, bounds.t, TrueHeight, TrueWidth, this.madeOf, 0);
+                FillBuffer(bounds.l, bounds.t, TrueHeight, TrueWidth, this.MadeOf, 0);
                 FlushBuffer();
                 FooterString = string.Format("({0},{1})", this.x, this.y);
                 Flush();
@@ -259,13 +260,13 @@ namespace MultyNetHack.Screen
         private void ZBufferUpdate(Component comp, int parentTop, int parentLeft)
         {
 
-            Point startEnd = comp.GetStartEndEnter(l - parentLeft - comp.x, r - parentLeft - comp.x);
+            Point startEnd = comp.GetStartEndEnter(LeftBound - parentLeft - comp.x, RightBound - parentLeft - comp.x);
             for (int i = startEnd.x; i <= startEnd.y; i++)
             {
                 if ((this as Component) & comp.sweep[i].component + new Point(parentLeft + comp.x, parentTop + comp.y))
                     ZBufferUpdate(comp.sweep[i].component, parentTop + comp.y, parentLeft + comp.x);
             }
-            FillBuffer(parentLeft + comp.l, parentTop + comp.t, comp.height, comp.width, comp.madeOf, comp.z);
+            FillBuffer(parentLeft + comp.LeftBound, parentTop + comp.TopBound, comp.Height, comp.Width, comp.MadeOf, comp.z);
 
         }
         private void FillBuffer(int x, int y, int h, int w, Material m, int zLevle)
@@ -295,12 +296,12 @@ namespace MultyNetHack.Screen
         }
         private void DrawPaths()
         {
-            this.controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
+            this.Controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
             {
                 LinearInterpolator pol = (i.Value as Path).Poly;
                 for (int j = bounds.l; j < bounds.r; j++)
                 {
-                    FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.madeOf, i.Value.z);
+                    FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.MadeOf, i.Value.z);
                 }
             });
         }

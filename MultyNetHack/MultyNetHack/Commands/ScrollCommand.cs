@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MultyNetHack.Commands
 {
     /// <summary>
-    /// Command for scrooling body part of the screen
+    /// Command for scrolling body part of the screen
     /// </summary>
     class ScrollCommand : BaseCommand
     {

@@ -9,7 +9,7 @@ using MultyNetHack.Commands;
 namespace MultyNetHack.Screen
 {
     /// <summary>
-    /// Screen showing all the optins. Extends BaseScreen
+    /// Screen showing all the options. Extends BaseScreen
     /// </summary>
     public class MainMenuScreen : BaseScreen
     {
@@ -21,8 +21,8 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Create new Main Menu Screen
         /// </summary>
-        /// <param name="Top">Distance from the top of the global console</param>
-        /// <param name="Left">Distance form the left of the global console</param>
+        /// <param Name="Top">Distance from the top of the global console</param>
+        /// <param Name="Left">Distance form the left of the global console</param>
         public MainMenuScreen(int Top,int Left) : base(Top, Left, "Main menu")
         {
             InitGlobals();
@@ -70,8 +70,8 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Start new instance of the game
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void StartLocal_OnPress(object sender, DateTime e)
         {
             this.Pause();

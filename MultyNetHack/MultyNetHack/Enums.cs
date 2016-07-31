@@ -47,11 +47,11 @@ namespace MultyNetHack
     public enum KindOfMonom
     {
         /// <summary>
-        /// a*x^b
+        /// a*x^BottomBound
         /// </summary>
         Line,
         /// <summary>
-        /// a*Sin(b*x)
+        /// a*Sin(BottomBound*x)
         /// </summary>
         Sine,
         Constant
@@ -68,20 +68,20 @@ namespace MultyNetHack
         Player,
         Npc,
         Loot,
-        Watter,
+        Water,
         Fire,
         Air,
         Darknes
     }
     /// <summary>
-    /// All of differtent game screens that can be displayed
+    /// All of different game screens that can be displayed
     /// </summary>
     public enum GameSceens
     {
         Game
     }
     /// <summary>
-    /// Different menu screens that can be displayd
+    /// Different menu screens that can be displayed
     /// </summary>
     public enum MenuSceens
     {

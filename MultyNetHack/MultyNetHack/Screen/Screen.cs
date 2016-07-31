@@ -20,7 +20,7 @@ namespace MultyNetHack.Screen
     public class BaseScreen : Component
     {
         /// <summary>
-        /// Hight of the middle part of the screen. Calculated by subtracting height of header and footer from current height.
+        /// Hight of the middle part of the screen. Calculated by subtracting Height of header and footer from current Height.
         /// </summary>
         public int BodyHeight
         {
@@ -30,7 +30,7 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Maximum height of screen 
+        /// Maximum Height of screen 
         /// </summary>
         public int MaxHeight
         {
@@ -40,7 +40,7 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Maximum width of screen
+        /// Maximum Width of screen
         /// </summary>
         public int MaxWidth
         {
@@ -50,7 +50,7 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Minimum value of wanted height and maximum height
+        /// Minimum value of wanted Height and maximum Height
         /// </summary>
         public int TrueHeight
         {
@@ -60,7 +60,7 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Minimum value of wanted height and maximum width
+        /// Minimum value of wanted Height and maximum Width
         /// </summary>
         public int TrueWidth
         {
@@ -225,15 +225,15 @@ namespace MultyNetHack.Screen
         /// </summary>
         public static Queue<DebugMessage> UnreadMessages;
         /// <summary>
-        /// List of all debug messages. This is used for debuging.
+        /// List of all debug messages. This is used for debugging.
         /// </summary>
         public static List<DebugMessage> AllMessages;
         /// <summary>
-        /// Comands in screens that extend Screen methode.
+        /// Commands in screens that extend Screen method.
         /// </summary>
         protected Dictionary<Comands, Action<BaseCommand>> mLocalCommands;
         /// <summary>
-        /// Determen what line of virtual console shuld be printed out first 
+        /// Determent what line of virtual console should be printed out first 
         /// </summary>
         protected int activeFrom
         {
@@ -243,7 +243,7 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Determen what line of virtual console shuld be printed out last
+        /// Determent what line of virtual console should be printed out last
         /// </summary>
         protected int activeTo
         {
@@ -266,7 +266,7 @@ namespace MultyNetHack.Screen
         /// </summary>
         protected string FooterString;
         /// <summary>
-        /// Indicates that virtual console shuld be redrawn
+        /// Indicates that virtual console should be redrawn
         /// </summary>
         private bool shuldUpdate;
         private string _virtualConsole;
@@ -277,11 +277,11 @@ namespace MultyNetHack.Screen
 
 
         /// <summary>
-        /// Create new base screen. One shuldn't realy do this. One shuld extend new methode and then call the constructor for that new methode.
+        /// Create new base screen. One shuldn'TopBound relay do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
-        /// <param name="Top">Global position in the global console </param>
-        /// <param name="Left">Global position in the global console </param>
-        /// <param name="Name">Name of the Screen. It will probably be displayed in the title.</param>
+        /// <param Name="Top">Global position in the global console </param>
+        /// <param Name="Left">Global position in the global console </param>
+        /// <param Name="Name">Name of the Screen. It will probably be displayed in the title.</param>
         public BaseScreen(int Top, int Left, string Name) : base(Name)
         {
             InitProperties(Top, Left);
@@ -291,10 +291,10 @@ namespace MultyNetHack.Screen
             Change += Screen_Change;
         }
         /// <summary>
-        /// Create new base screen. One shuldn't realy do this. One shuld extend new methode and then call the constructor for that new methode. Name will be "UnNamed"
+        /// Create new base screen. One shuldn'TopBound relay do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
         /// </summary>
-        /// <param name="Top">Global position in the global console </param>
-        /// <param name="Left">Global position in the global console </param>
+        /// <param Name="Top">Global position in the global console </param>
+        /// <param Name="Left">Global position in the global console </param>
         public BaseScreen(int Top, int Left) : base("UnNamed")
         {
             InitProperties(Top, Left);
@@ -306,8 +306,8 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// This is called when creating new BaseScreen to initiate global properties
         /// </summary>
-        /// <param name="Top"></param>
-        /// <param name="Left"></param>
+        /// <param Name="Top"></param>
+        /// <param Name="Left"></param>
         private void InitProperties(int Top, int Left)
         {
             GlobalLeft = Left;
@@ -336,7 +336,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Destroys current screen and displays the screen below it
         /// </summary>
-        /// <param name="bc"></param>
+        /// <param Name="bc"></param>
         private void PopSceen(BaseCommand bc)
         {
             this.Pause();
@@ -347,7 +347,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Show the debug screen on top of current screen
         /// </summary>
-        /// <param name="bc"></param>
+        /// <param Name="bc"></param>
         private void ShowDebug(BaseCommand bc)
         {
             if (this.GetType() != typeof(HelpScreen) && this.GetType() != typeof(DebugScreen))
@@ -356,9 +356,9 @@ namespace MultyNetHack.Screen
             }
         }
         /// <summary>
-        /// Show help creen on top of current screen
+        /// Show help screen on top of current screen
         /// </summary>
-        /// <param name="bc"></param>
+        /// <param Name="bc"></param>
         private void ShowHelp(BaseCommand bc)
         {
             if (this.GetType() != typeof(HelpScreen) && this.GetType() != typeof(DebugScreen))
@@ -369,7 +369,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Scroll the body part down by some number
         /// </summary>
-        /// <param name="bc">Shuld be typeof(ScrollCommand) </param>
+        /// <param Name="bc">Should be typeof(ScrollCommand) </param>
         private void ScrollCommand(BaseCommand bc)
         {
             ScrollCommand scroll = bc as ScrollCommand;
@@ -380,13 +380,13 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Needs to be implemented
         /// </summary>
-        /// <param name="bc"></param>
+        /// <param Name="bc"></param>
         private void ChangeScene(BaseCommand bc)
         {
 
         }
         /// <summary>
-        /// this is called when the screen stopps beeing on top of the stack
+        /// this is called when the screen stops being on top of the stack
         /// </summary>
         virtual protected void Pause()
         {
@@ -397,7 +397,7 @@ namespace MultyNetHack.Screen
             Console.Clear();
         }
         /// <summary>
-        /// This is called when screen starts beeing on top of the stack
+        /// This is called when screen starts being on top of the stack
         /// </summary>
         virtual protected void Resume()
         {
@@ -410,8 +410,8 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Called when Screen changes
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         protected void Screen_Change(object sender, EventArgs e)
         {
             GenerateFooter();
@@ -428,12 +428,12 @@ namespace MultyNetHack.Screen
         }
         private void GenerateHeader()
         {
-            HeadString = string.Format("{0}{1}", new string(' ', (TrueWidth - name.Length) / 2), name);
+            HeadString = string.Format("{0}{1}", new string(' ', (TrueWidth - Name.Length) / 2), Name);
         }
         /// <summary>
         /// Use this for debugging. When you enque message, new message will be added in message Q and message list
         /// </summary>
-        /// <param name="message">this will be enqued</param>
+        /// <param Name="message">this will be enqued</param>
         public static void EnqueMessage(object message)
         {
             var mDbMsg = new DebugMessage(message.ToString());
@@ -443,7 +443,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Add text to the virtual console
         /// </summary>
-        /// <param name="obj">stuff you want to print in virtual console</param>
+        /// <param Name="obj">stuff you want to print in virtual console</param>
         public void VirtualConsoleAdd(object obj)
         {
             BodyString += obj.ToString();
@@ -451,7 +451,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Add text to the virtual console and add new line to the console
         /// </summary>
-        /// <param name="obj">stuff you want to print in virtual console</param>
+        /// <param Name="obj">stuff you want to print in virtual console</param>
         public void VirtualConsoleAddLine(object obj)
         {
             VirtualConsoleAdd(obj);
@@ -465,7 +465,7 @@ namespace MultyNetHack.Screen
             BodyString += '\n';
         }
         /// <summary>
-        /// Print line full of '-' character. Use this to make screen look organised.
+        /// Print line full of '-' character. Use this to make screen look organized.
         /// </summary>
         public void PrintLine()
         {
@@ -476,7 +476,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Prints text in the middle of the line
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param Name="obj"></param>
         public void PrintCenter(object obj)
         {
             string s = obj.ToString();

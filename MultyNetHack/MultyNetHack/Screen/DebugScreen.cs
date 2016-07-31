@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MultyNetHack.Screen
 {
     /// <summary>
-    /// This shuld show all debug info (not implemented yet)
+    /// This should show all debug info (not implemented yet)
     /// </summary>
     class DebugScreen : BaseScreen 
     {

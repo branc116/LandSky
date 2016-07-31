@@ -1,7 +1,7 @@
 ﻿MultyNetHack
 
 --31.7.2016-- 
-	Generalization of differnt screens
+	Generalization of different screens
 	Added better support for command decoding
 	Added a lot of commants in the code
 	Added Ui components
@@ -10,8 +10,8 @@
 	Added path generation
 	Reworked text drawing system
 	Generalize keymaping
-	Better colison detection
-	Now when one starts the game, all controls and functions are displyed
+	Better collision detection
+	Now when one starts the game, all controls and functions are displayed
 	Now cmd adjusts Window width and height
 
 --16.6.2016--
@@ -20,7 +20,7 @@
 	Fixed recursive rendering (Now one can display room inside of a room inside of a room...)
 
 --12.6.2016.--
-	Added message qeueing
+	Added message queuing
 	Added option for adding a lot of rooms at a same time
-	Incressed performance
+	Increased performance
 	Fixed bugs
