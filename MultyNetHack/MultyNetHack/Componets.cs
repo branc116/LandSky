@@ -823,5 +823,5 @@ namespace MultyNetHack
         }
 
     }
-    
+     
 }
