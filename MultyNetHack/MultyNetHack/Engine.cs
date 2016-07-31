@@ -113,7 +113,5 @@ namespace MultyNetHack
             Task t = Initinput();
             
         }
-
-       
     }
 }
