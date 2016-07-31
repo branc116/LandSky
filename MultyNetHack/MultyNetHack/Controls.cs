@@ -71,5 +71,5 @@ namespace MultyNetHack
             InvokedBaseCommand.Add(Comands.Option9, new BaseCommand());
             InvokedBaseCommand.Add(Comands.LastSceen, new BaseCommand());
         }
-    }
+    } 
 }
