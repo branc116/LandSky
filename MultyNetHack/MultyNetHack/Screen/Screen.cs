@@ -249,10 +249,10 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(Scrool + BodyHeight, VirtualConsoleTop);
+                return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - 3 - HeadHeight*2));
             }
         }
-        protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHight, Height, Width;
+        protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHight;
         /// <summary>
         /// Invoke this when something changes
         /// </summary>
@@ -277,7 +277,7 @@ namespace MultyNetHack.Screen
 
 
         /// <summary>
-        /// Create new base screen. One shuldn'TopBound relay do this. One should extend new method and then call the constructor for that new method.
+        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -291,7 +291,7 @@ namespace MultyNetHack.Screen
             Change += Screen_Change;
         }
         /// <summary>
-        /// Create new base screen. One shuldn'TopBound relay do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
+        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -313,7 +313,7 @@ namespace MultyNetHack.Screen
             GlobalLeft = Left;
             GlobalTop = Top;
             WantedWidth = MaxWidth;
-            WantedHeight = WantedWidth;
+            WantedHeight = 30;
             BodyString = string.Empty;
             shuldUpdate = true;
             Comand = new Dictionary<Comands, Action<BaseCommand>>();
@@ -342,7 +342,8 @@ namespace MultyNetHack.Screen
             this.Pause();
             Active.Pop();
             if (Active.Count == 0)
-                Environment.Exit(0);   
+                Environment.Exit(0);
+            Active.Peek().Resume();
         }
         /// <summary>
         /// Show the debug screen on top of current screen
@@ -352,7 +353,7 @@ namespace MultyNetHack.Screen
         {
             if (this.GetType() != typeof(HelpScreen) && this.GetType() != typeof(DebugScreen))
             {
-                Active.Push(new DebugScreen(GlobalTop, GlobalLeft));
+                Active.Push(new DebugScreen(0, 0, this));
             }
         }
         /// <summary>
@@ -374,6 +375,10 @@ namespace MultyNetHack.Screen
         {
             ScrollCommand scroll = bc as ScrollCommand;
             Scrool += scroll.n;
+            if (VirtualConsoleTop >0)
+                Scrool %= VirtualConsoleTop;
+            if (Scrool < 0)
+                Scrool = VirtualConsoleTop;
 
             Change?.Invoke(null, EventArgs.Empty);
         }
@@ -403,9 +408,16 @@ namespace MultyNetHack.Screen
         {
             foreach (KeyValuePair<Comands, Action<BaseCommand>> mKVP in mLocalCommands)
             {
-                Comand.Add(mKVP.Key, mKVP.Value);
+                try
+                {
+                    Comand.Add(mKVP.Key, mKVP.Value);
+                }
+                catch
+                {
+
+                }
             }
-            Flush();    
+            Screen_Change(null, EventArgs.Empty);
         }
         /// <summary>
         /// Called when Screen changes
@@ -416,24 +428,28 @@ namespace MultyNetHack.Screen
         {
             GenerateFooter();
             GenerateHeader();
-            shuldUpdate = true;
             Flush();
         }
         
-        private void GenerateFooter()
+        virtual protected void GenerateFooter()
         {
-            string mid = string.Format("Shown lines from {0} to {1} out of {2}", activeFrom, activeTo, VirtualConsoleTop);
-            FooterString = string.Format("{0}{1}", new string(' ', TrueWidth / 2 - mid.Length / 2), mid);
+            string mid = string.Format("Shown lines from {0} to {1} out of {2}", activeFrom + 1, activeTo, VirtualConsoleTop);
+            GenerateFooter(mid);
+            
+        }
+        protected void GenerateFooter(string Mid)
+        {
+            FooterString = string.Format("{0}{1}", new string(' ', TrueWidth / 2 - Mid.Length / 2), Mid);
             FooterHight = 1;
         }
-        private void GenerateHeader()
+        virtual protected void GenerateHeader()
         {
-            HeadString = string.Format("{0}{1}", new string(' ', (TrueWidth - Name.Length) / 2), Name);
+            HeadString = string.Format("{0}{1}", new string(' ', Max(0, (TrueWidth - Name.Length) / 2)), Name);
         }
         /// <summary>
-        /// Use this for debugging. When you enque message, new message will be added in message Q and message list
+        /// Use this for debugging. When you enqueue message, new message will be added in message Q and message list
         /// </summary>
-        /// <param Name="message">this will be enqued</param>
+        /// <param Name="message">this will be enqueued</param>
         public static void EnqueMessage(object message)
         {
             var mDbMsg = new DebugMessage(message.ToString());
@@ -465,7 +481,7 @@ namespace MultyNetHack.Screen
             BodyString += '\n';
         }
         /// <summary>
-        /// Print line full of '-' character. Use this to make screen look organized.
+        /// Print line full of '-' character. Use this to make screen look nicer.
         /// </summary>
         public void PrintLine()
         {
