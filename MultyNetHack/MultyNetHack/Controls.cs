@@ -25,6 +25,8 @@ namespace MultyNetHack
             KeyMap.Add('K', Comands.TenStepsUp);
             KeyMap.Add('j', Comands.Down);
             KeyMap.Add('J', Comands.TenStepsDown);
+            KeyMap.Add('q', Comands.ScrollLeft);
+            KeyMap.Add('e', Comands.ScrollRight);
             KeyMap.Add(',', Comands.ScrollLeft);
             KeyMap.Add('.', Comands.ScrollRight);
             KeyMap.Add('r', Comands.GenerateOneRoom);
@@ -48,7 +50,7 @@ namespace MultyNetHack
         {
             InvokedBaseCommand = new Dictionary<Comands, BaseCommand>();
             InvokedBaseCommand.Add(Comands.GenerateOneRoom, new GenerateRoomsCommand(1));
-            InvokedBaseCommand.Add(Comands.GenerateALotOfRooms, new GenerateRoomsCommand(1000));
+            InvokedBaseCommand.Add(Comands.GenerateALotOfRooms, new GenerateRoomsCommand(100));
             InvokedBaseCommand.Add(Comands.Left, new MoveCommand(MoveDirection.Left, 1));
             InvokedBaseCommand.Add(Comands.TenStepsLeft, new MoveCommand(MoveDirection.Left, 10));
             InvokedBaseCommand.Add(Comands.Right, new MoveCommand(MoveDirection.Right, 1));
@@ -60,6 +62,7 @@ namespace MultyNetHack
             InvokedBaseCommand.Add(Comands.ScrollRight, new ScrollCommand(1));
             InvokedBaseCommand.Add(Comands.ScrollLeft, new ScrollCommand(-1));
             InvokedBaseCommand.Add(Comands.ShowHelp, new BaseCommand());
+            InvokedBaseCommand.Add(Comands.ShowDebug, new BaseCommand());
             InvokedBaseCommand.Add(Comands.Option1, new BaseCommand());
             InvokedBaseCommand.Add(Comands.Option2, new BaseCommand());
             InvokedBaseCommand.Add(Comands.Option3, new BaseCommand());
