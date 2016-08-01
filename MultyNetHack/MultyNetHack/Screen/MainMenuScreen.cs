@@ -29,8 +29,8 @@ namespace MultyNetHack.Screen
             InitButtons();
             InitComands();
             InitText();
-            
-            Flush();
+
+            Screen_Change(this, EventArgs.Empty);
         }
 
         private void InitGlobals()
