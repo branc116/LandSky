@@ -217,8 +217,8 @@ namespace MultyNetHack
         /// <returns></returns>
         public Point ToTopLeft(int x, int y)
         {
-            int top = Math.Min(this.height-1, Math.Max(1, this.t - y));
-            int left = Math.Min(this.width-1, Math.Max(1, x-this.l));
+            int top = Min(this.height-1, Max(1, this.t - y));
+            int left = Min(this.width-1, Max(1, this.r - x));
             Point mP = new Point(top,left);
             return mP;
 
@@ -226,6 +226,10 @@ namespace MultyNetHack
         public static Rectangle operator -(Rectangle rc, Point p)
         {
             return new Rectangle(rc.t - p.y, rc.r - p.x, rc.b - p.y, rc.l - p.x);
+        }
+        public static Rectangle operator +(Rectangle rc, Point p)
+        {
+            return new Rectangle(rc.t + p.y, rc.r + p.x, rc.b + p.y, rc.l + p.x);
         }
         public static bool operator &(Rectangle one, Rectangle two)
         {
@@ -317,7 +321,7 @@ namespace MultyNetHack
                         n++;
                 }
                 if (n != 1)
-                    throw new Exception("Can'TopBound interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
+                    throw new Exception("Can't interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
             }
 
         }
@@ -440,7 +444,7 @@ namespace MultyNetHack
                         }
                     }
                     if (!found)
-                        throw new Exception("Sorry can'TopBound interpolate :(");
+                        throw new Exception("Sorry can't interpolate :(");
                 }
             
                 for (int j = i + 1; j < n; j++)
