@@ -12,7 +12,7 @@ namespace MultyNetHack
         /// <param Name="args"></param>
         static void Main(string[] args)
         {
-            Engine e = new Engine(70,20);
+            Engine e = new Engine(180,20);
             Thread.Sleep(int.MaxValue - 2);
         } 
     }
