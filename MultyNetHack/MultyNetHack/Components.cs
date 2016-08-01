@@ -16,6 +16,13 @@ namespace MultyNetHack
     public abstract class Component {
         public int x, y, z;
         public int LeftBound, RightBound, TopBound, BottomBound;
+        public Rectangle Bounds
+        {
+            get
+            {
+                return new Rectangle(y + Height / 2, x + Width / 2, y - Height / 2, x - Width / 2);
+            }
+        }
         public Dictionary<string, Component> Controls;
         public List<string> Keys;
         public List<Sweep> sweep;
@@ -434,8 +441,12 @@ namespace MultyNetHack
                 await mTasks[0];
                 foreach(Room mRoom in mComps)
                 {
-                    this.Insert(mRoom);
-                    this.InsertInSweep(mRoom);
+                    if (mRoom.Bounds.width > 0 && mRoom.Bounds.height > 0)
+                    {
+                        mRoom.z = this.z + 3;
+                        this.Insert(mRoom);
+                        this.InsertInSweep(mRoom);
+                    }
                 }
             }
             
@@ -791,7 +802,7 @@ namespace MultyNetHack
 
         public void generatePathThrueRandomChildren(Component c)
         {
-            if (c.Controls.Count < 3) throw new Exception("You can'TopBound generate path in component that has less then 3 children... sorry :(");
+            if (c.Controls.Count < 3) throw new Exception("You can't generate path in component that has less then 3 children... sorry :(");
             int n = Math.Min(25, rnd.Next(c.Controls.Count/25 , c.Controls.Count));
             List<Point> Points = new List<Point>(n+1);
             int counter = 0;
