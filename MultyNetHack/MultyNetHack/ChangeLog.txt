@@ -1,9 +1,13 @@
 ﻿MultyNetHack
+--1.8.2016--
+	Fixed stuff
+	Added debug screen (press '*') in any screen to get in to debug screen
+
 
 --31.7.2016-- 
 	Generalization of different screens
 	Added better support for command decoding
-	Added a lot of commants in the code
+	Added a lot of comments in the code
 	Added Ui components
 
 --01.7.2016--
