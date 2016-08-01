@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MultyNetHack;
 using MultyNetHack.Commands;
 /// <summary>
-/// Heare are implemented ui elements
+/// Here are implemented ui elements
 /// </summary>
 namespace MultyNetHack.UIComponents
 {

@@ -11,28 +11,28 @@ namespace MultyNetHack
 {
     
     /// <summary>
-    /// Eveyithing shuld be extened from this
+    /// Everything should be extended from this
     /// </summary>
     public abstract class Component {
         public int x, y, z;
-        public int l, r, t, b;
-        public Dictionary<string, Component> controls;
-        public List<string> keys;
+        public int LeftBound, RightBound, TopBound, BottomBound;
+        public Dictionary<string, Component> Controls;
+        public List<string> Keys;
         public List<Sweep> sweep;
-        public int height, width, depht;
-        public Component parent;
-        public Material madeOf;
-        public string name;
-        public int numOfRooms, numOfWalls, numOfPaths;
-        public bool isPassable;
+        public int Height, Width;
+        public Component Parent;
+        public Material MadeOf;
+        public string Name;
+        public int NumOfRooms, NumOfWalls, NumOfPaths;
+        public bool IsPassable;
         private Random mRand;
         public Component(string name)
         {
-            controls = new Dictionary<string, Component>();
-            keys = new List<string>();
+            Controls = new Dictionary<string, Component>();
+            Keys = new List<string>();
             sweep = new List<Sweep>();
             mRand = new Random();
-            this.name = name;
+            this.Name = name;
 
         }
         public struct Sweep
@@ -99,11 +99,11 @@ namespace MultyNetHack
 
             public static bool operator ==(Sweep a, string b)
             {
-                return a.component.name == b;
+                return a.component.Name == b;
             }
             public static bool operator !=(Sweep a, string b)
             {
-                return a.component.name != b;
+                return a.component.Name != b;
             }
 
             public static bool operator ==(Sweep a, Component b)
@@ -128,47 +128,47 @@ namespace MultyNetHack
 
         public void Dispose()
         {
-            this.parent.keys.Remove(this.name);
-            this.parent.controls.Remove(this.name);
+            this.Parent.Keys.Remove(this.Name);
+            this.Parent.Controls.Remove(this.Name);
             sweep = null;
-            controls = null;
-            parent = null;
+            Controls = null;
+            Parent = null;
 
         }
         public void Insert(Component c)
         {
-            if (c.name == null) throw new Exception("Component must have a name");
-            this.keys.Add(c.name);
-            this.controls.Add(c.name, c);
+            if (c.Name == null) throw new Exception("Component must have a Name");
+            this.Keys.Add(c.Name);
+            this.Controls.Add(c.Name, c);
             switch (c.GetType().ToString())
             {
                 case "MultyNetHack.Room":
-                    numOfRooms++;
+                    NumOfRooms++;
                     break;
                 case "MultyNetHack.Path":
-                    numOfPaths++;
+                    NumOfPaths++;
                     break;
-                case "MultyNetHack.HorisontalWall":
-                    numOfWalls++;
+                case "MultyNetHack.HorizontalWall":
+                    NumOfWalls++;
                     break;
                 case "MultyNetHack.VerticalWall":
-                    numOfWalls++;
+                    NumOfWalls++;
                     break;
             }
 
-            if (c.parent != null)
+            if (c.Parent != null)
             {
-                c.parent.keys.Remove(c.name);
-                c.parent.controls.Remove(c.name);
+                c.Parent.Keys.Remove(c.Name);
+                c.Parent.Controls.Remove(c.Name);
             }
-            c.parent = this;
+            c.Parent = this;
         }
         public void InsertInSweep(Component c)
         {
             
             int lb = 0, ub = sweep.Count;
-            int x1 = c.l;
-            int x2 = c.r;
+            int x1 = c.LeftBound;
+            int x2 = c.RightBound;
             if (sweep.Count == 0)
             {
                 sweep.InsertRange(0, new Sweep[2] { new Sweep(c, x1, true), new Sweep(c, x2, false) });
@@ -221,10 +221,10 @@ namespace MultyNetHack
         }
         public void Delete(string name)
         {
-            Component c = controls[name];
-            foreach (string s in c.keys)
+            Component c = Controls[name];
+            foreach (string s in c.Keys)
             {
-                c.controls[s].Delete(s);
+                c.Controls[s].Delete(s);
             }
             foreach(Sweep s in sweep)
             {
@@ -233,13 +233,13 @@ namespace MultyNetHack
                     sweep.Remove(s);
                 }
             }
-            keys.Remove(name);
-            controls.Remove(name);
+            Keys.Remove(name);
+            Controls.Remove(name);
 
         }
         public void Delete(int i)
         {
-            Delete(keys[i]);
+            Delete(Keys[i]);
         }
         public Component GetComponentOnLocation(int x, int y)
         {
@@ -259,7 +259,7 @@ namespace MultyNetHack
                 }
             }
             Component solution = this;
-            controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
+            Controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
               {
                   Path p = i.Value as Path;
                   int delta = Convert.ToInt32(Math.Abs(point.y - p.Poly.ValueForX(point.x)));
@@ -417,7 +417,7 @@ namespace MultyNetHack
                         START:;
                         breakint++;
                         mR.GenerateRandom(quads[id], 500);
-                        if (!mCheckCollision(mRooms, mR) && !mCheckCollision(this.controls, mR) && breakint<100)
+                        if (!mCheckCollision(mRooms, mR) && !mCheckCollision(this.Controls, mR) && breakint<100)
                             goto START;
                         mR.GenerateWall();
                         made++;
@@ -469,34 +469,34 @@ namespace MultyNetHack
             });
             return returnValue;
         }
+
         //check for intersection in two rooms
-        
         public static bool operator &(Component one, Component two)
         {
-            return (one.l <= two.r && one.r >= two.l &&
-                one.t >= two.b && one.b <= two.t);
+            return (one.LeftBound <= two.RightBound && one.RightBound >= two.LeftBound &&
+                one.TopBound >= two.BottomBound && one.BottomBound <= two.TopBound);
         }
         public static bool operator &(Component one, Player two)
         {
-            return (one.l <= two.rightBound && one.r >= two.leftBound &&
-                one.t >= two.bottomBound && one.b <= two.topBound);
+            return (one.LeftBound <= two.rightBound && one.RightBound >= two.leftBound &&
+                one.TopBound >= two.bottomBound && one.BottomBound <= two.topBound);
         }
         public static bool operator &(Component one, Point two)
         {
-            return (one.t>=two.y && one.b<two.y && one.l <=two.x && one.r>two.x);
+            return (one.TopBound>=two.y && one.BottomBound<two.y && one.LeftBound <=two.x && one.RightBound>two.x);
         }
         public static bool operator &(Component one, Rectangle two)
         {
-            return (one.l < two.r && one.r > two.l &&
-                    one.t > two.b && one.b < two.t);
+            return (one.LeftBound < two.r && one.RightBound > two.l &&
+                    one.TopBound > two.b && one.BottomBound < two.t);
         }
         public static bool operator ==(Component one, Component two)
         {
-            if (one.t == two.t &&
-                one.b == two.b &&
-                one.l == two.l &&
-                one.r == two.r &&
-                one.name == two.name) return true;
+            if (one.TopBound == two.TopBound &&
+                one.BottomBound == two.BottomBound &&
+                one.LeftBound == two.LeftBound &&
+                one.RightBound == two.RightBound &&
+                one.Name == two.Name) return true;
             return false;
         }
         public static bool operator !=(Component one, Component two)
@@ -512,7 +512,7 @@ namespace MultyNetHack
         }
         public static Rectangle operator +(Component c, Point p)
         {
-            return new Rectangle(c.t + p.y, c.r + p.x, c.b + p.y, c.l + p.x);
+            return new Rectangle(c.TopBound + p.y, c.RightBound + p.x, c.BottomBound + p.y, c.LeftBound + p.x);
         }
         public override bool Equals(object obj)
         {
@@ -535,9 +535,9 @@ namespace MultyNetHack
         {
             genStack = 0;
             rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
-            isPassable = true;
+            IsPassable = true;
             sweep = new List<Sweep>();
-            controls = new Dictionary<string, Component>();
+            Controls = new Dictionary<string, Component>();
         }
         public void GeneratRandom()
         {
@@ -546,17 +546,17 @@ namespace MultyNetHack
             
             x = rand.Next(-500, 500);
             y = rand.Next(-500, 500);
-            width = rand.Next(15, 40);
-            height = rand.Next(7, 20);
-            l = x - width  /2;
-            t = y + height /2;
-            r = x + width  /2;
-            b = y - height /2;
-            width = r - l;
-            height = t - b;
-            madeOf = Material.Air;
-            z = parent.z + 2;
-            if (CollisionCheck(this) || width * height < 40)
+            Width = rand.Next(15, 40);
+            Height = rand.Next(7, 20);
+            LeftBound = x - Width  /2;
+            TopBound = y + Height /2;
+            RightBound = x + Width  /2;
+            BottomBound = y - Height /2;
+            Width = RightBound - LeftBound;
+            Height = TopBound - BottomBound;
+            MadeOf = Material.Air;
+            z = Parent.z + 2;
+            if (CollisionCheck(this) || Width * Height < 40)
                 if (genStack > 1000)
                 {
                     this.Dispose();
@@ -565,7 +565,7 @@ namespace MultyNetHack
                     goto START;
             else
             {
-                parent.InsertInSweep(this);
+                Parent.InsertInSweep(this);
                 GenerateWall();
             }
         }
@@ -582,15 +582,15 @@ namespace MultyNetHack
 
             x = rand.Next(left, right);
             y = rand.Next(bottom, top);
-            width = rand.Next(15, 40);
-            height = rand.Next(7, 20);
-            l = x - width / 2;
-            t = y + height / 2;
-            r = x + width / 2;
-            b = y - height / 2;
-            width = r - l;
-            height = t - b;
-            madeOf = Material.Air;    
+            Width = rand.Next(15, 40);
+            Height = rand.Next(7, 20);
+            LeftBound = x - Width / 2;
+            TopBound = y + Height / 2;
+            RightBound = x + Width / 2;
+            BottomBound = y - Height / 2;
+            Width = RightBound - LeftBound;
+            Height = TopBound - BottomBound;
+            MadeOf = Material.Air;    
         }
         public void GenerateRandom(Quadrant quadrant, int bound)
         {
@@ -606,11 +606,11 @@ namespace MultyNetHack
         public bool CollisionCheck(Room r)
         {
             Point startEnd;
-            startEnd = parent.GetStartEndEnter(r.x);
+            startEnd = Parent.GetStartEndEnter(r.x);
             // make it faster!!!
-            for  (int i = 0; i < parent.sweep.Count; i++)
+            for  (int i = 0; i < Parent.sweep.Count; i++)
             {
-                if (parent.sweep[i].enter==startEnd.enter && parent.sweep[i].component & r)
+                if (Parent.sweep[i].enter==startEnd.enter && Parent.sweep[i].component & r)
                     return true;
             }
             return false;
@@ -618,10 +618,10 @@ namespace MultyNetHack
         public void GenerateWall()
         {
 
-            HorisontalWall wT = new HorisontalWall("TopWall" + this.name, new Point(0, t - y), x - l, r - x);
-            HorisontalWall wB = new HorisontalWall("BottomWall" + this.name, new Point(0, b - y + 1), x - l, r - x);
-            VerticalWall wL = new VerticalWall("LeftWall" + this.name,new Point(l - x , 0), t - y - 1, y - b -1);
-            VerticalWall wR = new VerticalWall("RightWall" + this.name,new Point(r - x - 1, 0), t - y - 1, y - b);
+            HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, TopBound - y), x - LeftBound, RightBound - x);
+            HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, BottomBound - y + 1), x - LeftBound, RightBound - x);
+            VerticalWall wL = new VerticalWall("LeftWall" + this.Name,new Point(LeftBound - x , 0), TopBound - y - 1, y - BottomBound -1);
+            VerticalWall wR = new VerticalWall("RightWall" + this.Name,new Point(RightBound - x - 1, 0), TopBound - y - 1, y - BottomBound);
             wT.z = z + 1;
             wB.z = z + 1;
             wL.z = z + 1;
@@ -647,44 +647,44 @@ namespace MultyNetHack
         {
             get
             {
-                return x - width / 2;
+                return x - Width / 2;
             }
         }
         public int rightBound
         {
             get
             {
-                return x + width / 2;
+                return x + Width / 2;
             }
         }
         public int topBound
         {
             get
             {
-                return y + height / 2;
+                return y + Height / 2;
             }
         }
         public int bottomBound
         {
             get
             {
-                return y - height / 2;
+                return y - Height / 2;
             }
         }
 
         public void SizeOfScreen(int width, int height)
         {
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
         }
         public Player(int x, int y) : base("Player")
         {
             this.x = x;
             this.y = y;
 
-            width = 1;
-            height = 1;
-            madeOf = Material.Player;
+            Width = 1;
+            Height = 1;
+            MadeOf = Material.Player;
         }
         
         public static Player operator +(Player a, Player b)
@@ -711,20 +711,20 @@ namespace MultyNetHack
     /// <summary>
     /// Unpassable wall
     /// </summary>
-    public class HorisontalWall : Component
+    public class HorizontalWall : Component
     {
-        public HorisontalWall(string name, Point centerLoc, int sizeLeft, int sizeRight) : base(name)
+        public HorizontalWall(string name, Point centerLoc, int sizeLeft, int sizeRight) : base(name)
         {
-            isPassable = false;
+            IsPassable = false;
             x = centerLoc.x;
             y = centerLoc.y;
-            t = y;
-            b = y - 1;
-            l = -sizeLeft;
-            r = sizeRight;
-            madeOf = Material.HorisontalWall;
-            height = t - b;
-            width = r - l;
+            TopBound = y;
+            BottomBound = y - 1;
+            LeftBound = -sizeLeft;
+            RightBound = sizeRight;
+            MadeOf = Material.HorisontalWall;
+            Height = TopBound - BottomBound;
+            Width = RightBound - LeftBound;
         }
     }
     /// <summary>
@@ -734,16 +734,16 @@ namespace MultyNetHack
     {
         public VerticalWall(string name, Point location, int sizeUp, int sizeDown) : base(name)
         {
-            isPassable = false;
+            IsPassable = false;
             x = location.x;
             y = location.y;
-            l = x;
-            r = x + 1;
-            width = 1;
-            height = sizeUp + sizeDown;
-            t = sizeUp;
-            b = -sizeDown;
-            madeOf = Material.VerticalWall;
+            LeftBound = x;
+            RightBound = x + 1;
+            Width = 1;
+            Height = sizeUp + sizeDown;
+            TopBound = sizeUp;
+            BottomBound = -sizeDown;
+            MadeOf = Material.VerticalWall;
         }
     }
     /// <summary>
@@ -753,12 +753,12 @@ namespace MultyNetHack
     {
         public Root() : base("Root")
         {
-            isPassable = false;
-            numOfPaths = numOfRooms = 0;
+            IsPassable = false;
+            NumOfPaths = NumOfRooms = 0;
             z = 0;
-            madeOf = Material.Darknes;
-            width = int.MaxValue;
-            height = int.MaxValue;
+            MadeOf = Material.Darknes;
+            Width = int.MaxValue;
+            Height = int.MaxValue;
 
         }
 
@@ -768,7 +768,7 @@ namespace MultyNetHack
         }
     }
     /// <summary>
-    /// Passable object that connects diferent rooms
+    /// Passable object that connects different rooms
     /// </summary>
     public class Path : Component
     {
@@ -781,7 +781,7 @@ namespace MultyNetHack
             rnd = new Random(DateTime.Now.Millisecond + (1 + DateTime.Now.Second) * 1009 + (1 + DateTime.Now.Minute) * 62761 + (1 + DateTime.Now.Hour) * 3832999);
             ConnectedComponent = new List<Component>();
             Poly = new LinearInterpolator();
-            isPassable = true;
+            IsPassable = true;
         }
 
         public void generatePathThrueLocations(List<Point> Points)
@@ -791,22 +791,22 @@ namespace MultyNetHack
 
         public void generatePathThrueRandomChildren(Component c)
         {
-            if (c.controls.Count < 3) throw new Exception("You can't generate path in component that has less then 3 children... sorry :(");
-            int n = Math.Min(25, rnd.Next(c.controls.Count/25 , c.controls.Count));
+            if (c.Controls.Count < 3) throw new Exception("You can'TopBound generate path in component that has less then 3 children... sorry :(");
+            int n = Math.Min(25, rnd.Next(c.Controls.Count/25 , c.Controls.Count));
             List<Point> Points = new List<Point>(n+1);
             int counter = 0;
-            while (n!=0 && counter < c.controls.Count * 3 && Points.Count < 10)
+            while (n!=0 && counter < c.Controls.Count * 3 && Points.Count < 10)
             {
                 counter++;
-                int index = rnd.Next(0, c.controls.Count);
-                if (c.controls[c.keys[index]].GetType() == typeof(Room))
+                int index = rnd.Next(0, c.Controls.Count);
+                if (c.Controls[c.Keys[index]].GetType() == typeof(Room))
                 {
-                    Point candidat = new Point(c.controls[c.keys[index]].x, c.controls[c.keys[index]].y);
+                    Point candidat = new Point(c.Controls[c.Keys[index]].x, c.Controls[c.Keys[index]].y);
                     if (!Points.Contains(candidat) && !CanFindTheSameX(Points, candidat))
                     {
                         n--;
                         Points.Add(candidat);
-                        ConnectedComponent.Add(c.controls[c.keys[index]]);
+                        ConnectedComponent.Add(c.Controls[c.Keys[index]]);
                     }
                 }
             }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MultyNetHack.Commands
 {
     /// <summary>
-    /// Comand for creating paths
+    /// Command for creating paths
     /// </summary>
     public class GeneratePathCommand : BaseCommand
     {

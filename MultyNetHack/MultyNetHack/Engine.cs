@@ -19,7 +19,7 @@ namespace MultyNetHack
         /// <summary>
         /// Plays A major
         /// </summary>
-        /// <param name="tempo">Amount of time spend on each note (in ms)</param>
+        /// <param Name="tempo">Amount of time spend on each note (in ms)</param>
         public void PlayMajor(int tempo)
         {
             
@@ -103,8 +103,8 @@ namespace MultyNetHack
         /// <summary>
         /// Create new engine with main menu as a starting screen
         /// </summary>
-        /// <param name="width">Width of the Screens in the global console</param>
-        /// <param name="height">Height of the Screens in the global console</param>
+        /// <param Name="width">Width of the Screens in the global console</param>
+        /// <param Name="height">Height of the Screens in the global console</param>
         public Engine(int width, int height)
         {
             InitConsole(width, height);

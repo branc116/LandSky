@@ -203,7 +203,7 @@ namespace MultyNetHack
         }
         /// <summary>
         ///     |
-        ///     | l,t___
+        ///     | LeftBound,t___
         ///     |   |x,y|
         ///     |    ---
         /// -------------------
@@ -212,8 +212,8 @@ namespace MultyNetHack
         ///     |
         ///     |
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param Name="x"></param>
+        /// <param Name="y"></param>
         /// <returns></returns>
         public Point ToTopLeft(int x, int y)
         {
@@ -275,7 +275,6 @@ namespace MultyNetHack
     public class LinearInterpolator
     {
         List<Monom> Polinom;
-        List<double> Values;
         public LinearInterpolator()
         {
             Polinom = new List<Monom>();
@@ -318,7 +317,7 @@ namespace MultyNetHack
                         n++;
                 }
                 if (n != 1)
-                    throw new Exception("Can't interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
+                    throw new Exception("Can'TopBound interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
             }
 
         }
@@ -331,7 +330,7 @@ namespace MultyNetHack
             if (MustBeCorrect)
                 CheckIfOneCanInterpolate(Points);
             if (Monoms == KindOfMonom.Constant)
-                throw new Exception("One can't interpolate array of points only with constants, one can but it wount be good... don't select contants, pls, select line it's good, or sine");
+                throw new Exception("One can't interpolate array of points only with constants, one can but it wont be good... don't select constants, pls, select line it's good, or sine");
             List<KindOfMonom> Monomz = new List<KindOfMonom>(Points.Count);
             Monomz.Add(KindOfMonom.Constant);
             for (int i=1; i<Points.Count;i++)
@@ -413,7 +412,7 @@ namespace MultyNetHack
         public List<double> SolveMatrix(List<List<double>> Matrix)
         {
             if (Matrix[0].Count - 2 != Matrix.Count)
-                throw new Exception("One can only interpolate Matrix of size n*n+2\n a*X=b a:= n*n matrix, b:= 1*n combination, and 1*n matrix where are saved original inexes of rows");
+                throw new Exception("One can only interpolate Matrix of size n*n+2\n a*X=BottomBound a:= n*n matrix, BottomBound:= 1*n combination, and 1*n matrix where are saved original indexes of rows");
 #region down
             int n = Matrix.Count;
             if (Matrix[0].Count - 1 == Matrix.Count)
@@ -441,13 +440,12 @@ namespace MultyNetHack
                         }
                     }
                     if (!found)
-                        throw new Exception("Sorry can't interpolate :(");
+                        throw new Exception("Sorry can'TopBound interpolate :(");
                 }
             
                 for (int j = i + 1; j < n; j++)
                 {
                     double koeficjent = Matrix[j][i] / Matrix[i][i];
-                    //matrica[j][i] = 0;
 
                     for (int k = 0; k < n + 1; k++)
                     {

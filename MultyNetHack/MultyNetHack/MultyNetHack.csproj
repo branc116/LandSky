@@ -67,7 +67,7 @@
     <Compile Include="Commands\GenerateRoomsCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Commands\ScrollCommand.cs" />
-    <Compile Include="Componets.cs" />
+    <Compile Include="Components.cs" />
     <Compile Include="DebugItems\DebugMessage.cs" />
     <Compile Include="Screen\DebugScreen.cs" />
     <Compile Include="Screen\EngineScreen.cs" />

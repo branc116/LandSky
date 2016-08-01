@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MultyNetHack.Commands
 {
     /// <summary>
-    /// Every custom command shuld extend BaseCommand
+    /// Every custom command should extend BaseCommand
     /// </summary>
     public class BaseCommand
     {

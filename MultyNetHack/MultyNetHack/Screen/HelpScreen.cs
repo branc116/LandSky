@@ -14,7 +14,7 @@ namespace MultyNetHack.Screen
         public HelpScreen(int Top, int Left) : base(Top, Left, "Help")
         {
             //bool enter = false;
-            //foreach (var c in Comand)
+            //foreach (var c in Command)
             //{
 
             //    char val = Controls.KeyMap.Where((i) => { return i.Value == c.Key; }).ToList()[0].Key;

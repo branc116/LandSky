@@ -45,7 +45,7 @@ namespace MultyNetHack.Commands
                 return Down(1);
             else if (MoveCommand == Comands.TenStepsDown)
                 return Down(10);
-            else throw new Exception(string.Format("Comand {0} not valid", MoveCommand));
+            else throw new Exception(string.Format("Command {0} not valid", MoveCommand));
         }
         public static MoveCommand Left(int steps)
         {
