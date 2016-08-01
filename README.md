@@ -2,17 +2,17 @@
 
 <h2 align="center">A remake of the Nethack.</h4>
 
-MultyNetHack project is an attempt at building multiplayer version of the clasic game Nethack.
+MultyNetHack project is an attempt at building a multiplayer version of the clasic game Nethack.
 
 [![Build Status](https://travis-ci.org/branc116/MultyNetHack.svg?branch=master)](https://travis-ci.org/branc116/MultyNetHack)
 
 #### Goal include:
-* ***It shuld be multiplayer***
-* ***It shuld be sandbox***
-* ***It shuld be open source***
-* ***It shuld be fun as original game was***
-* ***It shuld be written in statically typed language***. 
-Reason for this is that is easier for new developers to get into.I choose C#.
+* ***It should be multiplayer***
+* ***It should be sandbox***
+* ***It should be open source***
+* ***It should be fun as original game was***
+* ***It should be written in statically typed language***. 
+Reason for this is that is easier for new developers to get into, I choose C#.
 
 #### Get started:
 * \>git clone https://github.com/branc116/MultyNetHack
@@ -31,7 +31,7 @@ Reason for this is that is easier for new developers to get into.I choose C#.
 Here are some of the design decisions:
 * ***Add as many comments as possible***. Just so that other people can jump in code and see what you've done.
 * ***Don't write you name on top of every file you make***. This is team effort, not a competition.
-* ***Naming convention***: Namespaces - CamelCase, classes - CamelCase, public properies - CamelCase, private properies - mCamelCase, other stuff is not really important
+* ***Naming convention***: Namespaces - PascalCase, classes - PascalCase, public properies - PascalCase, private properies - mPascalCase, other stuff is not really important
 * ***JSON***. Whenever you have to serialize object to save it, send it, ... use JSON
 
 #### Current state
@@ -47,9 +47,9 @@ What works:
 #### TODO list
 This is the list of stuff that need to be made. I'm always open to suggestions if you have an idea.
 * Implement real time database for multyplayer stuff
-* Implement sql or nosql database for saveing played status and game states
+* Implement sql or nosql database for saving player status and game states
 * Implement more screens
-* Make the drowing process faster
+* Make the drawing process faster
 * Make gameplay features
 * A lot more
 
