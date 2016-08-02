@@ -20,7 +20,7 @@ namespace MultyNetHack
         {
             get
             {
-                return new Rectangle(y + Height / 2, x + Width / 2, y - Height / 2, x - Width / 2);
+                return new Rectangle(y + Height / 2 + Height%2, x + Width / 2, y - Height / 2, x - Width / 2 - Width%2);
             }
         }
         public Dictionary<string, Component> Controls;
@@ -174,8 +174,8 @@ namespace MultyNetHack
         {
             
             int lb = 0, ub = sweep.Count;
-            int x1 = c.LeftBound;
-            int x2 = c.RightBound;
+            int x1 = c.Bounds.l;
+            int x2 = c.Bounds.r;
             if (sweep.Count == 0)
             {
                 sweep.InsertRange(0, new Sweep[2] { new Sweep(c, x1, true), new Sweep(c, x2, false) });
@@ -360,7 +360,13 @@ namespace MultyNetHack
             //    startEnd.y = lb;
             //else
             //    startEnd.y = Math.Min(sweep.Count-1,ub);
-            startEnd.y = Math.Min(sweep.Count-1, lb);
+            int i = 0;
+            while (ub + i < sweep.Count && sweep[ub +i] == sweep[ub])
+            {
+                i++;
+            }
+            ub += i;
+            startEnd.y = Math.Min(sweep.Count-1, ub);
             return startEnd;
         }
 
@@ -424,9 +430,8 @@ namespace MultyNetHack
                         START:;
                         breakint++;
                         mR.GenerateRandom(quads[id], 500);
-                        if (!mCheckCollision(mRooms, mR) && !mCheckCollision(this.Controls, mR) && breakint<100)
+                        if ((mCheckCollision(mRooms, mR) || mCheckCollision(this.Controls, mR)) && breakint<100)
                             goto START;
-                        mR.GenerateWall();
                         made++;
                         mRooms.Add(mR);
                     }
@@ -443,7 +448,9 @@ namespace MultyNetHack
                 {
                     if (mRoom.Bounds.width > 0 && mRoom.Bounds.height > 0)
                     {
+                        
                         mRoom.z = this.z + 3;
+                        mRoom.GenerateWall();
                         this.Insert(mRoom);
                         this.InsertInSweep(mRoom);
                     }
@@ -484,29 +491,29 @@ namespace MultyNetHack
         //check for intersection in two rooms
         public static bool operator &(Component one, Component two)
         {
-            return (one.LeftBound <= two.RightBound && one.RightBound >= two.LeftBound &&
-                one.TopBound >= two.BottomBound && one.BottomBound <= two.TopBound);
+            return (one.Bounds.l <= two.Bounds.r && one.Bounds.r >= two.Bounds.l &&
+                one.Bounds.t >= two.Bounds.b && one.Bounds.b <= two.Bounds.t);
         }
         public static bool operator &(Component one, Player two)
         {
-            return (one.LeftBound <= two.rightBound && one.RightBound >= two.leftBound &&
-                one.TopBound >= two.bottomBound && one.BottomBound <= two.topBound);
+            return (one.Bounds.l <= two.Bounds.r && one.Bounds.r >= two.Bounds.l &&
+                one.Bounds.t >= two.Bounds.b && one.Bounds.b <= two.Bounds.t);
         }
         public static bool operator &(Component one, Point two)
         {
-            return (one.TopBound>=two.y && one.BottomBound<two.y && one.LeftBound <=two.x && one.RightBound>two.x);
+            return (one.Bounds.t>=two.y && one.Bounds.b<two.y && one.Bounds.l <=two.x && one.Bounds.r>=two.x);
         }
         public static bool operator &(Component one, Rectangle two)
         {
-            return (one.LeftBound < two.r && one.RightBound > two.l &&
-                    one.TopBound > two.b && one.BottomBound < two.t);
+            return (one.Bounds.l < two.r && one.Bounds.r > two.l &&
+                    one.Bounds.t > two.b && one.Bounds.b < two.t);
         }
         public static bool operator ==(Component one, Component two)
         {
-            if (one.TopBound == two.TopBound &&
-                one.BottomBound == two.BottomBound &&
-                one.LeftBound == two.LeftBound &&
-                one.RightBound == two.RightBound &&
+            if (one.Bounds.t == two.Bounds.t &&
+                one.Bounds.b == two.Bounds.b &&
+                one.Bounds.l == two.Bounds.l &&
+                one.Bounds.r == two.Bounds.r &&
                 one.Name == two.Name) return true;
             return false;
         }
@@ -523,7 +530,7 @@ namespace MultyNetHack
         }
         public static Rectangle operator +(Component c, Point p)
         {
-            return new Rectangle(c.TopBound + p.y, c.RightBound + p.x, c.BottomBound + p.y, c.LeftBound + p.x);
+            return new Rectangle(c.Bounds.t + p.y, c.Bounds.r + p.x, c.Bounds.b + p.y, c.Bounds.l + p.x);
         }
         public override bool Equals(object obj)
         {
@@ -559,12 +566,6 @@ namespace MultyNetHack
             y = rand.Next(-500, 500);
             Width = rand.Next(15, 40);
             Height = rand.Next(7, 20);
-            LeftBound = x - Width  /2;
-            TopBound = y + Height /2;
-            RightBound = x + Width  /2;
-            BottomBound = y - Height /2;
-            Width = RightBound - LeftBound;
-            Height = TopBound - BottomBound;
             MadeOf = Material.Air;
             z = Parent.z + 2;
             if (CollisionCheck(this) || Width * Height < 40)
@@ -595,24 +596,19 @@ namespace MultyNetHack
             y = rand.Next(bottom, top);
             Width = rand.Next(15, 40);
             Height = rand.Next(7, 20);
-            LeftBound = x - Width / 2;
-            TopBound = y + Height / 2;
-            RightBound = x + Width / 2;
-            BottomBound = y - Height / 2;
-            Width = RightBound - LeftBound;
-            Height = TopBound - BottomBound;
+
             MadeOf = Material.Air;    
         }
         public void GenerateRandom(Quadrant quadrant, int bound)
         {
             if (quadrant == Quadrant.First)
-                GenerateRandom(bound, bound, 0, 0);
+                GenerateRandom(bound, 0, 0, bound);
             else if(quadrant == Quadrant.Second)
-                GenerateRandom(bound, 0,0, -bound);
-            else if (quadrant == Quadrant.Second)
-                GenerateRandom(0, 0,-bound, -bound);
-            else if (quadrant == Quadrant.Second)
-                GenerateRandom(0, bound, -bound, 0);
+                GenerateRandom(bound, -bound,0, 0);
+            else if (quadrant == Quadrant.Third)
+                GenerateRandom(0, -bound, -bound, 0);
+            else if (quadrant == Quadrant.Fourth)
+                GenerateRandom(0, 0, -bound, bound);
         }
         public bool CollisionCheck(Room r)
         {
@@ -629,10 +625,10 @@ namespace MultyNetHack
         public void GenerateWall()
         {
 
-            HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, TopBound - y), x - LeftBound, RightBound - x);
-            HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, BottomBound - y + 1), x - LeftBound, RightBound - x);
-            VerticalWall wL = new VerticalWall("LeftWall" + this.Name,new Point(LeftBound - x , 0), TopBound - y - 1, y - BottomBound -1);
-            VerticalWall wR = new VerticalWall("RightWall" + this.Name,new Point(RightBound - x - 1, 0), TopBound - y - 1, y - BottomBound);
+            HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, Bounds.t - y - 1),Width);
+            HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, Bounds.b - y), Width);
+            VerticalWall wL = new VerticalWall("LeftWall" + this.Name,new Point(Bounds.l - x + 1, 0), Height - 2);
+            VerticalWall wR = new VerticalWall("RightWall" + this.Name,new Point(Bounds.r - x, 0), Height - 2);
             wT.z = z + 1;
             wB.z = z + 1;
             wL.z = z + 1;
@@ -653,36 +649,6 @@ namespace MultyNetHack
     /// </summary>
     public class Player : Component
     {
-        
-        public int leftBound
-        {
-            get
-            {
-                return x - Width / 2;
-            }
-        }
-        public int rightBound
-        {
-            get
-            {
-                return x + Width / 2;
-            }
-        }
-        public int topBound
-        {
-            get
-            {
-                return y + Height / 2;
-            }
-        }
-        public int bottomBound
-        {
-            get
-            {
-                return y - Height / 2;
-            }
-        }
-
         public void SizeOfScreen(int width, int height)
         {
             this.Width = width;
@@ -729,13 +695,18 @@ namespace MultyNetHack
             IsPassable = false;
             x = centerLoc.x;
             y = centerLoc.y;
-            TopBound = y;
-            BottomBound = y - 1;
-            LeftBound = -sizeLeft;
-            RightBound = sizeRight;
             MadeOf = Material.HorisontalWall;
-            Height = TopBound - BottomBound;
-            Width = RightBound - LeftBound;
+            Height = 1;
+            Width = sizeLeft + sizeRight + 1;
+        }
+        public HorizontalWall(string name, Point centerLoc, int size) : base(name)
+        {
+            IsPassable = false;
+            x = centerLoc.x;
+            y = centerLoc.y;
+            MadeOf = Material.HorisontalWall;
+            Height = 1;
+            Width = size;
         }
     }
     /// <summary>
@@ -748,12 +719,17 @@ namespace MultyNetHack
             IsPassable = false;
             x = location.x;
             y = location.y;
-            LeftBound = x;
-            RightBound = x + 1;
             Width = 1;
             Height = sizeUp + sizeDown;
-            TopBound = sizeUp;
-            BottomBound = -sizeDown;
+            MadeOf = Material.VerticalWall;
+        }
+        public VerticalWall(string name, Point location, int size) : base(name)
+        {
+            IsPassable = false;
+            x = location.x;
+            y = location.y;
+            Width = 1;
+            Height = size;
             MadeOf = Material.VerticalWall;
         }
     }
