@@ -249,7 +249,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - 3 - HeadHeight*2));
+                return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - HeadHeight*2));
             }
         }
         protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHight;
@@ -439,7 +439,7 @@ namespace MultyNetHack.Screen
         }
         protected void GenerateFooter(string Mid)
         {
-            FooterString = string.Format("{0}{1}", new string(' ', TrueWidth / 2 - Mid.Length / 2), Mid);
+            FooterString = string.Format("{0}{1}", new string(' ', Max(0, TrueWidth / 2 - Mid.Length / 2)), Mid);
             FooterHight = 1;
         }
         virtual protected void GenerateHeader()
@@ -499,16 +499,23 @@ namespace MultyNetHack.Screen
             VirtualConsoleLeft = 0;
             BodyString += new string(' ', TrueWidth / 2 - s.Length / 2) + s + '\n';   
         }
+        bool inside = false;
         /// <summary>
         /// Use this when you made changes to the virtual console
         /// </summary>
         public void Flush()
         {
-            Console.CursorTop = GlobalTop;
-            Console.CursorLeft = GlobalLeft;
-            shuldUpdate = true;
-            Console.Clear();
-            Console.WriteLine(VirtualConsole);
+            if (!inside)
+            {
+                inside = true;
+                Console.CursorTop = GlobalTop;
+                Console.CursorLeft = GlobalLeft;
+                shuldUpdate = true;
+                string ThreadSafeShit = VirtualConsole;
+                Console.Clear();
+                Console.WriteLine(ThreadSafeShit);
+                inside = false;
+            }
         }
         /// <summary>
         /// Delete everything in the virtual consoled
