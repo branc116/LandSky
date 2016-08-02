@@ -222,6 +222,16 @@ namespace MultyNetHack
             Point mP = new Point(top,left);
             return mP;
 
+
+        }
+        internal Rectangle ToTopLeft(Rectangle Bounds)
+        {
+            var TransformdT = Max(0, Min(this.height - 1, this.t - Bounds.t));
+            var TransformdR = Max(0, Min(this.width - 1, Bounds.r - this.l));
+            var TransformdB = Max(1, Min(this.height - 1, this.t - Bounds.b));
+            var TransformdL = Max(0, Min(this.width - 1, Bounds.l - this.l));
+
+            return new Rectangle(TransformdT, TransformdR, TransformdB, TransformdL);
         }
         public static Rectangle operator -(Rectangle rc, Point p)
         {
@@ -236,6 +246,8 @@ namespace MultyNetHack
             return (one.l < two.r && one.r > two.l &&
                     one.t > two.b && one.b < two.t);
         }
+
+        
     }
     /// <summary>
     /// Point class
@@ -249,6 +261,10 @@ namespace MultyNetHack
             this.x = x;
             this.y = y;
         }
+        public static Point Origin()
+        {
+            return new Point(0, 0);
+        }
         public Point ToTopLeft(Size s, int x, int y)
         {
             Point mP = new Point(Math.Max(1, Math.Min(s.width - 1, x - this.x)), Math.Max(1, Math.Min(s.height - 2, -y + this.y)));
@@ -258,6 +274,10 @@ namespace MultyNetHack
         public static Point operator -(Point a, Point b)
         {
             return new Point(b.x - a.x, b.y - a.y);
+        }
+        public static Point operator +(Point a, Point b)
+        {
+            return new Point(a.x + b.x, a.y + b.y);
         }
     }
     /// <summary>
