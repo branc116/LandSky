@@ -109,7 +109,7 @@ namespace MultyNetHack.Screen
             x = 0;
             y = 0;
             z = 0;
-            WantedWidth = 70;
+            WantedWidth = 60;
             WantedHeight = 20;
             Width = TrueWidth;
             Height = TrueHeight;
@@ -221,7 +221,7 @@ namespace MultyNetHack.Screen
 
         protected override void GenerateFooter()
         {
-            string mid = string.Format("({0},{1})", this.x, this.y);
+            string mid = string.Format("({0},{1}) - {2}", this.x, this.y, this.GetComponentOnLocation(this.x,this.y).Name);
             GenerateFooter(mid);
         }
         bool inside = false;
@@ -248,12 +248,11 @@ namespace MultyNetHack.Screen
                     }
                 }
                 
-                FillBuffer(this.x, this.y, 1, 1, Material.Player, 15);
+                FillBuffer(new Rectangle(this.y,this.x ,this.y - 1,this.x - 1), Material.Player, 15);
                 DrawPaths();
-                ZBufferUpdate(this, 0, 0);
-                FillBuffer(Bounds.l, Bounds.t, TrueHeight, TrueWidth, this.MadeOf, 0);
+                ZBufferUpdate(this, Point.Origin());
+                FillBuffer(this.Bounds, this.MadeOf, 0);
                 FlushBuffer();
-                FooterString = string.Format("({0},{1})", this.x, this.y);
                 Screen_Change(this, EventArgs.Empty);
                 inside = false;
             }
@@ -273,9 +272,51 @@ namespace MultyNetHack.Screen
 
                 }
             }
-            FillBuffer(parentLeft + (parentLeft-comp.x) - comp.Bounds.width/2, parentTop - (parentTop - comp.y) + comp.Bounds.height/2, comp.Bounds.height, comp.Bounds.width, comp.MadeOf, comp.z);
+            FillBuffer(comp.Bounds.l - parentLeft , comp.Bounds.t - parentTop, comp.Bounds.height, comp.Bounds.width, comp.MadeOf, comp.z);
 
         }
+        private void ZBufferUpdate(Component comp, Point Translatin)
+        {
+            Rectangle TransformdBounds = comp.Bounds + Translatin;
+            Point startEnd = comp.GetStartEndEnter(TransformdBounds.l, TransformdBounds.r);
+            for (int i = startEnd.x; i <= startEnd.y; i++)
+            {
+                if (comp.GetType() != typeof(EngineSceen))
+                {
+                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin + new Point(comp.x, comp.y)))
+                    {
+                    
+                        var NewTranslatin = new Point(comp.x, comp.y) + Translatin;
+                        ZBufferUpdate(comp.sweep[i].component, NewTranslatin);
+                    }
+                    
+                }
+                else
+                {
+                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin))
+                        ZBufferUpdate(comp.sweep[i].component, Point.Origin());
+                }
+            }
+            FillBuffer(TransformdBounds, comp.MadeOf, comp.z);
+
+        }
+
+        private void FillBuffer(Rectangle transformdBounds, Material madeOf, int zLevel)
+        {
+            Rectangle Transformed = Bounds.ToTopLeft(transformdBounds);
+            for (int i=Transformed.t; i < Transformed.b; i++)
+            {
+                for (int j = Transformed.l; j < Transformed.r; j++)
+                {
+                    if (updated[i][j] < zLevel)
+                    {
+                        buff1[i][j] = Texture[madeOf];
+                        updated[i][j] = zLevel;
+                    }
+                }
+            }
+        }
+
         private void FillBuffer(int x, int y, int h, int w, Material m, int zLevle)
         {
             Point start = Bounds.ToTopLeft(x, y);
