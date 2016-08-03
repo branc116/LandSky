@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using MultyNetHack.MyEnums;
 using MultyNetHack.UIComponents;
-using MultyNetHack.Commands;
+
 
 namespace MultyNetHack.Screen
 {
@@ -75,7 +74,7 @@ namespace MultyNetHack.Screen
         private void StartLocal_OnPress(object sender, DateTime e)
         {
             this.Pause();
-            Active.Push(new EngineSceen(GlobalTop, GlobalLeft));
+            Active.Push(new SandboxMap(GlobalTop, GlobalLeft));
         }
 
     }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MultyNetHack;
-using MultyNetHack.Commands;
-using MultyNetHack.DebugItems;
 using static System.Math;
+
+using MultyNetHack.Commands;
+using MultyNetHack.Components;
+using MultyNetHack.DebugItems;
+using MultyNetHack.MyEnums;
 
 /// <summary>
 /// All of default screens are in this namespace
@@ -123,7 +123,7 @@ namespace MultyNetHack.Screen
                 }
                 if (i + value <= BodyString.Length && BodyString.Length != 0)
                     BodyString = BodyString.Remove(i + value);
-                else if (VirtualConsole.Length != 0)
+                else if (BodyString.Length != 0)
                     BodyString += new string(' ', i + value - BodyString.Length);
             }
         }
@@ -487,7 +487,7 @@ namespace MultyNetHack.Screen
         {
             
             VirtualConsoleLeft = 0;
-            VirtualConsoleAddLine(new string('-', TrueWidth));
+            VirtualConsoleAddLine(new string('-', TrueWidth)  + '\n');
         }
         /// <summary>
         /// Prints text in the middle of the line
@@ -495,7 +495,7 @@ namespace MultyNetHack.Screen
         /// <param Name="obj"></param>
         public void PrintCenter(object obj)
         {
-            string s = obj.ToString();
+            string s = obj.ToString() + '\n';
             VirtualConsoleLeft = 0;
             BodyString += new string(' ', TrueWidth / 2 - s.Length / 2) + s + '\n';   
         }

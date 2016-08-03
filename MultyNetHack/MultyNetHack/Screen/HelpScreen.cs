@@ -13,19 +13,20 @@ namespace MultyNetHack.Screen
     {
         public HelpScreen(int Top, int Left) : base(Top, Left, "Help")
         {
-            //bool enter = false;
-            //foreach (var c in Command)
-            //{
+            InitText();
+            Screen_Change(null, EventArgs.Empty);
+        }
 
-            //    char val = Controls.KeyMap.Where((i) => { return i.Value == c.Key; }).ToList()[0].Key;
-                
-            //    if (enter)
-            //        Left = TrueWidth / 2;
-            //    VirtualConsoleAddLine(string.Format("'{0}' -> {1}", valc.Key, ));
-            //    if (enter)
-            //        VirtualConsoleAddLine();
-            //    enter = !enter;
-            //}
+        private void InitText()
+        {
+            PrintCenter("This is MultyNetHack");
+            PrintLine();
+            PrintCenter("Rouge like multiplayer game");
+            PrintLine();
+            PrintCenter("Use h/j/k/l to move left/down/up/right");
+            PrintCenter("Press ESC to get to the last screen");
+            PrintCenter("Press 1-9 to chose option 1-9");
+            PrintCenter("This is still in early stages so there isn't a lot of gameplay");
         }
     }
 } 

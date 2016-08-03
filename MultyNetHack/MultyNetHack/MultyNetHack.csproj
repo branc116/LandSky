@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,7 +25,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -67,16 +67,24 @@
     <Compile Include="Commands\GenerateRoomsCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Commands\ScrollCommand.cs" />
-    <Compile Include="Components.cs" />
+    <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\Path.cs" />
+    <Compile Include="Components\Player.cs" />
+    <Compile Include="Components\Room.cs" />
+    <Compile Include="Components\Walls.cs" />
     <Compile Include="DebugItems\DebugMessage.cs" />
+    <Compile Include="MyEnums\Enums.cs" />
+    <Compile Include="MyMath\Interolator.cs" />
+    <Compile Include="MyMath\Monom.cs" />
+    <Compile Include="MyMath\Point.cs" />
+    <Compile Include="MyMath\Rectangle.cs" />
+    <Compile Include="MyMath\Size.cs" />
     <Compile Include="Screen\DebugScreen.cs" />
-    <Compile Include="Screen\EngineScreen.cs" />
+    <Compile Include="Screen\SandboxMapScreen.cs" />
     <Compile Include="Screen\MainMenuScreen.cs" />
     <Compile Include="Controls.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Screen\HelpScreen.cs" />
-    <Compile Include="Math.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screen\Screen.cs" />

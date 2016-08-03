@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MultyNetHack;
-using MultyNetHack.Commands;
 
+using MultyNetHack.Commands;
+using MultyNetHack.Components;
+using MultyNetHack.MyEnums;
 namespace MultyNetHack.Screen
 {
     /// <summary>
@@ -56,11 +55,10 @@ namespace MultyNetHack.Screen
         {
             foreach (var mWall in mWalls)
             {
-                VirtualConsoleAddLine(string.Format("{0}Wall {1} is located on ({2},{3}), width = {4}, height = {5}", new string(' ', indent * 2), mWall.Value.Name, mWall.Value.x, mWall.Value.y, mWall.Value.Bounds.width, mWall.Value.Bounds.height));
-                VirtualConsoleAddLine(string.Format("{0}Wall contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mWall.Value.NumOfRooms,mWall.Value.NumOfPaths, mWall.Value.NumOfWalls));
+                VirtualConsoleAddLine(string.Format("{0}Wall {1} is localy located on ({2},{3}) and globaly on ({4},{5}), width = {6}, height = {7}", new object[] { new string(' ', indent * 2), mWall.Value.Name, mWall.Value.LocalX, mWall.Value.LocalY, mWall.Value.GlobalX, mWall.Value.GlobalY, mWall.Value.Bounds.width, mWall.Value.Bounds.height }));
+                if (mWall.Value.Controls.Count>0)
+                    VirtualConsoleAddLine(string.Format("{0}Wall contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mWall.Value.NumOfRooms,mWall.Value.NumOfPaths, mWall.Value.NumOfWalls));
                 PrintControls(mWall.Value, indent + 1);
-
-
             }
         }
 
@@ -69,7 +67,8 @@ namespace MultyNetHack.Screen
             foreach (var mPath in mPaths)
             {
                 VirtualConsoleAddLine(string.Format("{0}Path {1} is polynomial of {2}th power", new string(' ', indent * 2), mPath.Value.Name, (mPath.Value as Path).ConnectedComponent.Count));
-                VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mPath.Value.NumOfRooms,mPath.Value.NumOfPaths, mPath.Value.NumOfWalls));
+                if (mPath.Value.Controls.Count > 0)
+                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mPath.Value.NumOfRooms,mPath.Value.NumOfPaths, mPath.Value.NumOfWalls));
                 if ((mPath.Value as Path).ConnectedComponent.Count > 0)
                 {
                     mPrintRooms((mPath.Value as Path).ConnectedComponent.Where(i => i.GetType() == typeof(Room)).ToList(), indent + 1);
@@ -83,8 +82,9 @@ namespace MultyNetHack.Screen
         {
             foreach (var mRoom in mRooms)
             {
-                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}", new string(' ', indent * 2), mRoom.Name, mRoom.x, mRoom.y, mRoom.Bounds.width, mRoom.Bounds.height));
-                VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mRoom.NumOfRooms, mRoom.NumOfPaths, mRoom.NumOfWalls));
+                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}", new string(' ', indent * 2), mRoom.Name, mRoom.LocalX, mRoom.LocalY, mRoom.Bounds.width, mRoom.Bounds.height));
+                if (mRoom.Controls.Count > 0)
+                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mRoom.NumOfRooms, mRoom.NumOfPaths, mRoom.NumOfWalls));
                 if (mRoom.NumOfRooms > 0)
                 {
                     mPrintRooms(mRoom.Controls.Where(i => i.Value.GetType() == typeof(Room)).ToList(), indent + 1);
@@ -98,11 +98,10 @@ namespace MultyNetHack.Screen
         {
             foreach(var mRoom in mRooms)
             {
-                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}",new string(' ',indent*2), mRoom.Value.Name, mRoom.Value.x, mRoom.Value.y, mRoom.Value.Bounds.width, mRoom.Value.Bounds.height));
-                VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls",new string(' ', indent*2), mRoom.Value.NumOfRooms,mRoom.Value.NumOfPaths, mRoom.Value.NumOfWalls));
+                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}",new string(' ',indent*2), mRoom.Value.Name, mRoom.Value.LocalX, mRoom.Value.LocalY, mRoom.Value.Bounds.width, mRoom.Value.Bounds.height));
+                if (mRoom.Value.Controls.Count > 0)
+                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls",new string(' ', indent*2), mRoom.Value.NumOfRooms,mRoom.Value.NumOfPaths, mRoom.Value.NumOfWalls));
                 PrintControls(mRoom.Value, indent + 1);
-
-
             }
         }
     }
