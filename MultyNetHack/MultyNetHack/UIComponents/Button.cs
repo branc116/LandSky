@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MultyNetHack;
+
 using MultyNetHack.Commands;
+using MultyNetHack.MyEnums;
 /// <summary>
 /// Here are implemented ui elements
 /// </summary>
