@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Data.Odbc;
 using System.Threading.Tasks;
-using MultyNetHack;
-using MultyNetHack.Commands;
 using static System.Math;
 using static System.Convert;
+
+using MultyNetHack.Commands;
+using MultyNetHack.Components;
+using MultyNetHack.MyEnums;
+using MultyNetHack.MyMath;
+
 namespace MultyNetHack.Screen
 {
     /// <summary>
     /// Displays the instance of the game. This Extends BaseScreen.
     /// </summary>
-    public class EngineSceen : BaseScreen
+    public class SandboxMap : BaseScreen
     {
         /// <summary>
         /// Matrix for zbuffering
@@ -43,7 +47,7 @@ namespace MultyNetHack.Screen
         /// </summary>
         /// <param Name="Top">Distance from the top of the global console</param>
         /// <param Name="Left">Distance form the left of the global console</param>
-        public EngineSceen(int Top, int Left) : base(Top, Left, "MultyNetHack")
+        public SandboxMap(int Top, int Left) : base(Top, Left, "MultyNetHack")
         {
             InitProperties();
             InitBuffer();
@@ -106,9 +110,9 @@ namespace MultyNetHack.Screen
         }
         private void InitProperties()
         {
-            x = 0;
-            y = 0;
-            z = 0;
+            LocalX = 0;
+            LocalY = 0;
+            ZValue = 0;
             WantedWidth = 60;
             WantedHeight = 20;
             Width = TrueWidth;
@@ -119,7 +123,7 @@ namespace MultyNetHack.Screen
             MadeOf = Material.Darknes;
             ghost = true;
             speed = 50; // steep = 1/speed
-
+            IsRoot = true;
         }
         private void InitEvents()
         {
@@ -182,33 +186,33 @@ namespace MultyNetHack.Screen
                 {
                     if (move.Direction == MoveDirection.Down || move.Direction == MoveDirection.DownLeft || move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.x, this.y - 1).IsPassable || ghost)
+                        if (this.GetComponentOnLocation(this.LocalX, this.LocalY - 1).IsPassable || ghost)
                         {
-                            this.y--;
+                            this.LocalY--;
                             mSteps--;
                         }
                     }
                     if (move.Direction == MoveDirection.Up || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.UpRight)
                     {
-                        if (this.GetComponentOnLocation(this.x, this.y + 1).IsPassable || ghost)
+                        if (this.GetComponentOnLocation(this.LocalX, this.LocalY + 1).IsPassable || ghost)
                         {
-                            this.y++;
+                            this.LocalY++;
                             mSteps--;
                         }
                     }
                     if (move.Direction == MoveDirection.Left || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.DownLeft)
                     {
-                        if (this.GetComponentOnLocation(this.x + 1, this.y).IsPassable || ghost)
+                        if (this.GetComponentOnLocation(this.LocalX + 1, this.LocalY).IsPassable || ghost)
                         {
-                            this.x--;
+                            this.LocalX--;
                             mSteps--;
                         }
                     }
                     if (move.Direction == MoveDirection.Right || move.Direction == MoveDirection.UpRight || move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.x - 1, this.y).IsPassable || ghost)
+                        if (this.GetComponentOnLocation(this.LocalX - 1, this.LocalY).IsPassable || ghost)
                         {
-                            this.x++;
+                            this.LocalX++;
                             mSteps--;
                         }
                     }
@@ -221,7 +225,7 @@ namespace MultyNetHack.Screen
 
         protected override void GenerateFooter()
         {
-            string mid = string.Format("({0},{1}) - {2}", this.x, this.y, this.GetComponentOnLocation(this.x,this.y).Name);
+            string mid = string.Format("({0},{1}) - {2}", this.LocalX, this.LocalY, this.GetComponentOnLocation(this.LocalX,this.LocalY).Name);
             GenerateFooter(mid);
         }
         bool inside = false;
@@ -248,7 +252,7 @@ namespace MultyNetHack.Screen
                     }
                 }
                 
-                FillBuffer(new Rectangle(this.y,this.x ,this.y - 1,this.x - 1), Material.Player, 15);
+                FillBuffer(new Rectangle(this.LocalY,this.LocalX ,this.LocalY - 1,this.LocalX - 1), Material.Player, 15);
                 DrawPaths();
                 ZBufferUpdate(this, Point.Origin());
                 FillBuffer(this.Bounds, this.MadeOf, 0);
@@ -260,19 +264,19 @@ namespace MultyNetHack.Screen
         private void ZBufferUpdate(Component comp, int parentTop, int parentLeft)
         {
 
-            Point startEnd = comp.GetStartEndEnter( comp.x - parentLeft - comp.Bounds.width, comp.x - parentLeft + comp.Bounds.width);
+            Point startEnd = comp.GetStartEndEnter( comp.LocalX - parentLeft - comp.Bounds.width, comp.LocalX - parentLeft + comp.Bounds.width);
             for (int i = startEnd.x; i <= startEnd.y; i++)
             {
                 if (this.Bounds & (comp.sweep[i].component.Bounds))
                 {
                     //if (comp.GetType() != typeof(EngineSceen))
-                        ZBufferUpdate(comp.sweep[i].component, parentTop + comp.y, parentLeft + comp.x);
+                        ZBufferUpdate(comp.sweep[i].component, parentTop + comp.LocalY, parentLeft + comp.LocalX);
                     //else
                     //    ZBufferUpdate(comp.sweep[i].component, 0, 0);
 
                 }
             }
-            FillBuffer(comp.Bounds.l - parentLeft , comp.Bounds.t - parentTop, comp.Bounds.height, comp.Bounds.width, comp.MadeOf, comp.z);
+            FillBuffer(comp.Bounds.l - parentLeft , comp.Bounds.t - parentTop, comp.Bounds.height, comp.Bounds.width, comp.MadeOf, comp.ZValue);
 
         }
         private void ZBufferUpdate(Component comp, Point Translatin)
@@ -281,12 +285,12 @@ namespace MultyNetHack.Screen
             Point startEnd = comp.GetStartEndEnter(TransformdBounds.l, TransformdBounds.r);
             for (int i = startEnd.x; i <= startEnd.y; i++)
             {
-                if (comp.GetType() != typeof(EngineSceen))
+                if (comp.GetType() != typeof(SandboxMap))
                 {
-                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin + new Point(comp.x, comp.y)))
+                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin + new Point(comp.LocalX, comp.LocalY)))
                     {
                     
-                        var NewTranslatin = new Point(comp.x, comp.y) + Translatin;
+                        var NewTranslatin = new Point(comp.LocalX, comp.LocalY) + Translatin;
                         ZBufferUpdate(comp.sweep[i].component, NewTranslatin);
                     }
                     
@@ -297,7 +301,7 @@ namespace MultyNetHack.Screen
                         ZBufferUpdate(comp.sweep[i].component, Point.Origin());
                 }
             }
-            FillBuffer(TransformdBounds, comp.MadeOf, comp.z);
+            FillBuffer(TransformdBounds, comp.MadeOf, comp.ZValue);
 
         }
 
@@ -349,7 +353,7 @@ namespace MultyNetHack.Screen
                 LinearInterpolator pol = (i.Value as Path).Poly;
                 for (int j = Bounds.l; j < Bounds.r; j++)
                 {
-                    FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.MadeOf, i.Value.z);
+                    FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.MadeOf, i.Value.ZValue);
                 }
             });
         }
