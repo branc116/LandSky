@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MultyNetHack
+﻿namespace MultyNetHack.MyEnums
 {
     /// <summary>
     /// All supported commands
@@ -105,7 +99,7 @@ namespace MultyNetHack
         Down,
         DownLeft,
         Left,
-        UpLeft   
+        UpLeft
     }
     /// <summary>
     /// Cartesian coordinate system quadrants
@@ -126,4 +120,4 @@ namespace MultyNetHack
         Paused,
         Disposed
     }
-} 
+}
