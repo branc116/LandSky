@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Timers;
-using System.Threading;
 using System.Threading.Tasks;
-using MultyNetHack.Screen;
-using MultyNetHack.DebugItems;
 using static System.Convert;
 using static System.Math;
+
+using MultyNetHack.Screen;
+using MultyNetHack.DebugItems;
+using MultyNetHack.MyMath;
+
 namespace MultyNetHack
 {
     /// <summary>
