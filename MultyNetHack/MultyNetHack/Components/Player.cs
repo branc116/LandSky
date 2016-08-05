@@ -7,18 +7,11 @@ namespace MultyNetHack.Components
     /// </summary>
     public class Player : Component
     {
-        public void SizeOfScreen(int width, int height)
-        {
-            this.Width = width;
-            this.Height = height;
-        }
         public Player(int x, int y) : base("Player")
         {
             this.LocalX = x;
             this.LocalY = y;
 
-            Width = 1;
-            Height = 1;
             MadeOf = Material.Player;
         }
 
