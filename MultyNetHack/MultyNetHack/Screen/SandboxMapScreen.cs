@@ -109,13 +109,14 @@ namespace MultyNetHack.Screen
         }
         private void InitProperties()
         {
+            mBounds = new Rectangle(10, 30, -10, -30);
             LocalX = 0;
             LocalY = 0;
             ZValue = 0;
+            
             WantedWidth = 60;
             WantedHeight = 20;
-            Width = TrueWidth;
-            Height = TrueHeight;
+            
             buff1 = new List<List<char>>();
             updated = new List<List<int>>();
             mLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
@@ -224,8 +225,15 @@ namespace MultyNetHack.Screen
 
         protected override void GenerateFooter()
         {
-            string mid = string.Format("({0},{1}) - {2}", this.LocalX, this.LocalY, this.GetComponentOnLocation(this.LocalX,this.LocalY).Name);
-            GenerateFooter(mid);
+            try
+            {
+                string mid = string.Format("({0},{1}) - {2}", this.LocalX, this.LocalY, this.GetComponentOnLocation(this.LocalX, this.LocalY).Name);
+                GenerateFooter(mid);
+            }
+            catch
+            {
+                base.GenerateFooter();
+            }
         }
         bool inside = false;
         private void EngineConsole_Draw(object sender, int e)
@@ -253,20 +261,20 @@ namespace MultyNetHack.Screen
                 
                 FillBuffer(new Rectangle(this.LocalY,this.LocalX ,this.LocalY - 1,this.LocalX - 1), Material.Player, 15);
                 DrawPaths();
-                ZBufferUpdate(this, Point.Origin());
-                FillBuffer(this.Bounds, this.MadeOf, 0);
+                ZBufferUpdate(this);
+                FillBuffer(this.LocalBounds, this.MadeOf, 0);
                 FlushBuffer();
-                Screen_Change(this, EventArgs.Empty);
+                ScreenChange();
                 inside = false;
             }
         }
         private void ZBufferUpdate(Component comp, int parentTop, int parentLeft)
         {
 
-            Point startEnd = comp.GetStartEndEnter( comp.LocalX - parentLeft - comp.Bounds.width, comp.LocalX - parentLeft + comp.Bounds.width);
+            Point startEnd = comp.GetStartEndEnter( comp.LocalX - parentLeft - comp.LocalBounds.Width, comp.LocalX - parentLeft + comp.LocalBounds.Width);
             for (int i = startEnd.x; i <= startEnd.y; i++)
             {
-                if (this.Bounds & (comp.sweep[i].component.Bounds))
+                if (this.LocalBounds & (comp.sweep[i].component.LocalBounds))
                 {
                     //if (comp.GetType() != typeof(EngineSceen))
                         ZBufferUpdate(comp.sweep[i].component, parentTop + comp.LocalY, parentLeft + comp.LocalX);
@@ -275,18 +283,18 @@ namespace MultyNetHack.Screen
 
                 }
             }
-            FillBuffer(comp.Bounds.l - parentLeft , comp.Bounds.t - parentTop, comp.Bounds.height, comp.Bounds.width, comp.MadeOf, comp.ZValue);
+            FillBuffer(comp.LocalBounds.LeftBound - parentLeft , comp.LocalBounds.TopBound - parentTop, comp.LocalBounds.height, comp.LocalBounds.Width, comp.MadeOf, comp.ZValue);
 
         }
         private void ZBufferUpdate(Component comp, Point Translatin)
         {
-            Rectangle TransformdBounds = comp.Bounds + Translatin;
-            Point startEnd = comp.GetStartEndEnter(TransformdBounds.l, TransformdBounds.r);
+            Rectangle TransformdBounds = comp.LocalBounds + Translatin;
+            Point startEnd = comp.GetStartEndEnter(TransformdBounds.LeftBound, TransformdBounds.RightBound);
             for (int i = startEnd.x; i <= startEnd.y; i++)
             {
                 if (comp.GetType() != typeof(SandboxMap))
                 {
-                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin + new Point(comp.LocalX, comp.LocalY)))
+                    if (this.LocalBounds & (comp.sweep[i].component.LocalBounds + Translatin + new Point(comp.LocalX, comp.LocalY)))
                     {
                     
                         var NewTranslatin = new Point(comp.LocalX, comp.LocalY) + Translatin;
@@ -296,20 +304,32 @@ namespace MultyNetHack.Screen
                 }
                 else
                 {
-                    if (this.Bounds & (comp.sweep[i].component.Bounds + Translatin))
+                    if (this.LocalBounds & (comp.sweep[i].component.LocalBounds + Translatin))
                         ZBufferUpdate(comp.sweep[i].component, Point.Origin());
                 }
             }
             FillBuffer(TransformdBounds, comp.MadeOf, comp.ZValue);
 
         }
+        private void ZBufferUpdate(Component comp)
+        {
+            var GoodComponents = comp.Controls.Where(i => ((i.Value.GetType() == typeof(Room) ||
+                                                            i.Value.GetType() == typeof(Wall)) &&
+                                                            i.Value.GlobalBounds & this.LocalBounds
 
+            )).ToList();
+            foreach (var GoodComponent in GoodComponents)
+            {
+                ZBufferUpdate(GoodComponent.Value);
+            }
+            FillBuffer(comp.GlobalBounds, comp.MadeOf, comp.ZValue);
+        }
         private void FillBuffer(Rectangle transformdBounds, Material madeOf, int zLevel)
         {
-            Rectangle Transformed = Bounds.ToTopLeft(transformdBounds);
-            for (int i=Transformed.t; i < Transformed.b; i++)
+            Rectangle Transformed = LocalBounds.ToTopLeft(transformdBounds);
+            for (int i=Transformed.TopBound; i < Transformed.BottomBound; i++)
             {
-                for (int j = Transformed.l; j < Transformed.r; j++)
+                for (int j = Transformed.LeftBound; j < Transformed.RightBound; j++)
                 {
                     if (updated[i][j] < zLevel)
                     {
@@ -322,8 +342,8 @@ namespace MultyNetHack.Screen
 
         private void FillBuffer(int x, int y, int h, int w, Material m, int zLevle)
         {
-            Point start = Bounds.ToTopLeft(x, y);
-            Point end = Bounds.ToTopLeft(x + w, y - h);
+            Point start = LocalBounds.ToTopLeft(x, y);
+            Point end = LocalBounds.ToTopLeft(x + w, y - h);
             for (int i = Min(end.y, start.y); i < Max(start.y, end.y); i++)
             {
                 for (int j = Min(end.x, start.x); j < Max(start.x, end.x); j++)
@@ -340,17 +360,16 @@ namespace MultyNetHack.Screen
         private void FlushBuffer()
         {
             Clear();
-            Console.Clear();
             foreach (List<char> c in buff1)
                 VirtualConsoleAddLine(new string(c.ToArray()));
-            Screen_Change(this, EventArgs.Empty);
+            ScreenChange();
         }
         private void DrawPaths()
         {
             this.Controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
             {
                 LinearInterpolator pol = (i.Value as Path).Poly;
-                for (int j = Bounds.l; j < Bounds.r; j++)
+                for (int j = LocalBounds.LeftBound; j < LocalBounds.RightBound; j++)
                 {
                     FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.MadeOf, i.Value.ZValue);
                 }
