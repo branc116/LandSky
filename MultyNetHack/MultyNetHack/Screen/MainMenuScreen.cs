@@ -29,7 +29,7 @@ namespace MultyNetHack.Screen
             InitComands();
             InitText();
 
-            Screen_Change(this, EventArgs.Empty);
+            ScreenChange();
         }
 
         private void InitGlobals()

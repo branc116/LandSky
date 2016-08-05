@@ -26,7 +26,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return TrueHeight - HeadHeight - FooterHight;
+                return TrueHeight - HeadHeight - FooterHeight;
             }
         }
         /// <summary>
@@ -56,7 +56,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(MaxHeight, Height);
+                return Min(MaxHeight, mScreenHeight);
             }
         }
         /// <summary>
@@ -66,7 +66,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(MaxWidth, Width)-1;
+                return Min(MaxWidth, mScreenWidth)-1;
             }
         }
         /// <summary>
@@ -76,12 +76,12 @@ namespace MultyNetHack.Screen
         {
             set
             {
-                Height = value;
-                Change?.Invoke(null, EventArgs.Empty);
+                mScreenHeight = value;
+                ScreenChange();
             }
             get
             {
-                return Height;
+                return mScreenHeight;
             }
         } 
         /// <summary>
@@ -91,12 +91,12 @@ namespace MultyNetHack.Screen
         {
             set
             {
-                Width = value;
-                Change?.Invoke(null, EventArgs.Empty);
+                mScreenWidth = value;
+                ScreenChange();
             }
             get
             {
-                return Width;
+                return mScreenWidth;
             }
         }
         /// <summary>
@@ -252,11 +252,11 @@ namespace MultyNetHack.Screen
                 return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - HeadHeight*2));
             }
         }
-        protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHight;
-        /// <summary>
-        /// Invoke this when something changes
-        /// </summary>
-        protected event EventHandler Change;
+        protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHeight, mScreenHeight, mScreenWidth;
+        ///// <summary>
+        ///// Invoke this when something changes
+        ///// </summary>
+        //protected event EventHandler Change;
         /// <summary>
         /// String that is displayed on top of everything
         /// </summary>
@@ -277,7 +277,7 @@ namespace MultyNetHack.Screen
 
 
         /// <summary>
-        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method.
+        /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -288,10 +288,10 @@ namespace MultyNetHack.Screen
             InitComands();
             GenerateHeader();
             GenerateFooter();
-            Change += Screen_Change;
+            
         }
         /// <summary>
-        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
+        /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -301,7 +301,6 @@ namespace MultyNetHack.Screen
             InitComands();
             GenerateHeader();
             GenerateFooter();
-            Change += Screen_Change;
         }
         /// <summary>
         /// This is called when creating new BaseScreen to initiate global properties
@@ -310,15 +309,13 @@ namespace MultyNetHack.Screen
         /// <param Name="Left"></param>
         private void InitProperties(int Top, int Left)
         {
+            BodyString = string.Empty;
             GlobalLeft = Left;
             GlobalTop = Top;
             WantedWidth = MaxWidth;
             WantedHeight = 30;
-            BodyString = string.Empty;
             shuldUpdate = true;
             Comand = new Dictionary<Comands, Action<BaseCommand>>();
-            
-
             mLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
             
         }
@@ -380,7 +377,7 @@ namespace MultyNetHack.Screen
             if (Scrool < 0)
                 Scrool = VirtualConsoleTop;
 
-            Change?.Invoke(null, EventArgs.Empty);
+            ScreenChange();
         }
         /// <summary>
         /// Needs to be implemented
@@ -417,14 +414,14 @@ namespace MultyNetHack.Screen
 
                 }
             }
-            Screen_Change(null, EventArgs.Empty);
+            ScreenChange();
         }
         /// <summary>
         /// Called when Screen changes
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="e"></param>
-        protected void Screen_Change(object sender, EventArgs e)
+        protected void ScreenChange()
         {
             GenerateFooter();
             GenerateHeader();
@@ -440,7 +437,7 @@ namespace MultyNetHack.Screen
         protected void GenerateFooter(string Mid)
         {
             FooterString = string.Format("{0}{1}", new string(' ', Max(0, TrueWidth / 2 - Mid.Length / 2)), Mid);
-            FooterHight = 1;
+            FooterHeight = 1;
         }
         virtual protected void GenerateHeader()
         {

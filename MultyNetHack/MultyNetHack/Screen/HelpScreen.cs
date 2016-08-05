@@ -14,7 +14,7 @@ namespace MultyNetHack.Screen
         public HelpScreen(int Top, int Left) : base(Top, Left, "Help")
         {
             InitText();
-            Screen_Change(null, EventArgs.Empty);
+            ScreenChange();
         }
 
         private void InitText()
