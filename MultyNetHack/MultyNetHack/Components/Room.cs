@@ -29,8 +29,6 @@ namespace MultyNetHack.Components
 
             LocalX = rand.Next(-500, 500);
             LocalY = rand.Next(-500, 500);
-            Width = rand.Next(15, 40);
-            Height = rand.Next(7, 20);
             MadeOf = Material.Air;
             ZValue = Parent.ZValue + 2;
             if (CollisionCheck(this) || Width * Height < 40)
@@ -57,11 +55,11 @@ namespace MultyNetHack.Components
                 int temp = left; left = right; right = left;
             }
 
-            LocalX = rand.Next(left, right);
-            LocalY = rand.Next(bottom, top);
-            Width = rand.Next(15, 40);
-            Height = rand.Next(7, 20);
-
+            int l = rand.Next(left, right);
+            int t = rand.Next(bottom, top);
+            int b = rand.Next(t - 40, t - 15);
+            int r = rand.Next(l + 7, l + 20);
+            mBounds = new Rectangle(t, r, b, l);
             MadeOf = Material.Air;
         }
         public void GenerateRandom(Quadrant quadrant, int bound)
@@ -90,10 +88,15 @@ namespace MultyNetHack.Components
         public void GenerateWall()
         {
 
-            HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, Bounds.t - LocalY - 1), Width);
-            HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, Bounds.b - LocalY), Width);
-            VerticalWall wL = new VerticalWall("LeftWall" + this.Name, new Point(Bounds.l - LocalX + 1, 0), Height - 2);
-            VerticalWall wR = new VerticalWall("RightWall" + this.Name, new Point(Bounds.r - LocalX, 0), Height - 2);
+            //HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, LocalBounds.height/2 - 1), LocalBounds.Width);
+            //HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, -LocalBounds.height/2), LocalBounds.Width);
+            //VerticalWall wL = new VerticalWall("LeftWall" + this.Name, new Point(LocalBounds.Width/2 + 1, 0), LocalBounds.height - 2);
+            //VerticalWall wR = new VerticalWall("RightWall" + this.Name, new Point(-LocalBounds.Width / 2, 0), LocalBounds.height - 2);
+            Wall wT = new Wall("TopWall", new Rectangle(LocalBounds.TopBound, LocalBounds.RightBound, LocalBounds.TopBound - 1, LocalBounds.LeftBound));
+            Wall wB = new Wall("BottomWall", new Rectangle(LocalBounds.BottomBound + 1, LocalBounds.RightBound, LocalBounds.BottomBound, LocalBounds.LeftBound));
+            Wall wL = new Wall("LeftWall",new Rectangle(LocalBounds.TopBound - 1, LocalBounds.LeftBound + 1, LocalBounds.BottomBound + 1, LocalBounds.LeftBound));
+            Wall wR = new Wall("RightWall", new Rectangle(LocalBounds.TopBound - 1, LocalBounds.RightBound, LocalBounds.BottomBound + 1, LocalBounds.RightBound - 1));
+
             wT.ZValue = ZValue + 1;
             wB.ZValue = ZValue + 1;
             wL.ZValue = ZValue + 1;
