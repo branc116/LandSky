@@ -13,7 +13,29 @@ namespace MultyNetHack.Components
     /// </summary>
     public abstract class Component
     {
-        public int LocalX, LocalY, ZValue;
+        public int LocalX
+        {
+            get
+            {
+                return LocalBounds.X;
+            }
+            set
+            {
+                LocalBounds.X = value;
+            }
+        }
+        public int LocalY
+        {
+            get
+            {
+                return LocalBounds.Y;
+            }
+            set
+            {
+                LocalBounds.Y = value;
+            }
+        }
+        public int ZValue;
         public int GlobalX
         {
             get
@@ -41,21 +63,27 @@ namespace MultyNetHack.Components
                 }
             }
         }
-        public bool IsRoot;    
-        public Rectangle Bounds
+        public Rectangle LocalBounds
         {
             get
             {
-                return new Rectangle(LocalY + Height / 2 + Height % 2, LocalX + Width / 2, LocalY - Height / 2, LocalX - Width / 2 - Width % 2);
+                return mBounds;
             }
         }
-        public Dictionary<string, Component> Controls;
-        public List<string> Keys;
-        public List<Sweep> sweep;
-        public int Height, Width;
-        public Component Parent;
-        public Material MadeOf;
-        public string Name;
+        public Rectangle GlobalBounds
+        {
+            get
+            {
+                if (this.IsRoot)
+                {
+                    return new Rectangle(0, 0, 0, 0);
+                }
+                else
+                {
+                    return LocalBounds + Parent.GlobalBounds;
+                }
+            }
+        }
         public int NumOfRooms
         {
             get
@@ -67,7 +95,7 @@ namespace MultyNetHack.Components
         {
             get
             {
-                return Controls.Where(i => i.Value.GetType() == typeof(HorizontalWall) || i.Value.GetType() == typeof(VerticalWall)).Count();
+                return Controls.Where(i => i.Value.GetType() == typeof(Wall)).Count();
             }
         }
         public int NumOfPaths
@@ -77,8 +105,34 @@ namespace MultyNetHack.Components
                 return Controls.Where(i => i.Value.GetType() == typeof(Path)).Count();
             }
         }
+        public int Height
+        {
+            get
+            {
+                return LocalBounds.height;
+            }
+        }
+        public int Width
+        {
+            get
+            {
+                return LocalBounds.Width;
+            }
+        }
+
+            
+        public bool IsRoot;
+        public Dictionary<string, Component> Controls;
+        public List<string> Keys;
+        public List<Sweep> sweep;
+        public Component Parent;
+        public Material MadeOf;
+        public string Name;
         public bool IsPassable;
-        private Random mRand;
+
+        protected Rectangle mBounds;
+        protected Random mRand;
+
         public Component(string name)
         {
             Controls = new Dictionary<string, Component>();
@@ -204,8 +258,8 @@ namespace MultyNetHack.Components
         {
 
             int lb = 0, ub = sweep.Count;
-            int x1 = c.Bounds.l;
-            int x2 = c.Bounds.r;
+            int x1 = c.LocalBounds.LeftBound;
+            int x2 = c.LocalBounds.RightBound;
             if (sweep.Count == 0)
             {
                 sweep.InsertRange(0, new Sweep[2] { new Sweep(c, x1, true), new Sweep(c, x2, false) });
@@ -478,7 +532,7 @@ namespace MultyNetHack.Components
                 await mTasks[0];
                 foreach (Room mRoom in mComps)
                 {
-                    if (mRoom.Bounds.width > 0 && mRoom.Bounds.height > 0)
+                    if (mRoom.LocalBounds.Width > 0 && mRoom.LocalBounds.height > 0)
                     {
 
                         mRoom.ZValue = this.ZValue + 3;
@@ -523,29 +577,29 @@ namespace MultyNetHack.Components
         //check for intersection in two rooms
         public static bool operator &(Component one, Component two)
         {
-            return (one.Bounds.l <= two.Bounds.r && one.Bounds.r >= two.Bounds.l &&
-                one.Bounds.t >= two.Bounds.b && one.Bounds.b <= two.Bounds.t);
+            return (one.LocalBounds.LeftBound <= two.LocalBounds.RightBound && one.LocalBounds.RightBound >= two.LocalBounds.LeftBound &&
+                one.LocalBounds.TopBound >= two.LocalBounds.BottomBound && one.LocalBounds.BottomBound <= two.LocalBounds.TopBound);
         }
         public static bool operator &(Component one, Player two)
         {
-            return (one.Bounds.l <= two.Bounds.r && one.Bounds.r >= two.Bounds.l &&
-                one.Bounds.t >= two.Bounds.b && one.Bounds.b <= two.Bounds.t);
+            return (one.LocalBounds.LeftBound <= two.LocalBounds.RightBound && one.LocalBounds.RightBound >= two.LocalBounds.LeftBound &&
+                one.LocalBounds.TopBound >= two.LocalBounds.BottomBound && one.LocalBounds.BottomBound <= two.LocalBounds.TopBound);
         }
         public static bool operator &(Component one, Point two)
         {
-            return (one.Bounds.t >= two.y && one.Bounds.b < two.y && one.Bounds.l <= two.x && one.Bounds.r >= two.x);
+            return (one.LocalBounds.TopBound >= two.y && one.LocalBounds.BottomBound < two.y && one.LocalBounds.LeftBound <= two.x && one.LocalBounds.RightBound >= two.x);
         }
         public static bool operator &(Component one, Rectangle two)
         {
-            return (one.Bounds.l < two.r && one.Bounds.r > two.l &&
-                    one.Bounds.t > two.b && one.Bounds.b < two.t);
+            return (one.LocalBounds.LeftBound < two.RightBound && one.LocalBounds.RightBound > two.LeftBound &&
+                    one.LocalBounds.TopBound > two.BottomBound && one.LocalBounds.BottomBound < two.TopBound);
         }
         public static bool operator ==(Component one, Component two)
         {
-            if (one.Bounds.t == two.Bounds.t &&
-                one.Bounds.b == two.Bounds.b &&
-                one.Bounds.l == two.Bounds.l &&
-                one.Bounds.r == two.Bounds.r &&
+            if (one.LocalBounds.TopBound == two.LocalBounds.TopBound &&
+                one.LocalBounds.BottomBound == two.LocalBounds.BottomBound &&
+                one.LocalBounds.LeftBound == two.LocalBounds.LeftBound &&
+                one.LocalBounds.RightBound == two.LocalBounds.RightBound &&
                 one.Name == two.Name) return true;
             return false;
         }
@@ -562,7 +616,7 @@ namespace MultyNetHack.Components
         }
         public static Rectangle operator +(Component c, Point p)
         {
-            return new Rectangle(c.Bounds.t + p.y, c.Bounds.r + p.x, c.Bounds.b + p.y, c.Bounds.l + p.x);
+            return new Rectangle(c.LocalBounds.TopBound + p.y, c.LocalBounds.RightBound + p.x, c.LocalBounds.BottomBound + p.y, c.LocalBounds.LeftBound + p.x);
         }
         public override bool Equals(object obj)
         {
