@@ -5,103 +5,108 @@ using System.Linq;
 using MultyNetHack.Commands;
 using MultyNetHack.Components;
 using MultyNetHack.MyEnums;
+
 namespace MultyNetHack.Screen
 {
     /// <summary>
     /// This should show all debug info (not implemented yet)
     /// </summary>
-    class DebugScreen : BaseScreen 
+    public class DebugScreen : BaseScreen 
     {
-        public DebugScreen(int Top, int Left, BaseScreen ScreenToDebug) : base (Top, Left, string.Format("Debugging {0} screen, it's type of {1}", ScreenToDebug.Name, ScreenToDebug.GetType().ToString().Split(new char[] { '.' }).Last()))
+        public DebugScreen(int Top, int Left, BaseScreen ScreenToDebug) : base (Top,
+                                                                                Left,
+                                                                                $"Debugging {ScreenToDebug.Name} screen, it's type of {ScreenToDebug.GetType().ToString().Split(new char[] {'.'}).Last()}"
+                                                                               )
         {
-            mInitText(ScreenToDebug);
+            MInitText(ScreenToDebug);
             ScreenChange();
         }
-
-        private void mInitText(BaseScreen screenToDebug)
+        private void MInitText(BaseScreen ScreenToDebug)
         {
-            VirtualConsoleAddLine(string.Format("Contains {0} rooms, {1} paths, {2} walls", screenToDebug.NumOfRooms, screenToDebug.NumOfPaths, screenToDebug.NumOfWalls));
-            PrintControls(screenToDebug as Component, 1);
-            VirtualConsoleAddLine(string.Format("Able to input {0} different commands", screenToDebug.Comand.Count));
-            mPrintCommands(screenToDebug.Comand, 1);
+            VirtualConsoleAddLine($"Contains {ScreenToDebug.NumOfRooms} rooms, {ScreenToDebug.NumOfPaths} paths, {ScreenToDebug.NumOfWalls} walls");
+            PrintControls(ScreenToDebug as Component, 1);
+            VirtualConsoleAddLine($"Able to input {ScreenToDebug.Comand.Count} different commands");
+            MPrintCommands(ScreenToDebug.Comand, 1);
         }
-
-        private void mPrintCommands(Dictionary<Comands, Action<BaseCommand>> mCommands, int indent)
+        private void MPrintCommands(Dictionary<Comands, Action<BaseCommand>> MCommands, int Indent)
         {
             var Km = MultyNetHack.Controls.KeyMap;
-            foreach(var mCommand in mCommands)
+            foreach(var Command in MCommands)
             {
-                VirtualConsoleAddLine(string.Format("{0}{1} -> {2} -> {3}",new string(' ',indent*2), Km.Where(i => i.Value == mCommand.Key).ToList()?[0].Key, mCommand.Key, mCommand.Value.Method.Name));
+                VirtualConsoleAddLine(
+                    $"{new string(' ', Indent*2)}{Km.Where(I => I.Value == Command.Key).ToList()?[0].Key} -> {Command.Key} -> {Command.Value.Method.Name}");
             }
         }
-
-        private void PrintControls(Component screenToDebug, int indent)
+        private void PrintControls(Component ScreenToDebug, int Indent)
         {
-            if (screenToDebug.NumOfRooms > 0)
+            if (ScreenToDebug.NumOfRooms > 0)
             {
-                mPrintRooms(screenToDebug.Controls.Where(i => i.Value.GetType() == typeof(Room)).ToList(), indent);
+                MPrintRooms(ScreenToDebug.Controls.Where(I => I.Value.GetType() == typeof(Room)).ToList(), Indent);
             }
-            if (screenToDebug.NumOfPaths > 0)
+            if (ScreenToDebug.NumOfPaths > 0)
             {
-                mPrintPaths(screenToDebug.Controls.Where(i => i.Value.GetType() == typeof(Path)).ToList(), indent);
+                MPrintPaths(ScreenToDebug.Controls.Where(I => I.Value.GetType() == typeof(Path)).ToList(), Indent);
             }
-            if (screenToDebug.NumOfWalls > 0)
+            if (ScreenToDebug.NumOfWalls > 0)
             {
-                mPrintWalls(screenToDebug.Controls.Where(i => i.Value.GetType() == typeof(Wall) ).ToList(), indent);
+                MPrintWalls(ScreenToDebug.Controls.Where(I => I.Value.GetType() == typeof(Wall) ).ToList(), Indent);
             }
         }
-
-        private void mPrintWalls(List<KeyValuePair<string, Component>> mWalls, int indent)
+        private void MPrintWalls(IEnumerable<KeyValuePair<string, Component>> MWalls, int Indent)
         {
-            foreach (var mWall in mWalls)
+            foreach (var Wall in MWalls)
             {
-                VirtualConsoleAddLine(string.Format("{0}Wall {1} is localy located on ({2},{3}) and globaly on ({4},{5}), width = {6}, height = {7}", new object[] { new string(' ', indent * 2), mWall.Value.Name, mWall.Value.LocalX, mWall.Value.LocalY, mWall.Value.GlobalX, mWall.Value.GlobalY, mWall.Value.LocalBounds.Width, mWall.Value.LocalBounds.height }));
-                if (mWall.Value.Controls.Count>0)
-                    VirtualConsoleAddLine(string.Format("{0}Wall contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mWall.Value.NumOfRooms,mWall.Value.NumOfPaths, mWall.Value.NumOfWalls));
-                PrintControls(mWall.Value, indent + 1);
+                VirtualConsoleAddLine(string.Format("{0}Wall {1} is localy located on ({2},{3}) and globaly on ({4},{5}), width = {6}, height = {7}", new object[] { new string(' ', Indent * 2), Wall.Value.Name, Wall.Value.LocalX, Wall.Value.LocalY, Wall.Value.GlobalX, Wall.Value.GlobalY, Wall.Value.LocalBounds.Width, Wall.Value.LocalBounds.Height }));
+                if (Wall.Value.Controls.Count>0)
+                    VirtualConsoleAddLine(
+                        $"{new string(' ', Indent*2)}Wall contains {Wall.Value.NumOfRooms} Rooms, {Wall.Value.NumOfPaths} Paths, {Wall.Value.NumOfWalls} walls");
+                PrintControls(Wall.Value, Indent + 1);
             }
         }
-
-        private void mPrintPaths(List<KeyValuePair<string, Component>> mPaths, int indent)
+        private void MPrintPaths(IEnumerable<KeyValuePair<string, Component>> MPaths, int Indent)
         {
-            foreach (var mPath in mPaths)
+            foreach (var Path in MPaths)
             {
-                VirtualConsoleAddLine(string.Format("{0}Path {1} is polynomial of {2}th power", new string(' ', indent * 2), mPath.Value.Name, (mPath.Value as Path).ConnectedComponent.Count));
-                if (mPath.Value.Controls.Count > 0)
-                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mPath.Value.NumOfRooms,mPath.Value.NumOfPaths, mPath.Value.NumOfWalls));
-                if ((mPath.Value as Path).ConnectedComponent.Count > 0)
+                VirtualConsoleAddLine(
+                    $"{new string(' ', Indent*2)}Path {Path.Value.Name} is polynomial of {(Path.Value as Path).ConnectedComponent.Count}th power");
+                if (Path.Value.Controls.Count > 0)
+                    VirtualConsoleAddLine(
+                        $"{new string(' ', Indent*2)}Room contains {Path.Value.NumOfRooms} Rooms, {Path.Value.NumOfPaths} Paths, {Path.Value.NumOfWalls} walls");
+                if ((Path.Value as Path).ConnectedComponent.Count > 0)
                 {
-                    mPrintRooms((mPath.Value as Path).ConnectedComponent.Where(i => i.GetType() == typeof(Room)).ToList(), indent + 1);
+                    MPrintRooms((Path.Value as Path).ConnectedComponent.Where(I => I.GetType() == typeof(Room)).ToList(), Indent + 1);
                 }
-                PrintControls(mPath.Value, indent + 1);
+                PrintControls(Path.Value, Indent + 1);
 
             }
         }
-
-        private void mPrintRooms(List<Component> mRooms, int indent)
+        private void MPrintRooms(IEnumerable<Component> MRooms, int Indent)
         {
-            foreach (var mRoom in mRooms)
+            foreach (var Room in MRooms)
             {
-                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}", new string(' ', indent * 2), mRoom.Name, mRoom.LocalX, mRoom.LocalY, mRoom.LocalBounds.Width, mRoom.LocalBounds.height));
-                if (mRoom.Controls.Count > 0)
-                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls", new string(' ', indent * 2), mRoom.NumOfRooms, mRoom.NumOfPaths, mRoom.NumOfWalls));
-                if (mRoom.NumOfRooms > 0)
+                VirtualConsoleAddLine(
+                    $"{new string(' ', Indent*2)}Room {Room.Name} is located on ({Room.LocalX},{Room.LocalY}), width = {Room.LocalBounds.Width}, height = {Room.LocalBounds.Height}");
+                if (Room.Controls.Count > 0)
+                    VirtualConsoleAddLine(
+                        $"{new string(' ', Indent*2)}Room contains {Room.NumOfRooms} Rooms, {Room.NumOfPaths} Paths, {Room.NumOfWalls} walls");
+                if (Room.NumOfRooms > 0)
                 {
-                    mPrintRooms(mRoom.Controls.Where(i => i.Value.GetType() == typeof(Room)).ToList(), indent + 1);
+                    MPrintRooms(Room.Controls.Where(I => I.Value.GetType() == typeof(Room)).ToList(), Indent + 1);
                 }
-                PrintControls(mRoom, indent + 1);
+                PrintControls(Room, Indent + 1);
 
             }
         }
-
-        private void mPrintRooms(List<KeyValuePair<string, Component>> mRooms,int indent)
+        private void MPrintRooms(IEnumerable<KeyValuePair<string, Component>> MRooms,int Indent)
         {
-            foreach(var mRoom in mRooms)
+            foreach(var Room in MRooms)
             {
-                VirtualConsoleAddLine(string.Format("{0}Room {1} is located on ({2},{3}), width = {4}, height = {5}",new string(' ',indent*2), mRoom.Value.Name, mRoom.Value.LocalX, mRoom.Value.LocalY, mRoom.Value.LocalBounds.Width, mRoom.Value.LocalBounds.height));
-                if (mRoom.Value.Controls.Count > 0)
-                    VirtualConsoleAddLine(string.Format("{0}Room contains {1} Rooms, {2} Paths, {3} walls",new string(' ', indent*2), mRoom.Value.NumOfRooms,mRoom.Value.NumOfPaths, mRoom.Value.NumOfWalls));
-                PrintControls(mRoom.Value, indent + 1);
+                VirtualConsoleAddLine(
+                    $"{new string(' ', Indent*2)}Room {Room.Value.Name} is located on ({Room.Value.LocalX},{Room.Value.LocalY}), width = {Room.Value.LocalBounds.Width}, height = {Room.Value.LocalBounds.Height}");
+                if (Room.Value.Controls.Count > 0)
+                    VirtualConsoleAddLine(
+                        $"{new string(' ', Indent*2)}Room contains {Room.Value.NumOfRooms} Rooms, {Room.Value.NumOfPaths} Paths, {Room.Value.NumOfWalls} walls");
+                PrintControls(Room.Value, Indent + 1);
             }
         }
     }

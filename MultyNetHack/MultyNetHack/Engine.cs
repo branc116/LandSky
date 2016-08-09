@@ -15,48 +15,51 @@ namespace MultyNetHack
     /// </summary>
     class Engine
     {
-        Size SceenSize;
+        private Size mSceenSize;
         /// <summary>
         /// Plays A major
         /// </summary>
         /// <param Name="tempo">Amount of time spend on each note (in ms)</param>
-        public void PlayMajor(int tempo)
+        public void PlayMajor(int Tempo)
         {
             
-            int dur = tempo;
-            Console.Beep(ToInt32(440 * Pow(2, (double)12 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)14 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)16 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)17 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)19 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)21 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)23 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)24 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)23 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)21 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)19 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)17 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)16 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, (double)14 / 12)), dur);
-            Console.Beep(ToInt32(440 * Pow(2, 12 / 12)), dur);
+            int Dur = Tempo;
+            Console.Beep(ToInt32(440 * Pow(2, (double)12 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)14 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)16 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)17 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)19 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)21 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)23 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)24 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)23 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)21 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)19 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)17 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)16 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, (double)14 / 12)), Dur);
+            Console.Beep(ToInt32(440 * Pow(2, 12 / 12)), Dur);
         }
 
-        private void InitConsole(int width, int height)
+        private void InitConsole(int Width, int Height)
         {
-            Console.WindowWidth = width + 1;
-            Console.BufferWidth = width + 1;
-            Console.WindowHeight = height * 3;
+            Console.WindowWidth = Width + 1;
+            Console.BufferWidth = Width + 1;
+            Console.WindowHeight = Height * 3;
             try
             {
                 Console.CursorVisible = false;
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             PlayMajor(2);
             
         }
-        private void InitProperties(int width,int height)
+        private void InitProperties(int Width,int Height)
         {
-            SceenSize = new Size(width, height);
+            mSceenSize = new Size(Width, Height);
             BaseScreen.Active = new Stack<BaseScreen>();
             
             BaseScreen.AllMessages = new List<DebugMessage>();
@@ -71,24 +74,24 @@ namespace MultyNetHack
         /// <returns></returns>
         private Task Initinput()
         {
-            var c = Console.ReadKey(true);
+            var C = Console.ReadKey(true);
             
             while (true)
             {
                 try
                 {
-                    var cc = Controls.KeyMap[c.KeyChar];
-                    var ss = BaseScreen.Active.Peek();
+                    var Cc = Controls.KeyMap[C.KeyChar];
+                    var Ss = BaseScreen.Active.Peek();
                     Task.Run(() =>
                     {
                         try
                         {
-                            ss.Comand[cc](Controls.InvokedBaseCommand[cc]);
+                            Ss.Comand[Cc](Controls.InvokedBaseCommand[Cc]);
                         }
-                        catch(Exception ex)
+                        catch(Exception Ex)
                         {
-                            if (ex != null)
-                                ex = null;
+                            if (Ex != null)
+                                Ex = null;
                         }
                     });
                 }
@@ -96,7 +99,7 @@ namespace MultyNetHack
                     BaseScreen.EnqueMessage(e);
                     if (e!=null) e = null;
                 }
-                c = Console.ReadKey(true);
+                C = Console.ReadKey(true);
             }
 
         }
@@ -105,12 +108,12 @@ namespace MultyNetHack
         /// </summary>
         /// <param Name="width">Width of the Screens in the global console</param>
         /// <param Name="height">Height of the Screens in the global console</param>
-        public Engine(int width, int height)
+        public Engine(int Width, int Height)
         {
-            InitConsole(width, height);
-            InitProperties(width, height);
+            InitConsole(Width, Height);
+            InitProperties(Width, Height);
             BaseScreen.Active.Push(new MainMenuScreen(0, 0));
-            Task t = Initinput();
+            Task T = Initinput();
             
         }
     }

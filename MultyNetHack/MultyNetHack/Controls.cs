@@ -13,65 +13,69 @@ namespace MultyNetHack
     {
         public static Dictionary<char, Comands> KeyMap;
         public static Dictionary<Comands, BaseCommand> InvokedBaseCommand;
-        static public void LoadKeyMap()
+        public static void LoadKeyMap()
         {
-            KeyMap = new Dictionary<char, Comands>();
-            KeyMap.Add('h', Comands.Left);
-            KeyMap.Add('H', Comands.TenStepsLeft);
-            KeyMap.Add('l', Comands.Right);
-            KeyMap.Add('L', Comands.TenStepsRight);
-            KeyMap.Add('k', Comands.Up);
-            KeyMap.Add('K', Comands.TenStepsUp);
-            KeyMap.Add('j', Comands.Down);
-            KeyMap.Add('J', Comands.TenStepsDown);
-            KeyMap.Add('q', Comands.ScrollLeft);
-            KeyMap.Add('e', Comands.ScrollRight);
-            KeyMap.Add(',', Comands.ScrollLeft);
-            KeyMap.Add('.', Comands.ScrollRight);
-            KeyMap.Add('r', Comands.GenerateOneRoom);
-            KeyMap.Add('R', Comands.GenerateALotOfRooms);
-            KeyMap.Add('P', Comands.GenerateRandomPath);
-            KeyMap.Add('d', Comands.DequeMessage);
-            KeyMap.Add(Convert.ToChar(27), Comands.LastSceen);
-            KeyMap.Add('?', Comands.ShowHelp);
-            KeyMap.Add('*', Comands.ShowDebug);
-            KeyMap.Add('1', Comands.Option1);
-            KeyMap.Add('2', Comands.Option2);
-            KeyMap.Add('3', Comands.Option3);
-            KeyMap.Add('4', Comands.Option4);
-            KeyMap.Add('5', Comands.Option5);
-            KeyMap.Add('6', Comands.Option6);
-            KeyMap.Add('7', Comands.Option7);
-            KeyMap.Add('8', Comands.Option8);
-            KeyMap.Add('9', Comands.Option9);
+            KeyMap = new Dictionary<char, Comands>
+            {
+                {'h', Comands.Left},
+                {'H', Comands.TenStepsLeft},
+                {'l', Comands.Right},
+                {'L', Comands.TenStepsRight},
+                {'k', Comands.Up},
+                {'K', Comands.TenStepsUp},
+                {'j', Comands.Down},
+                {'J', Comands.TenStepsDown},
+                {'q', Comands.ScrollLeft},
+                {'e', Comands.ScrollRight},
+                {',', Comands.ScrollLeft},
+                {'.', Comands.ScrollRight},
+                {'r', Comands.GenerateOneRoom},
+                {'R', Comands.GenerateALotOfRooms},
+                {'P', Comands.GenerateRandomPath},
+                {'d', Comands.DequeMessage},
+                {Convert.ToChar(27), Comands.LastSceen},
+                {'?', Comands.ShowHelp},
+                {'*', Comands.ShowDebug},
+                {'1', Comands.Option1},
+                {'2', Comands.Option2},
+                {'3', Comands.Option3},
+                {'4', Comands.Option4},
+                {'5', Comands.Option5},
+                {'6', Comands.Option6},
+                {'7', Comands.Option7},
+                {'8', Comands.Option8},
+                {'9', Comands.Option9}
+            };
         }
-        static public void LoadInvokedBaseCommand()
+        public static void LoadInvokedBaseCommand()
         {
-            InvokedBaseCommand = new Dictionary<Comands, BaseCommand>();
-            InvokedBaseCommand.Add(Comands.GenerateOneRoom, new GenerateRoomsCommand(1));
-            InvokedBaseCommand.Add(Comands.GenerateALotOfRooms, new GenerateRoomsCommand(100));
-            InvokedBaseCommand.Add(Comands.Left, new MoveCommand(MoveDirection.Left, 1));
-            InvokedBaseCommand.Add(Comands.TenStepsLeft, new MoveCommand(MoveDirection.Left, 10));
-            InvokedBaseCommand.Add(Comands.Right, new MoveCommand(MoveDirection.Right, 1));
-            InvokedBaseCommand.Add(Comands.TenStepsRight, new MoveCommand(MoveDirection.Right, 10));
-            InvokedBaseCommand.Add(Comands.Down, new MoveCommand(MoveDirection.Down, 1));
-            InvokedBaseCommand.Add(Comands.TenStepsDown, new MoveCommand(MoveDirection.Down, 10));
-            InvokedBaseCommand.Add(Comands.Up, new MoveCommand(MoveDirection.Up, 1));
-            InvokedBaseCommand.Add(Comands.TenStepsUp, new MoveCommand(MoveDirection.Up, 10));
-            InvokedBaseCommand.Add(Comands.ScrollRight, new ScrollCommand(1));
-            InvokedBaseCommand.Add(Comands.ScrollLeft, new ScrollCommand(-1));
-            InvokedBaseCommand.Add(Comands.ShowHelp, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.ShowDebug, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option1, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option2, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option3, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option4, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option5, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option6, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option7, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option8, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.Option9, new BaseCommand());
-            InvokedBaseCommand.Add(Comands.LastSceen, new BaseCommand());
+            InvokedBaseCommand = new Dictionary<Comands, BaseCommand>
+            {
+                {Comands.GenerateOneRoom,     new GenerateRoomsCommand(1)},
+                {Comands.GenerateALotOfRooms, new GenerateRoomsCommand(100)},
+                {Comands.Left,                new MoveCommand(MoveDirection.Left, 1)},
+                {Comands.TenStepsLeft,        new MoveCommand(MoveDirection.Left, 10)},
+                {Comands.Right,               new MoveCommand(MoveDirection.Right, 1)},
+                {Comands.TenStepsRight,       new MoveCommand(MoveDirection.Right, 10)},
+                {Comands.Down,                new MoveCommand(MoveDirection.Down, 1)},
+                {Comands.TenStepsDown,        new MoveCommand(MoveDirection.Down, 10)},
+                {Comands.Up,                  new MoveCommand(MoveDirection.Up, 1)},
+                {Comands.TenStepsUp,          new MoveCommand(MoveDirection.Up, 10)},
+                {Comands.ScrollRight,         new ScrollCommand(1)},
+                {Comands.ScrollLeft,          new ScrollCommand(-1)},
+                {Comands.ShowHelp,            new BaseCommand()},
+                {Comands.ShowDebug,           new BaseCommand()},
+                {Comands.Option1,             new BaseCommand()},
+                {Comands.Option2,             new BaseCommand()},
+                {Comands.Option3,             new BaseCommand()},
+                {Comands.Option4,             new BaseCommand()},
+                {Comands.Option5,             new BaseCommand()},
+                {Comands.Option6,             new BaseCommand()},
+                {Comands.Option7,             new BaseCommand()},
+                {Comands.Option8,             new BaseCommand()},
+                {Comands.Option9,             new BaseCommand()},
+                {Comands.LastSceen,           new BaseCommand()}
+            };
         }
     } 
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MultyNetHack;
-namespace MultyNetHack.Screen
+﻿namespace MultyNetHack.Screen
 {
     /// <summary>
     /// Help screen (need to be implemented)
@@ -16,7 +10,6 @@ namespace MultyNetHack.Screen
             InitText();
             ScreenChange();
         }
-
         private void InitText()
         {
             PrintCenter("This is MultyNetHack");

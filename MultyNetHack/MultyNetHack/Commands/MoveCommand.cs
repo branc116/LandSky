@@ -11,7 +11,6 @@ namespace MultyNetHack.Commands
         public static CancellationToken CancleMove;
         public static CancellationTokenSource InvokeCancle;
 
-
         public MoveCommand(MoveDirection Direction, int steps) {
             this.Direction = Direction;
             this.Steps = steps;
@@ -25,24 +24,29 @@ namespace MultyNetHack.Commands
         }
         public static MoveCommand Phrase(Comands MoveCommand)
         {
-            if (MoveCommand == Comands.Left)
-                return Left(1);
-            else if (MoveCommand == Comands.TenStepsLeft)
-                return Left(10);
-            else if (MoveCommand == Comands.Right)
-                return Right(1);
-            else if (MoveCommand == Comands.TenStepsRight)
-                return Right(10);
-            if (MoveCommand == Comands.Up)
-                return Up(1);
-            else if (MoveCommand == Comands.TenStepsUp)
-                return Left(10);
-            else if (MoveCommand == Comands.Down)
-                return Down(1);
-            else if (MoveCommand == Comands.TenStepsDown)
-                return Down(10);
-            else throw new Exception(string.Format("Command {0} not valid", MoveCommand));
+            switch (MoveCommand)
+            {
+                case Comands.Left:
+                    return Left(1);
+                case Comands.TenStepsLeft:
+                    return Left(10);
+                case Comands.Right:
+                    return Right(1);
+                case Comands.TenStepsRight:
+                    return Right(10);
+                case Comands.Up:
+                    return Up(1);
+                case Comands.TenStepsUp:
+                    return Left(10);
+                case Comands.Down:
+                    return Down(1);
+                case Comands.TenStepsDown:
+                    return Down(10);
+                default:
+                    throw new Exception($"Command {MoveCommand} not valid");
+            }
         }
+
         public static MoveCommand Left(int steps)
         {
             return new MoveCommand(MoveDirection.Left, steps);

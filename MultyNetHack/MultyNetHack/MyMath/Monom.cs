@@ -1,4 +1,5 @@
-﻿using static System.Math;
+﻿using System;
+using static System.Math;
 
 using MultyNetHack.MyEnums;
 
@@ -10,163 +11,135 @@ namespace MultyNetHack.MyMath
     /// </summary>
     public class Monom
     {
-        KindOfMonom monom;
+        
+        private double mA, mB, mC;
+        private const double mTolerance = 10e-6;
 
-        double a, b, c;
-        public KindOfMonom SetMonomKind
+        public KindOfMonom ThisKindOfMonom;
+        public KindOfMonom SetThisKindOfMonomKind
         {
+            get
+            {
+                return ThisKindOfMonom;
+            }
             set
             {
-                a = b = c = 0;
-                monom = value;
+                mA = mB = mC = 0;
+                ThisKindOfMonom = value;
             }
         }
-        public double ParamaterA
-        {
-            get
-            {
-                if (monom != KindOfMonom.Constant)
-                    return a;
-                else
-                    return 0;
-            }
-        }
-        public double ParamaterB
-        {
-            get
-            {
-                if (monom != KindOfMonom.Constant)
-                    return b;
-                else
-                    return 0;
-            }
-        }
-        public double Constant
-        {
-            get
-            {
-                if (monom == KindOfMonom.Constant)
-                    return c;
-                else
-                    return 0;
-            }
-        }
+        public double ParamaterA => ThisKindOfMonom != KindOfMonom.Constant ? mA : 0;
+        public double ParamaterB => ThisKindOfMonom != KindOfMonom.Constant ? mB : 0;
+        public double Constant => ThisKindOfMonom == KindOfMonom.Constant ? mC : 0;
         public double InterpolatedValue
         {
+            get {
+                return this.ThisKindOfMonom != KindOfMonom.Constant ? mA : mC;
+            }
             set
             {
-                if (this.monom != KindOfMonom.Constant)
-                    a = value;
+                if (this.ThisKindOfMonom != KindOfMonom.Constant)
+                    mA = value;
                 else
-                    c = value;
+                    mC = value;
             }
         }
-        public Monom(KindOfMonom Monom, double ParamaterA, double ParamaterB)
+
+        public Monom(KindOfMonom ThisKindOfMonom, double ParamaterA, double ParamaterB)
         {
-            if (Monom != KindOfMonom.Constant)
+            if (ThisKindOfMonom != KindOfMonom.Constant)
             {
-                a = ParamaterA;
-                b = ParamaterB;
+                mA = ParamaterA;
+                mB = ParamaterB;
             }
             else
             {
-                c = ParamaterA;
+                mC = ParamaterA;
             }
-            monom = Monom;
+            this.ThisKindOfMonom = ThisKindOfMonom;
         }
         public Monom(double Constant)
         {
-            monom = KindOfMonom.Constant;
+            ThisKindOfMonom = KindOfMonom.Constant;
 
         }
-        public double ValuForX(double x)
+        public double ValuForX(double X)
         {
-            if (monom == KindOfMonom.Line)
-                return a * Pow(x, b);
-            else if (monom == KindOfMonom.Sine)
-                return a * Sin(b * x);
-            else
-                return c;
-
-        }
-        public double DerivativeForX(double x)
-        {
-            if (monom == KindOfMonom.Constant)
-                return 0;
-            else if (monom == KindOfMonom.Line)
+            switch (ThisKindOfMonom)
             {
-                if (b == 1)
-                    return a;
-                if (b == 0)
-                    return 0;
-                return a * b * Pow(x, b - 1);
+                case KindOfMonom.Line:
+                    return mA * Pow(X, mB);
+                case KindOfMonom.Sine:
+                    return mA * Sin(mB * X);
+                case KindOfMonom.Constant:
+                    return mC;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            else
+            
+        }
+        public double DerivativeForX(double X)
+        {
+            switch (ThisKindOfMonom)
             {
-                if (b == 0)
+                case KindOfMonom.Constant:
                     return 0;
-                return b * a * Cos(b * x);
+                case KindOfMonom.Line:
+                    if (Abs(mB - 1) < mTolerance)
+                        return mA;
+                    if (Abs(mB) < mTolerance)
+                        return 0;
+                    return mA*mB*Pow(X, mB - 1);
+                case KindOfMonom.Sine:
+                    if (Abs(mB) < mTolerance)
+                        return 0;
+                    return mB * mA * Cos(mB * X);
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
         public string LinearRepresentationOfMonom()
         {
-            string plus = "+";
-            switch (monom)
+            const string plus = "+";
+            switch (ThisKindOfMonom)
             {
                 case KindOfMonom.Constant:
-                    if (c > 0)
-                        return plus + string.Format("{0}", Round(c, 2));
-                    else if (c < 0)
-                        return string.Format("{0}", Round(c, 2));
-                    else
-                        return string.Empty;
+                    if (mC > 0)
+                        return plus + $"{Round(mC, 2)}";
+                    return mC < 0 ? $"{Round(mC, 2)}" : string.Empty;
                 case KindOfMonom.Line:
-                    if (b > 1)
+                    if (mB > 1)
                     {
-
-                        if (a > 0)
-                            return plus + string.Format("{0}X^{1}", Round(a, 2), Round(b, 2));
-                        else if (a < 0)
-                            return string.Format("{0}X^{1}", Round(a, 2), Round(b, 2));
-                        else
-                            return string.Empty;
+                        if (mA > 0)
+                            return plus + $"{Round(mA, 2)}X^{Round(mB, 2)}";
+                        return mA < 0 ? $"{Round(mA, 2)}X^{Round(mB, 2)}" : string.Empty;
                     }
-                    else if (b == 1)
+                    if (Abs(mB - 1) < mTolerance)
                     {
-                        if (a > 0)
-                            return plus + string.Format("{0}X", Round(a, 2));
-                        else if (a < 0)
-                            return string.Format("{0}X", Round(a, 2));
-                        else
-                            return string.Empty;
+                        if (mA > 0)
+                            return plus + $"{Round(mA, 2)}X";
+                        return mA < 0 ? $"{Round(mA, 2)}X" : string.Empty;
                     }
                     else
                     {
-                        if (a > 0)
-                            return plus + string.Format("{0}", Round(a, 2));
-                        else if (a < 0)
-                            return string.Format("{0}", Round(a, 2));
-                        else
-                            return string.Empty;
+                        if (mA > 0)
+                            return plus + $"{Round(mA, 2)}";
+                        return mA < 0 ? $"{Round(mA, 2)}" : string.Empty;
                     }
+                case KindOfMonom.Sine:
+                    if (Abs(mB) > mTolerance)
+                    {
+                        if (Abs(mA - 1) < mTolerance)
+                            return plus + $"Sin(X{Round(mB, 2)})";
+                        if (Abs(mA + 1) < mTolerance)
+                            return plus + $"-Sin(X{Round(mB, 2)})";
+                        if (mA > 0)
+                            return plus + $"{Round(mA, 2)}Sin({Round(mB, 2)}X)";
+                        return mA < 0 ? $"{Round(mA, 2)}Sin({Round(mB, 2)}X)" : string.Empty;
+                    }
+                    return string.Empty;
                 default:
-                    if (b != 0)
-                    {
-                        if (a == 1)
-                            return plus + string.Format("Sin(X{1})", Round(b, 2));
-                        if (a == -1)
-                            return plus + string.Format("-Sin(X{1})", Round(b, 2));
-                        if (a > 0)
-                            return plus + string.Format("{0}Sin({1}X)", Round(a, 2), Round(b, 2));
-                        else if (a < 0)
-                            return string.Format("{0}Sin({1}X)", Round(a, 2), Round(b, 2));
-                        else
-                            return string.Empty;
-                    }
-                    else
-                    {
-                        return string.Empty;
-                    }
+                    return string.Empty;
             }
         }
     }

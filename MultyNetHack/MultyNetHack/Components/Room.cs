@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using MultyNetHack.MyEnums;
 using MultyNetHack.MyMath;
@@ -11,105 +12,72 @@ namespace MultyNetHack.Components
     /// </summary>
     public class Room : Component
     {
-        private int genStack;
-        private Random rand;
 
-        public Room(string name) : base(name)
+        public Room(string Name) : base(Name)
         {
-            genStack = 0;
-            rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
+            Rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
             IsPassable = true;
-            sweep = new List<Sweep>();
             Controls = new Dictionary<string, Component>();
         }
-        public void GeneratRandom()
+        public void GenerateRandom(int Top, int Left, int Bottom, int Right)
         {
-            START:;
-            genStack++;
-
-            LocalX = rand.Next(-500, 500);
-            LocalY = rand.Next(-500, 500);
-            MadeOf = Material.Air;
-            ZValue = Parent.ZValue + 2;
-            if (CollisionCheck(this) || Width * Height < 40)
-                if (genStack > 1000)
-                {
-                    this.Dispose();
-                }
-                else
-                    goto START;
-            else
+            if (Top < Bottom)
             {
-                Parent.InsertInSweep(this);
-                GenerateWall();
+                int Temp = Top;
+                Top = Bottom;
+                Bottom = Temp;
             }
-        }
-        public void GenerateRandom(int top, int left, int bottom, int right)
-        {
-            if (top < bottom)
+            if (Right < Left)
             {
-                int temp = top; top = bottom; bottom = temp;
-            }
-            if (right < left)
-            {
-                int temp = left; left = right; right = left;
+                int Temp = Left; Left = Right; Right = Temp;
             }
 
-            int l = rand.Next(left, right);
-            int t = rand.Next(bottom, top);
-            int b = rand.Next(t - 40, t - 15);
-            int r = rand.Next(l + 7, l + 20);
-            mBounds = new Rectangle(t, r, b, l);
+            int L = Rand.Next(Left, Right);
+            int T = Rand.Next(Bottom, Top);
+            int B = Rand.Next(T - 40, T - 15);
+            int R = Rand.Next(L + 7, L + 20);
+            Bounds = new Rectangle(T, R, B, L);
             MadeOf = Material.Air;
         }
-        public void GenerateRandom(Quadrant quadrant, int bound)
+        public void GenerateRandom(Quadrant Quadrant, int Bound)
         {
-            if (quadrant == Quadrant.First)
-                GenerateRandom(bound, 0, 0, bound);
-            else if (quadrant == Quadrant.Second)
-                GenerateRandom(bound, -bound, 0, 0);
-            else if (quadrant == Quadrant.Third)
-                GenerateRandom(0, -bound, -bound, 0);
-            else if (quadrant == Quadrant.Fourth)
-                GenerateRandom(0, 0, -bound, bound);
-        }
-        public bool CollisionCheck(Room r)
-        {
-            Point startEnd;
-            startEnd = Parent.GetStartEndEnter(r.LocalX);
-            // make it faster!!!
-            for (int i = 0; i < Parent.sweep.Count; i++)
+            switch (Quadrant)
             {
-                if (Parent.sweep[i].enter == startEnd.enter && Parent.sweep[i].component & r)
-                    return true;
+                case Quadrant.First:
+                    GenerateRandom(Bound, 0, 0, Bound);
+                    break;
+                case Quadrant.Second:
+                    GenerateRandom(Bound, -Bound, 0, 0);
+                    break;
+                case Quadrant.Third:
+                    GenerateRandom(0, -Bound, -Bound, 0);
+                    break;
+                case Quadrant.Fourth:
+                    GenerateRandom(0, 0, -Bound, Bound);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Quadrant), Quadrant, null);
             }
-            return false;
+        }
+        public bool CollisionCheck(Room R)
+        {
+            return this.Parent.Controls.Any(N => N.Value.GetType() != typeof(Path) && N.Value.LocalBounds & R.LocalBounds);
         }
         public void GenerateWall()
         {
+            Wall WT = new Wall("TopWall", new Rectangle(new Point(0, this.Height/2 - 1), this.Width, 1));
+            Wall WB = new Wall("BottomWall", new Rectangle(new Point(0, -this.Height/2 + 1), this.Width, 1));
+            Wall WL = new Wall("LeftWall", new Rectangle(new Point(-this.Width/2 - 1, 0), 1, this.Height));
+            Wall WR = new Wall("RightWall", new Rectangle(new Point(this.Width/2, 0), 1, this.Height));
 
-            //HorizontalWall wT = new HorizontalWall("TopWall" + this.Name, new Point(0, LocalBounds.height/2 - 1), LocalBounds.Width);
-            //HorizontalWall wB = new HorizontalWall("BottomWall" + this.Name, new Point(0, -LocalBounds.height/2), LocalBounds.Width);
-            //VerticalWall wL = new VerticalWall("LeftWall" + this.Name, new Point(LocalBounds.Width/2 + 1, 0), LocalBounds.height - 2);
-            //VerticalWall wR = new VerticalWall("RightWall" + this.Name, new Point(-LocalBounds.Width / 2, 0), LocalBounds.height - 2);
-            Wall wT = new Wall("TopWall", new Rectangle(LocalBounds.TopBound, LocalBounds.RightBound, LocalBounds.TopBound - 1, LocalBounds.LeftBound));
-            Wall wB = new Wall("BottomWall", new Rectangle(LocalBounds.BottomBound + 1, LocalBounds.RightBound, LocalBounds.BottomBound, LocalBounds.LeftBound));
-            Wall wL = new Wall("LeftWall",new Rectangle(LocalBounds.TopBound - 1, LocalBounds.LeftBound + 1, LocalBounds.BottomBound + 1, LocalBounds.LeftBound));
-            Wall wR = new Wall("RightWall", new Rectangle(LocalBounds.TopBound - 1, LocalBounds.RightBound, LocalBounds.BottomBound + 1, LocalBounds.RightBound - 1));
-
-            wT.ZValue = ZValue + 1;
-            wB.ZValue = ZValue + 1;
-            wL.ZValue = ZValue + 1;
-            wR.ZValue = ZValue + 1;
-            this.Insert(wT);
-            this.Insert(wB);
-            this.Insert(wL);
-            this.Insert(wR);
-            this.InsertInSweep(wT);
-            this.InsertInSweep(wB);
-            this.InsertInSweep(wL);
-            this.InsertInSweep(wR);
+            WT.ZValue = ZValue + 1;
+            WB.ZValue = ZValue + 1;
+            WL.ZValue = ZValue + 1;
+            WR.ZValue = ZValue + 1;
+            this.Insert(WT);
+            this.Insert(WB);
+            this.Insert(WL);
+            this.Insert(WR);
         }
-
     }
 }

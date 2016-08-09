@@ -6,11 +6,11 @@ namespace MultyNetHack.MyMath
     /// </summary>
     public class Size
     {
-        public int height, width;
-        public Size(int width, int height)
+        public int Height, Width;
+        public Size(int Width, int Height)
         {
-            this.height = height;
-            this.width = width;
+            this.Height = Height;
+            this.Width = Width;
         }
 
     }

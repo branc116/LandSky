@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-namespace MultyNetHack
+﻿namespace MultyNetHack
 {
     class Program
     {
@@ -10,10 +6,10 @@ namespace MultyNetHack
         /// Start of the program
         /// </summary>
         /// <param Name="args"></param>
-        static void Main(string[] args)
+        static void Main(string[] Args)
         {
-            new Engine(180,20);
-        } 
+            var Engine = new Engine(180,20);
+        }
     }
 
 }

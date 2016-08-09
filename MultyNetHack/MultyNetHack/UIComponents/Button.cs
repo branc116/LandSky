@@ -2,9 +2,7 @@
 
 using MultyNetHack.Commands;
 using MultyNetHack.MyEnums;
-/// <summary>
-/// Here are implemented ui elements
-/// </summary>
+
 namespace MultyNetHack.UIComponents
 {
     /// <summary>
@@ -25,13 +23,13 @@ namespace MultyNetHack.UIComponents
         {
             OnPress?.Invoke(this, DateTime.Now);
         }
-        public void InvokEvent(BaseCommand bc)
+        public void InvokEvent(BaseCommand Bc)
         {
             OnPress?.Invoke(this, DateTime.Now);
         }
         public override string ToString()
         {
-            return string.Format("{0}. {1}", InvokeCommand.ToString().Replace("Option", string.Empty), Text);
+            return $"{InvokeCommand.ToString().Replace("Option", string.Empty)}. {Text}";
         }
 
     }

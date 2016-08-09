@@ -13,36 +13,32 @@ using MultyNetHack.MyMath;
 namespace MultyNetHack.Screen
 {
     /// <summary>
-    /// Displays the instance of the game. This Extends BaseScreen.
+    ///     Displays the instance of the game. This Extends BaseScreen.
     /// </summary>
     public class SandboxMap : BaseScreen
     {
         /// <summary>
-        /// Matrix for zbuffering
+        ///     Current state of the game instance
         /// </summary>
-        private List<List<int>> updated;
+        private List<List<char>> mBuff1;
+        private bool mGhost;
+        private readonly object mLockDrawMethode = new object();
         /// <summary>
-        /// Current state of the game instance
+        ///     The bounds in the Cartesian coordinate system
         /// </summary>
-        private List<List<char>> buff1;
+        private Rectangle mMBoundsAroundThisPlayer;
+        private int mSpeed;
         /// <summary>
-        /// Textures for the materials
+        ///     Textures for the materials
         /// </summary>
-        Dictionary<Material, char> Texture;
-        public event EventHandler<string> Message;
+        private Dictionary<Material, char> mTexture;
+        private Player mThisPlayer;
         /// <summary>
-        /// Invoke this when update in the game happens( Played move, npc move...)
+        ///     Matrix for zbuffering
         /// </summary>
-        public event EventHandler<int> Draw;
+        private List<List<int>> mUpdated;
         /// <summary>
-        /// The bounds in the Cartesian coordinate system
-        /// </summary>
-
-        
-        bool ghost; 
-        int speed;
-        /// <summary>
-        /// Create new Engine Screen
+        ///     Create new Engine Screen
         /// </summary>
         /// <param Name="Top">Distance from the top of the global console</param>
         /// <param Name="Left">Distance form the left of the global console</param>
@@ -53,306 +49,265 @@ namespace MultyNetHack.Screen
             InitTexture();
             InitEvents();
             InitControls();
-            Draw?.Invoke(this, 22);
+            EngineConsoleDraw();
         }
+        public Rectangle BoundsAroundThisPlayer
+        {
+            get
+            {
+                if (mMBoundsAroundThisPlayer == null)
+                    mMBoundsAroundThisPlayer =
+                        new Rectangle(new Point(mThisPlayer.LocalBounds.X, mThisPlayer.LocalBounds.Y), WantedWidth,
+                            WantedHeight);
+                else
+                {
+                    mMBoundsAroundThisPlayer.X = mThisPlayer.LocalBounds.X;
+                    mMBoundsAroundThisPlayer.Y = mThisPlayer.LocalBounds.Y;
+                }
+                return mMBoundsAroundThisPlayer;
+            }
+        }
+        public event EventHandler<string> Message;
+
         private void InitBuffer()
         {
-
-            buff1 = new List<List<char>>(TrueHeight);
-            for (int j = 0; j < TrueHeight; j++)
+            mBuff1 = new List<List<char>>(TrueHeight);
+            for (var J = 0; J < TrueHeight; J++)
             {
-                buff1.Add(new List<char>(TrueWidth));
-                buff1[j] = new List<char>(TrueWidth);
-                if (j == 0)
+                mBuff1.Add(new List<char>(TrueWidth));
+                mBuff1[J] = new List<char>(TrueWidth);
+                if (J == 0)
                 {
-                    for (int i = 0; i < TrueWidth; i++)
+                    for (var I = 0; I < TrueWidth; I++)
                     {
-                        buff1[j].Add(new char());
+                        mBuff1[J].Add(new char());
                     }
                 }
                 else
-                    buff1[j].AddRange(buff1[0]);
+                    mBuff1[J].AddRange(mBuff1[0]);
             }
         }
         private void InitTexture()
         {
-            Texture = new Dictionary<Material, char>();
-            Texture.Add(Material.Air, '.');
-            Texture.Add(Material.Fire, '~');
-            Texture.Add(Material.Loot, '$');
-            Texture.Add(Material.Npc, 'N');
-            Texture.Add(Material.Path, '#');
-            Texture.Add(Material.Player, '@');
-            Texture.Add(Material.Trap, '.');
-            Texture.Add(Material.HorisontalWall, '-');
-            Texture.Add(Material.VerticalWall, '|');
-            Texture.Add(Material.Water, '}');
-            Texture.Add(Material.Darknes, ' ');
+            mTexture = new Dictionary<Material, char>();
+            mTexture.Add(Material.Air, '.');
+            mTexture.Add(Material.Fire, '~');
+            mTexture.Add(Material.Loot, '$');
+            mTexture.Add(Material.Npc, 'N');
+            mTexture.Add(Material.Path, '#');
+            mTexture.Add(Material.Player, '@');
+            mTexture.Add(Material.Trap, '.');
+            mTexture.Add(Material.HorisontalWall, '-');
+            mTexture.Add(Material.VerticalWall, '|');
+            mTexture.Add(Material.Water, '}');
+            mTexture.Add(Material.Darknes, ' ');
         }
         private void InitControls()
         {
-            mLocalCommands.Add(Comands.Left, GeneralMove);
-            mLocalCommands.Add(Comands.TenStepsLeft, GeneralMove);
-            mLocalCommands.Add(Comands.Right, GeneralMove);
-            mLocalCommands.Add(Comands.TenStepsRight, GeneralMove);
-            mLocalCommands.Add(Comands.Up, GeneralMove);
-            mLocalCommands.Add(Comands.TenStepsUp, GeneralMove);
-            mLocalCommands.Add(Comands.Down, GeneralMove);
-            mLocalCommands.Add(Comands.TenStepsDown, GeneralMove);
-            mLocalCommands.Add(Comands.GenerateALotOfRooms, GenerateRooms);
-            mLocalCommands.Add(Comands.GenerateOneRoom, GenerateRooms);
-            mLocalCommands.Add(Comands.GenerateRandomPath, GeneratePath);
-            foreach(KeyValuePair<Comands,Action<BaseCommand>> mComm in mLocalCommands)
+            MLocalCommands.Add(Comands.Left, GeneralMove);
+            MLocalCommands.Add(Comands.TenStepsLeft, GeneralMove);
+            MLocalCommands.Add(Comands.Right, GeneralMove);
+            MLocalCommands.Add(Comands.TenStepsRight, GeneralMove);
+            MLocalCommands.Add(Comands.Up, GeneralMove);
+            MLocalCommands.Add(Comands.TenStepsUp, GeneralMove);
+            MLocalCommands.Add(Comands.Down, GeneralMove);
+            MLocalCommands.Add(Comands.TenStepsDown, GeneralMove);
+            MLocalCommands.Add(Comands.GenerateALotOfRooms, GenerateRooms);
+            MLocalCommands.Add(Comands.GenerateOneRoom, GenerateRooms);
+            MLocalCommands.Add(Comands.GenerateRandomPath, GeneratePath);
+            foreach (var Comm in MLocalCommands)
             {
-                Comand.Add(mComm.Key, mComm.Value);
+                Comand.Add(Comm.Key, Comm.Value);
             }
         }
         private void InitProperties()
         {
-            mBounds = new Rectangle(10, 30, -10, -30);
-            LocalX = 0;
-            LocalY = 0;
-            ZValue = 0;
-            
             WantedWidth = 60;
             WantedHeight = 20;
-            
-            buff1 = new List<List<char>>();
-            updated = new List<List<int>>();
-            mLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
+            mThisPlayer = new Player("CrazyMOFO");
+            Insert(mThisPlayer);
+            mBuff1 = new List<List<char>>();
+            mUpdated = new List<List<int>>();
+            MLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
             MadeOf = Material.Darknes;
-            ghost = true;
-            speed = 50; // steep = 1/speed
+            mGhost = true;
+            mSpeed = 50; // steep = 1/speed
             IsRoot = true;
         }
         private void InitEvents()
         {
-            Draw += EngineConsole_Draw;
         }
         public void MyDispose()
         {
-            foreach (KeyValuePair<Comands, Action<BaseCommand>> mComm in mLocalCommands)
+            foreach (var Comm in MLocalCommands)
             {
-                Comand.Remove(mComm.Key);
+                Comand.Remove(Comm.Key);
             }
-            Draw -= EngineConsole_Draw;
         }
 
         /// <summary>
-        /// Generate new rooms in this instance of the game
+        ///     Generate new rooms in this instance of the game
         /// </summary>
         /// <param Name="bc">This should be typeof(GenerateRoomsCommand) </param>
-        private void GenerateRooms(BaseCommand bc)
+        private void GenerateRooms(BaseCommand Bc)
         {
-            GenerateRoomsCommand gRC = bc as GenerateRoomsCommand;
+            var GRc = Bc as GenerateRoomsCommand;
             Task.Run(async () =>
             {
-                DateTime startTime = DateTime.Now;
-                await this.GenerateRandomRooms((bc as GenerateRoomsCommand).numberOfRooms);
-                
-                EnqueMessage(string.Format("Generated {0} rooms in {0}s\n", (bc as GenerateRoomsCommand).numberOfRooms, DateTime.Now.Second-startTime.Second));
-                Draw?.Invoke(null, 1);
+                var StartTime = DateTime.Now;
+                await GenerateRandomRooms((Bc as GenerateRoomsCommand).NumberOfRooms);
+
+                EnqueMessage(string.Format("Generated {0} rooms in {0}s\n", (Bc as GenerateRoomsCommand).NumberOfRooms,
+                    DateTime.Now.Second - StartTime.Second));
+                EngineConsoleDraw();
             }, GenerateRoomsCommand.CancelGenerting);
-            
         }
         /// <summary>
-        /// Generate new paths in this instance of the game
+        ///     Generate new paths in this instance of the game
         /// </summary>
         /// <param Name="bc">This should be typeof(GeneratePathCommand) </param>
-        private async void GeneratePath(BaseCommand bc)
+        private async void GeneratePath(BaseCommand Bc)
         {
-            if (this.NumOfRooms < 10)
-                await Task.Run(()=> { GenerateRooms(new GenerateRoomsCommand(100)); });
-            for (int i = 0; i < (bc as GeneratePathCommand).NumberOfPaths; i++)
+            if (NumOfRooms < 10)
+                await Task.Run(() => { GenerateRooms(new GenerateRoomsCommand(100)); });
+            for (var I = 0; I < (Bc as GeneratePathCommand).NumberOfPaths; I++)
             {
-                Path p = new Path("Path" + this.NumOfPaths);
-                p.generatePathThrueRandomChildren(this);
-                this.Insert(p);
+                var P = new Path("Path" + NumOfPaths);
+                P.GeneratePathThrueRandomChildren(this);
+                Insert(P);
             }
-            Draw?.Invoke(this, 2);
+            EngineConsoleDraw();
         }
         /// <summary>
-        /// Move played in current game instance
+        ///     Move played in current game instance
         /// </summary>
         /// <param Name="bc">this should be typeof(MoveCommand) </param>
-        private void GeneralMove(BaseCommand bc)
+        private void GeneralMove(BaseCommand Bc)
         {
-            MoveCommand move = bc as MoveCommand;
+            var Move = Bc as MoveCommand;
             MoveCommand.InitToken();
-            Task t = Task.Run(async () =>
+            var T = Task.Run(async () =>
             {
-                int mSteps = move.Steps;
-                while (mSteps > 0)
+                int Steps = Move.Steps;
+                while (Steps > 0)
                 {
-                    if (move.Direction == MoveDirection.Down || move.Direction == MoveDirection.DownLeft || move.Direction == MoveDirection.DownRight)
+                    if (Move.Direction == MoveDirection.Down || Move.Direction == MoveDirection.DownLeft ||
+                        Move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.LocalX, this.LocalY - 1).IsPassable || ghost)
+                        if (GetComponentOnLocation(mThisPlayer.LocalX, mThisPlayer.LocalY - 1).IsPassable || mGhost)
                         {
-                            this.LocalY--;
-                            mSteps--;
+                            mThisPlayer.LocalY--;
+                            Steps--;
                         }
                     }
-                    if (move.Direction == MoveDirection.Up || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.UpRight)
+                    if (Move.Direction == MoveDirection.Up || Move.Direction == MoveDirection.UpLeft ||
+                        Move.Direction == MoveDirection.UpRight)
                     {
-                        if (this.GetComponentOnLocation(this.LocalX, this.LocalY + 1).IsPassable || ghost)
+                        if (GetComponentOnLocation(mThisPlayer.LocalX, mThisPlayer.LocalY + 1).IsPassable || mGhost)
                         {
-                            this.LocalY++;
-                            mSteps--;
+                            mThisPlayer.LocalY++;
+                            Steps--;
                         }
                     }
-                    if (move.Direction == MoveDirection.Left || move.Direction == MoveDirection.UpLeft || move.Direction == MoveDirection.DownLeft)
+                    if (Move.Direction == MoveDirection.Left || Move.Direction == MoveDirection.UpLeft ||
+                        Move.Direction == MoveDirection.DownLeft)
                     {
-                        if (this.GetComponentOnLocation(this.LocalX + 1, this.LocalY).IsPassable || ghost)
+                        if (GetComponentOnLocation(mThisPlayer.LocalX + 1, mThisPlayer.LocalY).IsPassable || mGhost)
                         {
-                            this.LocalX--;
-                            mSteps--;
+                            mThisPlayer.LocalX--;
+                            Steps--;
                         }
                     }
-                    if (move.Direction == MoveDirection.Right || move.Direction == MoveDirection.UpRight || move.Direction == MoveDirection.DownRight)
+                    if (Move.Direction == MoveDirection.Right || Move.Direction == MoveDirection.UpRight ||
+                        Move.Direction == MoveDirection.DownRight)
                     {
-                        if (this.GetComponentOnLocation(this.LocalX - 1, this.LocalY).IsPassable || ghost)
+                        if (GetComponentOnLocation(mThisPlayer.LocalX - 1, mThisPlayer.LocalY).IsPassable || mGhost)
                         {
-                            this.LocalX++;
-                            mSteps--;
+                            mThisPlayer.LocalX++;
+                            Steps--;
                         }
                     }
-                    Draw?.Invoke(this, 2);
-                    await Task.Delay(speed);
+                    EngineConsoleDraw();
+                    await Task.Delay(mSpeed);
                 }
-
             }, MoveCommand.CancleMove);
         }
-
         protected override void GenerateFooter()
         {
             try
             {
-                string mid = string.Format("({0},{1}) - {2}", this.LocalX, this.LocalY, this.GetComponentOnLocation(this.LocalX, this.LocalY).Name);
-                GenerateFooter(mid);
+                string Mid = $"({mThisPlayer.LocalX},{mThisPlayer.LocalY}) - {GetComponentOnLocation(mThisPlayer.LocalX, mThisPlayer.LocalY).Name}";
+                GenerateFooter(Mid);
             }
             catch
             {
                 base.GenerateFooter();
             }
         }
-        bool inside = false;
-        private void EngineConsole_Draw(object sender, int e)
+        private void EngineConsoleDraw()
         {
-            if (!inside)
+            lock (mLockDrawMethode)
             {
-                inside = true;
-                updated = new List<List<int>>(TrueHeight);
-                for (int i = 0; i < TrueHeight; i++)
+                for (var I = 0; I < TrueHeight; I++)
                 {
-
-                    updated.Add(new List<int>(TrueWidth));
-                    if (i == 0)
+                    mUpdated.Add(new List<int>(TrueWidth));
+                    if (I == 0)
                     {
-                        for (int j = 0; j < TrueWidth; j++)
+                        for (var J = 0; J < TrueWidth; J++)
                         {
-                            updated[i].Add(-1);
+                            mUpdated[I].Add(-1);
                         }
                     }
                     else
                     {
-                        updated[i].AddRange(updated[0]);
+                        mUpdated[I].AddRange(mUpdated[0]);
                     }
                 }
-                
-                FillBuffer(new Rectangle(this.LocalY,this.LocalX ,this.LocalY - 1,this.LocalX - 1), Material.Player, 15);
+
                 DrawPaths();
                 ZBufferUpdate(this);
-                FillBuffer(this.LocalBounds, this.MadeOf, 0);
+                FillBuffer(BoundsAroundThisPlayer, MadeOf, 0);
                 FlushBuffer();
                 ScreenChange();
-                inside = false;
             }
         }
-        private void ZBufferUpdate(Component comp, int parentTop, int parentLeft)
+        private void ZBufferUpdate(Component Comp)
         {
-
-            Point startEnd = comp.GetStartEndEnter( comp.LocalX - parentLeft - comp.LocalBounds.Width, comp.LocalX - parentLeft + comp.LocalBounds.Width);
-            for (int i = startEnd.x; i <= startEnd.y; i++)
-            {
-                if (this.LocalBounds & (comp.sweep[i].component.LocalBounds))
-                {
-                    //if (comp.GetType() != typeof(EngineSceen))
-                        ZBufferUpdate(comp.sweep[i].component, parentTop + comp.LocalY, parentLeft + comp.LocalX);
-                    //else
-                    //    ZBufferUpdate(comp.sweep[i].component, 0, 0);
-
-                }
-            }
-            FillBuffer(comp.LocalBounds.LeftBound - parentLeft , comp.LocalBounds.TopBound - parentTop, comp.LocalBounds.height, comp.LocalBounds.Width, comp.MadeOf, comp.ZValue);
-
-        }
-        private void ZBufferUpdate(Component comp, Point Translatin)
-        {
-            Rectangle TransformdBounds = comp.LocalBounds + Translatin;
-            Point startEnd = comp.GetStartEndEnter(TransformdBounds.LeftBound, TransformdBounds.RightBound);
-            for (int i = startEnd.x; i <= startEnd.y; i++)
-            {
-                if (comp.GetType() != typeof(SandboxMap))
-                {
-                    if (this.LocalBounds & (comp.sweep[i].component.LocalBounds + Translatin + new Point(comp.LocalX, comp.LocalY)))
-                    {
-                    
-                        var NewTranslatin = new Point(comp.LocalX, comp.LocalY) + Translatin;
-                        ZBufferUpdate(comp.sweep[i].component, NewTranslatin);
-                    }
-                    
-                }
-                else
-                {
-                    if (this.LocalBounds & (comp.sweep[i].component.LocalBounds + Translatin))
-                        ZBufferUpdate(comp.sweep[i].component, Point.Origin());
-                }
-            }
-            FillBuffer(TransformdBounds, comp.MadeOf, comp.ZValue);
-
-        }
-        private void ZBufferUpdate(Component comp)
-        {
-            var GoodComponents = comp.Controls.Where(i => ((i.Value.GetType() == typeof(Room) ||
-                                                            i.Value.GetType() == typeof(Wall)) &&
-                                                            i.Value.GlobalBounds & this.LocalBounds
-
-            )).ToList();
+            var GoodComponents = Comp.Controls.Where(I => I.Value.GetType() != typeof(Path) &&
+                                                          I.Value.GlobalBounds & BoundsAroundThisPlayer);
             foreach (var GoodComponent in GoodComponents)
             {
                 ZBufferUpdate(GoodComponent.Value);
             }
-            FillBuffer(comp.GlobalBounds, comp.MadeOf, comp.ZValue);
+            FillBuffer(Comp.GlobalBounds, Comp.MadeOf, Comp.ZValue);
         }
-        private void FillBuffer(Rectangle transformdBounds, Material madeOf, int zLevel)
+        private void FillBuffer(Rectangle TransformdBounds, Material madeOf, int ZLevel)
         {
-            Rectangle Transformed = LocalBounds.ToTopLeft(transformdBounds);
-            for (int i=Transformed.TopBound; i < Transformed.BottomBound; i++)
+            var Transformed = BoundsAroundThisPlayer.ToTopLeft(TransformdBounds);
+            for (int I = Transformed.TopBound; I < Transformed.BottomBound; I++)
             {
-                for (int j = Transformed.LeftBound; j < Transformed.RightBound; j++)
+                for (int J = Transformed.LeftBound; J < Transformed.RightBound; J++)
                 {
-                    if (updated[i][j] < zLevel)
+                    if (mUpdated[I][J] < ZLevel)
                     {
-                        buff1[i][j] = Texture[madeOf];
-                        updated[i][j] = zLevel;
+                        mBuff1[I][J] = mTexture[madeOf];
+                        mUpdated[I][J] = ZLevel;
                     }
                 }
             }
         }
-
-        private void FillBuffer(int x, int y, int h, int w, Material m, int zLevle)
+        private void FillBuffer(int X, int Y, int H, int W, Material M, int ZLevle)
         {
-            Point start = LocalBounds.ToTopLeft(x, y);
-            Point end = LocalBounds.ToTopLeft(x + w, y - h);
-            for (int i = Min(end.y, start.y); i < Max(start.y, end.y); i++)
+            var Start = LocalBounds.ToTopLeft(X, Y);
+            var End = LocalBounds.ToTopLeft(X + W, Y - H);
+            for (int I = Min(End.Y, Start.Y); I < Max(Start.Y, End.Y); I++)
             {
-                for (int j = Min(end.x, start.x); j < Max(start.x, end.x); j++)
+                for (int J = Min(End.X, Start.X); J < Max(Start.X, End.X); J++)
                 {
-
-                    if (updated[j][i] < zLevle)
+                    if (mUpdated[J][I] < ZLevle)
                     {
-                        buff1[j][i] = Texture[m];
-                        updated[j][i] = zLevle;
+                        mBuff1[J][I] = mTexture[M];
+                        mUpdated[J][I] = ZLevle;
                     }
                 }
             }
@@ -360,21 +315,21 @@ namespace MultyNetHack.Screen
         private void FlushBuffer()
         {
             Clear();
-            foreach (List<char> c in buff1)
-                VirtualConsoleAddLine(new string(c.ToArray()));
+            foreach (var C in mBuff1)
+                VirtualConsoleAddLine(new string(C.ToArray()));
             ScreenChange();
         }
         private void DrawPaths()
         {
-            this.Controls.Where(i => i.Value.GetType() == typeof(Path)).ToList().ForEach((i) =>
+            Controls.Where(I => I.Value.GetType() == typeof(Path)).ToList().ForEach(I =>
             {
-                LinearInterpolator pol = (i.Value as Path).Poly;
-                for (int j = LocalBounds.LeftBound; j < LocalBounds.RightBound; j++)
+                var Pol = (I.Value as Path).Poly;
+                for (int J = LocalBounds.LeftBound; J < LocalBounds.RightBound; J++)
                 {
-                    FillBuffer(j, ToInt32(pol.ValueForX(j) + Abs(pol.DerivativeForX(j))) + 2, Abs(ToInt32(pol.DerivativeForX(j)) * 2) + 4, 1, i.Value.MadeOf, i.Value.ZValue);
+                    FillBuffer(J, ToInt32(Pol.ValueForX(J) + Abs(Pol.DerivativeForX(J))) + 2,
+                        Abs(ToInt32(Pol.DerivativeForX(J))*2) + 4, 1, I.Value.MadeOf, I.Value.ZValue);
                 }
             });
         }
-
     }
 }
