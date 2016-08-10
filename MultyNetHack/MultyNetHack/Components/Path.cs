@@ -29,15 +29,16 @@ namespace MultyNetHack.Components
         public void GeneratePathThrueRandomChildren(Component C)
         {
             if (C.Controls.Count < 3) throw new Exception("You can't generate path in component that has less then 3 children... sorry :(");
-            int N = Math.Min(10, Rand.Next(C.Controls.Count / 25, C.Controls.Count));
-            List<Point> Points = new List<Point>(N + 1)
+            int N = Math.Min(10, Rand.Next(C.Controls.Count / 4, C.Controls.Count));
+            var Points = new List<Point>(N + 1)
             {
-                C.Controls.ElementAt(Rand.Next(0, C.Controls.Count)).Value.LocalBounds.Location
+                C.Controls.ElementAt(Rand.Next(0, C.Controls.Count - 1)).Value.LocalBounds.Location
             };
             N--;
             while (--N > 0)
             {
-                Points.Add(C.Controls.Where(K => Points.All(J => J != K.Value.LocalBounds.Location))
+                Points.Add(C.Controls.Where(I => I.Value.GetType() != typeof(Path) && I.Value.GetType() != typeof(Player)) 
+                                     .Where(K => Points.All(J => J.X != K.Value.LocalBounds.Location.X))
                                      .OrderBy(I => Points
                                      .Sum(M => M.AbsDerivative(I.Value.LocalBounds.Location)))
                                      .First().Value.LocalBounds.Location);
@@ -52,7 +53,12 @@ namespace MultyNetHack.Components
 
         public static bool operator &(Path One, Point Two)
         {
-            return One.Poly.DerivativeForX(Two.X) + One.Poly.ValueForX(Two.X) > Two.Y && One.Poly.ValueForX(Two.X) - One.Poly.DerivativeForX(Two.X) < Two.Y; 
+            return One.Poly.DerivativeForX(Two.X) + One.Poly.ValueForX(Two.X) + 2 > Two.Y && One.Poly.ValueForX(Two.X) - One.Poly.DerivativeForX(Two.X) - 2 < Two.Y; 
+        }
+
+        public bool IsOnPath(Point point)
+        {
+            return this & point;
         }
     }
 
