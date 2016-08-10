@@ -26,7 +26,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return TrueHeight - HeadHeight - FooterHight;
+                return TrueHeight - HeadHeight - FooterHeight;
             }
         }
         /// <summary>
@@ -56,7 +56,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(MaxHeight, Height);
+                return Min(MaxHeight, MScreenHeight);
             }
         }
         /// <summary>
@@ -66,7 +66,7 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(MaxWidth, Width)-1;
+                return Min(MaxWidth, MScreenWidth)-1;
             }
         }
         /// <summary>
@@ -76,12 +76,12 @@ namespace MultyNetHack.Screen
         {
             set
             {
-                Height = value;
-                Change?.Invoke(null, EventArgs.Empty);
+                MScreenHeight = value;
+                ScreenChange();
             }
             get
             {
-                return Height;
+                return MScreenHeight;
             }
         } 
         /// <summary>
@@ -91,12 +91,12 @@ namespace MultyNetHack.Screen
         {
             set
             {
-                Width = value;
-                Change?.Invoke(null, EventArgs.Empty);
+                MScreenWidth = value;
+                ScreenChange();
             }
             get
             {
-                return Width;
+                return MScreenWidth;
             }
         }
         /// <summary>
@@ -106,25 +106,25 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                for (int i = BodyString.Length - 1; i >= 0; i--)
+                for (int I = mBodyString.Length - 1; I >= 0; I--)
                 {
-                    if (BodyString[i] == '\n')
-                        return BodyString.Length - i - 1;
+                    if (mBodyString[I] == '\n')
+                        return mBodyString.Length - I - 1;
                 }
-                return BodyString.Length;
+                return mBodyString.Length;
             }
             set
             {
-                int i = BodyString.Length - 1;
-                for (; i >= 0; i--)
+                int I = mBodyString.Length - 1;
+                for (; I >= 0; I--)
                 {
-                    if (BodyString[i] == '\n')
+                    if (mBodyString[I] == '\n')
                         break;
                 }
-                if (i + value <= BodyString.Length && BodyString.Length != 0)
-                    BodyString = BodyString.Remove(i + value);
-                else if (BodyString.Length != 0)
-                    BodyString += new string(' ', i + value - BodyString.Length);
+                if (I + value <= mBodyString.Length && mBodyString.Length != 0)
+                    mBodyString = mBodyString.Remove(I + value);
+                else if (mBodyString.Length != 0)
+                    mBodyString += new string(' ', I + value - mBodyString.Length);
             }
         }
         /// <summary>
@@ -134,20 +134,20 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return BodyString.Where(i => i == '\n').ToList().Count;
+                return mBodyString.Where(I => I == '\n').ToList().Count;
             }
             set
             {
                 if (VirtualConsoleTop < value)
                 {
-                    BodyString += new string('\n', value - VirtualConsoleTop);
+                    mBodyString += new string('\n', value - VirtualConsoleTop);
                 }
                 else if (VirtualConsoleTop > value)
                 {
-                    int i = 0;
-                    for (; i < BodyString.Length; i++)
+                    int I = 0;
+                    for (; I < mBodyString.Length; I++)
                     {
-                        if (BodyString[i] == '\n')
+                        if (mBodyString[I] == '\n')
                         {
                             value--;
                             if (value == 0)
@@ -156,11 +156,11 @@ namespace MultyNetHack.Screen
 
                     }
 
-                    BodyString = BodyString.Remove(i + 1);
+                    mBodyString = mBodyString.Remove(I + 1);
                 }
                 else
                 {
-                    BodyString = BodyString.Remove(BodyString.LastIndexOf('\n') + 1);
+                    mBodyString = mBodyString.Remove(mBodyString.LastIndexOf('\n') + 1);
                 }
             }
 
@@ -172,30 +172,30 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                if (shuldUpdate)
+                if (mShuldUpdate)
                 {
-                    string s = '+' + new string('-', TrueWidth) + '+' + '\n';
-                    HeadString.Split('\n').ToList().ForEach((i) =>
+                    string S = '+' + new string('-', TrueWidth) + '+' + '\n';
+                    HeadString.Split('\n').ToList().ForEach((I) =>
                     {
-                        s += '|' + i.Substring(0, Min(i.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - i.Length)) + '|' +'\n';
+                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' +'\n';
                     });
-                    s += '|' + new string('-', TrueWidth) + '|' + '\n';
-                    List<string> ss = BodyString.Split('\n').ToList();
-                    for (int j = activeFrom; j < activeTo; j++)
+                    S += '|' + new string('-', TrueWidth) + '|' + '\n';
+                    List<string> Ss = mBodyString.Split('\n').ToList();
+                    for (int J = ActiveFrom; J < ActiveTo; J++)
                     {
-                        string i = ss[j];
-                        s += '|' + i.Substring(0, Min(i.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - i.Length)) + '|' + '\n';
+                        string I = Ss[J];
+                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' + '\n';
                     }
-                    s += '|' + new string('-', TrueWidth) + '|' + '\n';
-                    FooterString.Split('\n').ToList().ForEach((i) =>
+                    S += '|' + new string('-', TrueWidth) + '|' + '\n';
+                    FooterString.Split('\n').ToList().ForEach((I) =>
                     {
-                        s += '|' + i.Substring(0, Min(i.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - i.Length)) + '|' + '\n';
+                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' + '\n';
                     });
-                    s += '+' + new string('-', TrueWidth) + '+';
-                    _virtualConsole = s;
-                    shuldUpdate = false;
+                    S += '+' + new string('-', TrueWidth) + '+';
+                    mVirtualConsole = S;
+                    mShuldUpdate = false;
                 }
-                return _virtualConsole;
+                return mVirtualConsole;
             }
         }
         /// <summary>
@@ -205,13 +205,12 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return mScrool;
+                return MScrool;
             }set
             {
-                mScrool = value % VirtualConsoleTop;
+                MScrool = value % VirtualConsoleTop;
             }
         }
-
         /// <summary>
         /// Active screen that are displayed. Push on stack new screen to pause the current screen and display new screen
         /// </summary>
@@ -228,14 +227,15 @@ namespace MultyNetHack.Screen
         /// List of all debug messages. This is used for debugging.
         /// </summary>
         public static List<DebugMessage> AllMessages;
+
         /// <summary>
         /// Commands in screens that extend Screen method.
         /// </summary>
-        protected Dictionary<Comands, Action<BaseCommand>> mLocalCommands;
+        protected Dictionary<Comands, Action<BaseCommand>> MLocalCommands;
         /// <summary>
         /// Determent what line of virtual console should be printed out first 
         /// </summary>
-        protected int activeFrom
+        protected int ActiveFrom
         {
             get
             {
@@ -245,18 +245,18 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Determent what line of virtual console should be printed out last
         /// </summary>
-        protected int activeTo
+        protected int ActiveTo
         {
             get
             {
                 return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - HeadHeight*2));
             }
         }
-        protected int mScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHight;
-        /// <summary>
-        /// Invoke this when something changes
-        /// </summary>
-        protected event EventHandler Change;
+        protected int MScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHeight, MScreenHeight, MScreenWidth;
+        ///// <summary>
+        ///// Invoke this when something changes
+        ///// </summary>
+        //protected event EventHandler Change;
         /// <summary>
         /// String that is displayed on top of everything
         /// </summary>
@@ -265,19 +265,20 @@ namespace MultyNetHack.Screen
         /// String that is displayed on the bottom of the screen
         /// </summary>
         protected string FooterString;
+
         /// <summary>
         /// Indicates that virtual console should be redrawn
         /// </summary>
-        private bool shuldUpdate;
-        private string _virtualConsole;
+        private bool mShuldUpdate;
+        private string mVirtualConsole;
         /// <summary>
         /// This is displayed in the middle of the screen
         /// </summary>
-        private string BodyString;
-
+        private string mBodyString;
+        private object mObjectToLockFlush;
 
         /// <summary>
-        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method.
+        /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -288,10 +289,10 @@ namespace MultyNetHack.Screen
             InitComands();
             GenerateHeader();
             GenerateFooter();
-            Change += Screen_Change;
+            
         }
         /// <summary>
-        /// Create new base screen. One shouldn't relay do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
+        /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
         /// </summary>
         /// <param Name="Top">Global position in the global console </param>
         /// <param Name="Left">Global position in the global console </param>
@@ -301,7 +302,6 @@ namespace MultyNetHack.Screen
             InitComands();
             GenerateHeader();
             GenerateFooter();
-            Change += Screen_Change;
         }
         /// <summary>
         /// This is called when creating new BaseScreen to initiate global properties
@@ -310,16 +310,14 @@ namespace MultyNetHack.Screen
         /// <param Name="Left"></param>
         private void InitProperties(int Top, int Left)
         {
+            mBodyString = string.Empty;
             GlobalLeft = Left;
             GlobalTop = Top;
             WantedWidth = MaxWidth;
             WantedHeight = 30;
-            BodyString = string.Empty;
-            shuldUpdate = true;
+            mShuldUpdate = true;
             Comand = new Dictionary<Comands, Action<BaseCommand>>();
-            
-
-            mLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
+            MLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
             
         }
         /// <summary>
@@ -337,7 +335,7 @@ namespace MultyNetHack.Screen
         /// Destroys current screen and displays the screen below it
         /// </summary>
         /// <param Name="bc"></param>
-        private void PopSceen(BaseCommand bc)
+        private void PopSceen(BaseCommand Bc)
         {
             this.Pause();
             Active.Pop();
@@ -349,7 +347,7 @@ namespace MultyNetHack.Screen
         /// Show the debug screen on top of current screen
         /// </summary>
         /// <param Name="bc"></param>
-        private void ShowDebug(BaseCommand bc)
+        private void ShowDebug(BaseCommand Bc)
         {
             if (this.GetType() != typeof(HelpScreen) && this.GetType() != typeof(DebugScreen))
             {
@@ -360,7 +358,7 @@ namespace MultyNetHack.Screen
         /// Show help screen on top of current screen
         /// </summary>
         /// <param Name="bc"></param>
-        private void ShowHelp(BaseCommand bc)
+        private void ShowHelp(BaseCommand Bc)
         {
             if (this.GetType() != typeof(HelpScreen) && this.GetType() != typeof(DebugScreen))
             {
@@ -371,114 +369,114 @@ namespace MultyNetHack.Screen
         /// Scroll the body part down by some number
         /// </summary>
         /// <param Name="bc">Should be typeof(ScrollCommand) </param>
-        private void ScrollCommand(BaseCommand bc)
+        private void ScrollCommand(BaseCommand Bc)
         {
-            ScrollCommand scroll = bc as ScrollCommand;
-            Scrool += scroll.n;
+            ScrollCommand Scroll = Bc as ScrollCommand;
+            Scrool += Scroll.N;
             if (VirtualConsoleTop >0)
                 Scrool %= VirtualConsoleTop;
             if (Scrool < 0)
                 Scrool = VirtualConsoleTop;
 
-            Change?.Invoke(null, EventArgs.Empty);
+            ScreenChange();
         }
         /// <summary>
         /// Needs to be implemented
         /// </summary>
         /// <param Name="bc"></param>
-        private void ChangeScene(BaseCommand bc)
+        private void ChangeScene(BaseCommand Bc)
         {
 
         }
         /// <summary>
         /// this is called when the screen stops being on top of the stack
         /// </summary>
-        virtual protected void Pause()
+        protected virtual void Pause()
         {
-            foreach (KeyValuePair<Comands, Action<BaseCommand>> mKVP in mLocalCommands)
+            foreach (KeyValuePair<Comands, Action<BaseCommand>> Kvp in MLocalCommands)
             {
-                Comand.Remove(mKVP.Key);
+                Comand.Remove(Kvp.Key);
             }
             Console.Clear();
         }
         /// <summary>
         /// This is called when screen starts being on top of the stack
         /// </summary>
-        virtual protected void Resume()
+        protected virtual void Resume()
         {
-            foreach (KeyValuePair<Comands, Action<BaseCommand>> mKVP in mLocalCommands)
+            foreach (KeyValuePair<Comands, Action<BaseCommand>> Kvp in MLocalCommands)
             {
                 try
                 {
-                    Comand.Add(mKVP.Key, mKVP.Value);
+                    Comand.Add(Kvp.Key, Kvp.Value);
                 }
                 catch
                 {
 
                 }
             }
-            Screen_Change(null, EventArgs.Empty);
+            ScreenChange();
         }
         /// <summary>
         /// Called when Screen changes
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="e"></param>
-        protected void Screen_Change(object sender, EventArgs e)
+        protected void ScreenChange()
         {
             GenerateFooter();
             GenerateHeader();
             Flush();
         }
         
-        virtual protected void GenerateFooter()
+        protected virtual void GenerateFooter()
         {
-            string mid = string.Format("Shown lines from {0} to {1} out of {2}", activeFrom + 1, activeTo, VirtualConsoleTop);
-            GenerateFooter(mid);
+            string Mid = $"Shown lines from {ActiveFrom + 1} to {ActiveTo} out of {VirtualConsoleTop}";
+            GenerateFooter(Mid);
             
         }
         protected void GenerateFooter(string Mid)
         {
-            FooterString = string.Format("{0}{1}", new string(' ', Max(0, TrueWidth / 2 - Mid.Length / 2)), Mid);
-            FooterHight = 1;
+            FooterString = $"{new string(' ', Max(0, TrueWidth/2 - Mid.Length/2))}{Mid}";
+            FooterHeight = 1;
         }
-        virtual protected void GenerateHeader()
+        protected virtual void GenerateHeader()
         {
-            HeadString = string.Format("{0}{1}", new string(' ', Max(0, (TrueWidth - Name.Length) / 2)), Name);
+            HeadString = $"{new string(' ', Max(0, (TrueWidth - Name.Length)/2))}{Name}";
         }
         /// <summary>
         /// Use this for debugging. When you enqueue message, new message will be added in message Q and message list
         /// </summary>
         /// <param Name="message">this will be enqueued</param>
-        public static void EnqueMessage(object message)
+        public static void EnqueMessage(object Message)
         {
-            var mDbMsg = new DebugMessage(message.ToString());
-            UnreadMessages.Enqueue(mDbMsg);
-            AllMessages.Add(mDbMsg);
+            var DbMsg = new DebugMessage(Message.ToString());
+            UnreadMessages.Enqueue(DbMsg);
+            AllMessages.Add(DbMsg);
         }
         /// <summary>
         /// Add text to the virtual console
         /// </summary>
         /// <param Name="obj">stuff you want to print in virtual console</param>
-        public void VirtualConsoleAdd(object obj)
+        public void VirtualConsoleAdd(object Obj)
         {
-            BodyString += obj.ToString();
+            mBodyString += Obj.ToString();
         }
         /// <summary>
         /// Add text to the virtual console and add new line to the console
         /// </summary>
         /// <param Name="obj">stuff you want to print in virtual console</param>
-        public void VirtualConsoleAddLine(object obj)
+        public void VirtualConsoleAddLine(object Obj)
         {
-            VirtualConsoleAdd(obj);
-            BodyString += '\n';
+            VirtualConsoleAdd(Obj);
+            mBodyString += '\n';
         }
         /// <summary>
         /// Only add new line to the virtual console
         /// </summary>
         public void VirtualConsoleAddLine()
         {
-            BodyString += '\n';
+            mBodyString += '\n';
         }
         /// <summary>
         /// Print line full of '-' character. Use this to make screen look nicer.
@@ -493,28 +491,27 @@ namespace MultyNetHack.Screen
         /// Prints text in the middle of the line
         /// </summary>
         /// <param Name="obj"></param>
-        public void PrintCenter(object obj)
+        public void PrintCenter(object Obj)
         {
-            string s = obj.ToString() + '\n';
+            string S = Obj.ToString() + '\n';
             VirtualConsoleLeft = 0;
-            BodyString += new string(' ', TrueWidth / 2 - s.Length / 2) + s + '\n';   
+            mBodyString += new string(' ', TrueWidth / 2 - S.Length / 2) + S + '\n';   
         }
-        bool inside = false;
         /// <summary>
         /// Use this when you made changes to the virtual console
         /// </summary>
         public void Flush()
         {
-            if (!inside)
+            if (mObjectToLockFlush == null)
+                mObjectToLockFlush = new object();
+            lock (mObjectToLockFlush)
             {
-                inside = true;
                 Console.CursorTop = GlobalTop;
                 Console.CursorLeft = GlobalLeft;
-                shuldUpdate = true;
+                mShuldUpdate = true;
                 string ThreadSafeShit = VirtualConsole;
                 Console.Clear();
                 Console.WriteLine(ThreadSafeShit);
-                inside = false;
             }
         }
         /// <summary>
@@ -522,7 +519,7 @@ namespace MultyNetHack.Screen
         /// </summary>
         public void Clear()
         {
-            BodyString = string.Empty;
+            mBodyString = string.Empty;
         }
     }
 }

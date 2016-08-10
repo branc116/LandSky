@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-
+﻿using System.Threading;
 
 namespace MultyNetHack.Commands
 {
@@ -14,15 +8,16 @@ namespace MultyNetHack.Commands
     class GenerateRoomsCommand : BaseCommand
     {
 
-        public int numberOfRooms;
-        static public CancellationToken CancelGenerting;
-        static private CancellationTokenSource mSource;
-        public GenerateRoomsCommand(int n)
+        public int NumberOfRooms;
+        public static CancellationToken CancelGenerting;
+        private static CancellationTokenSource mMSource;
+
+        public GenerateRoomsCommand(int N)
         {
-            numberOfRooms = n;
-            mSource?.Cancel();
-            mSource = new CancellationTokenSource();
-            CancelGenerting = mSource.Token;
+            NumberOfRooms = N;
+            mMSource?.Cancel();
+            mMSource = new CancellationTokenSource();
+            CancelGenerting = mMSource.Token;
         }
         public static GenerateRoomsCommand GenerateAlotOfRooms()
         {
@@ -34,7 +29,7 @@ namespace MultyNetHack.Commands
         }
         public static void CancleGeneratingRooms()
         {
-            mSource?.Cancel();  
+            mMSource?.Cancel();  
         }
 
     }

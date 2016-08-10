@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MultyNetHack.Commands
+﻿namespace MultyNetHack.Commands
 {
     /// <summary>
     /// Command for scrolling body part of the screen
     /// </summary>
     class ScrollCommand : BaseCommand
     {
-        public int n;
-        public ScrollCommand(int n)
+        public int N;
+        public ScrollCommand(int N)
         {
-            this.n = n;
+            this.N = N;
         }
         public static ScrollCommand Left()
         {

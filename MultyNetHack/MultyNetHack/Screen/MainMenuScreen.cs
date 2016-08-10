@@ -15,13 +15,12 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// List of buttons in use
         /// </summary>
-        private List<Button> mButtons;
-        
+        private List<Button> mMButtons;
         /// <summary>
         /// Create new Main Menu Screen
         /// </summary>
-        /// <param Name="Top">Distance from the top of the global console</param>
-        /// <param Name="Left">Distance form the left of the global console</param>
+        /// <param name="Top">Distance from the top of the global console</param>
+        /// <param name="Left">Distance form the left of the global console</param>
         public MainMenuScreen(int Top,int Left) : base(Top, Left, "Main menu")
         {
             InitGlobals();
@@ -29,38 +28,37 @@ namespace MultyNetHack.Screen
             InitComands();
             InitText();
 
-            Screen_Change(this, EventArgs.Empty);
+            ScreenChange();
         }
-
         private void InitGlobals()
         {
-            mButtons = new List<Button>();
+            mMButtons = new List<Button>();
         }
         private void InitButtons()
         {
             Button StartLocalGame = new Button("StartLocal", Comands.Option1) { Text = "Start new local game" };
             Button Exit = new Button("Exit", Comands.Option2) { Text = "Exit game" };
-            StartLocalGame.OnPress += StartLocal_OnPress;
-            Exit.OnPress += Exit_OnPress;
-            mButtons.AddRange(new Button[] { StartLocalGame, Exit });
+            StartLocalGame.OnPress += StartLocalOnPress;
+            Exit.OnPress += ExitOnPress;
+            mMButtons.AddRange(new Button[] { StartLocalGame, Exit });
         }
         private void InitComands()
         {
-            foreach (Button mB in mButtons)
+            foreach (Button B in mMButtons)
             {
-                mLocalCommands.Add(mB.InvokeCommand, mB.InvokEvent);
+                MLocalCommands.Add(B.InvokeCommand, B.InvokEvent);
             }
             this.Resume();
         }
         private void InitText()
         {
-            foreach (Button mB in mButtons)
+            foreach (Button B in mMButtons)
             {
-                this.VirtualConsoleAddLine(mB.ToString());
+                this.VirtualConsoleAddLine(B.ToString());
             }
         }
 
-        private void Exit_OnPress(object sender, DateTime e)
+        private void ExitOnPress(object Sender, DateTime E)
         {
             this.Pause();
             Active.Pop();
@@ -69,9 +67,9 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Start new instance of the game
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
-        private void StartLocal_OnPress(object sender, DateTime e)
+        /// <param name="Sender"></param>
+        /// <param name="E"></param>
+        private void StartLocalOnPress(object Sender, DateTime E)
         {
             this.Pause();
             Active.Push(new SandboxMap(GlobalTop, GlobalLeft));

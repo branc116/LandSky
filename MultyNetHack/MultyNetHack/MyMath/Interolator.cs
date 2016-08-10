@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using static System.Math;
 
 using MultyNetHack.MyEnums;
@@ -11,49 +12,50 @@ namespace MultyNetHack.MyMath
     /// </summary>
     public class LinearInterpolator
     {
-        List<Monom> Polinom;
+        private List<Monom> mPolinom;
+
         public LinearInterpolator()
         {
-            Polinom = new List<Monom>();
+            mPolinom = new List<Monom>();
 
         }
-        public double ValueForX(double x)
+        public double ValueForX(double X)
         {
-            double rj = 0;
-            foreach (Monom m in Polinom)
+            double Rj = 0;
+            foreach (Monom m in mPolinom)
             {
-                rj += m.ValuForX(x);
+                Rj += m.ValuForX(X);
             }
-            return Round(rj, 2);
+            return Round(Rj, 2);
         }
-        public double ValueForX(int x)
+        public double ValueForX(int X)
         {
-            return ValueForX(Convert.ToDouble(x));
+            return ValueForX(Convert.ToDouble(X));
         }
-        public double DerivativeForX(double x)
+        public double DerivativeForX(double X)
         {
-            double rj = 0;
-            foreach (Monom m in Polinom)
+            double Rj = 0;
+            foreach (Monom m in mPolinom)
             {
-                rj += m.DerivativeForX(x);
+                Rj += m.DerivativeForX(X);
             }
-            return Round(rj, 0);
+            return Round(Rj, 0);
         }
-        public double DerivativeForX(int x)
+        public double DerivativeForX(int X)
         {
-            return DerivativeForX(Convert.ToDouble(x));
+            return DerivativeForX(Convert.ToDouble(X));
         }
-        protected void CheckIfOneCanInterpolate(List<Point> Points)
+        private void CheckIfOneCanInterpolate(List<Point> Points)
         {
-            foreach (Point p in Points)
+            foreach (Point P in Points)
             {
-                int n = 0;
-                for (int i = 0; i < Points.Count; i++)
+                int N = 0;
+                for (int I = 0; I < Points.Count; I++)
                 {
-                    if (Points[i].x == p.x)
-                        n++;
+                    if (Points[I].X == P.X)
+                        N++;
                 }
-                if (n != 1)
+                if (N != 1)
                     throw new Exception("Can't interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
             }
 
@@ -70,7 +72,7 @@ namespace MultyNetHack.MyMath
                 throw new Exception("One can't interpolate array of points only with constants, one can but it wont be good... don't select constants, pls, select line it's good, or sine");
             List<KindOfMonom> Monomz = new List<KindOfMonom>(Points.Count);
             Monomz.Add(KindOfMonom.Constant);
-            for (int i = 1; i < Points.Count; i++)
+            for (int I = 1; I < Points.Count; I++)
             {
                 Monomz.Add(Monoms);
             }
@@ -79,56 +81,56 @@ namespace MultyNetHack.MyMath
         public void Interpolate(List<Point> Points, List<KindOfMonom> Monoms)
         {
             List<List<double>> Matrix = new List<List<double>>(Points.Count);
-            Polinom = new List<Monom>();
-            int lastLine = -1, lastSine = 0;
-            for (int i = 0; i < Points.Count; i++)
+            mPolinom = new List<Monom>();
+            int LastLine = -1, LastSine = 0;
+            for (int I = 0; I < Points.Count; I++)
             {
                 Matrix.Add(new List<double>());
-                for (int j = 0; j < Points.Count + 2; j++)
+                for (int J = 0; J < Points.Count + 2; J++)
                 {
-                    Matrix[i].Add(0);
+                    Matrix[I].Add(0);
                 }
             }
-            for (int i = 0; i < Points.Count; i++)
+            for (int I = 0; I < Points.Count; I++)
             {
 
-                switch (Monoms[i])
+                switch (Monoms[I])
                 {
                     case KindOfMonom.Constant:
-                        Polinom.Add(new Monom(1));
-                        for (int j = 0; j < Points.Count; j++)
+                        mPolinom.Add(new Monom(1));
+                        for (int J = 0; J < Points.Count; J++)
                         {
-                            Matrix[j][i] = 1;
+                            Matrix[J][I] = 1;
                         }
                         break;
                     case KindOfMonom.Line:
-                        lastLine++;
-                        Polinom.Add(new Monom(KindOfMonom.Line, 1, lastLine));
-                        for (int j = 1; j < Points.Count; j++)
+                        LastLine++;
+                        mPolinom.Add(new Monom(KindOfMonom.Line, 1, LastLine));
+                        for (int J = 1; J < Points.Count; J++)
                         {
-                            Point p = Points[j];
-                            Matrix[j][i] = Pow(p.x, lastLine);
+                            Point P = Points[J];
+                            Matrix[J][I] = Pow(P.X, LastLine);
                         }
                         break;
                     case KindOfMonom.Sine:
-                        lastSine++;
-                        Polinom.Add(new Monom(KindOfMonom.Sine, 1, lastSine));
-                        for (int j = 1; j < Points.Count; j++)
+                        LastSine++;
+                        mPolinom.Add(new Monom(KindOfMonom.Sine, 1, LastSine));
+                        for (int J = 1; J < Points.Count; J++)
                         {
-                            Point p = Points[j];
-                            Matrix[j][i] = Sin(lastSine * p.x);
+                            Point P = Points[J];
+                            Matrix[J][I] = Sin(LastSine * P.X);
                         }
                         break;
                 }
 
-                Matrix[i][Points.Count] = (Points[i].y);
+                Matrix[I][Points.Count] = (Points[I].Y);
                 //start x
-                Matrix[i][Points.Count + 1] = i;
+                Matrix[I][Points.Count + 1] = I;
             }
-            List<double> aas = SolveMatrix(Matrix);
-            for (int i = 0; i < aas.Count; i++)
+            List<double> Aas = SolveMatrix(Matrix);
+            for (int I = 0; I < Aas.Count; I++)
             {
-                Polinom[i].InterpolatedValue = aas[i];
+                mPolinom[I].InterpolatedValue = Aas[I];
             }
         }
         public void Interpolate(List<Point> Points, List<KindOfMonom> Monoms, bool MustBeCorrect)
@@ -137,56 +139,52 @@ namespace MultyNetHack.MyMath
                 CheckIfOneCanInterpolate(Points);
             Interpolate(Points, Monoms);
         }
-        public string LinearRepresentationOfPolinom()
+        public override string ToString()
         {
-            string s = string.Empty;
-            foreach (Monom m in Polinom)
-            {
-                s += " " + m.LinearRepresentationOfMonom() + " ";
-            }
-            return s;
+            return mPolinom.Aggregate(string.Empty, (Current, m) => Current + (" " + m.LinearRepresentationOfMonom() + " "));
         }
+
         public List<double> SolveMatrix(List<List<double>> Matrix)
         {
             if (Matrix[0].Count - 2 != Matrix.Count)
                 throw new Exception("One can only interpolate Matrix of size n*n+2\n a*X=BottomBound a:= n*n matrix, BottomBound:= 1*n combination, and 1*n matrix where are saved original indexes of rows");
             #region down
-            int n = Matrix.Count;
+            int N = Matrix.Count;
             if (Matrix[0].Count - 1 == Matrix.Count)
             {
-                for (int i = 0; i < Matrix.Count; i++)
+                for (int I = 0; I < Matrix.Count; I++)
                 {
-                    Matrix[i].Add(i);
+                    Matrix[I].Add(I);
                 }
             }
-            double miny = 0.0001;
-            for (int i = 0; i < n; i++)
+            double Miny = 0.0001;
+            for (int I = 0; I < N; I++)
             {
-                if (Abs(Matrix[i][i]) - miny <= 0)
+                if (Abs(Matrix[I][I]) - Miny <= 0)
                 {
-                    bool found = false;
-                    for (int j = n - 1; j > i; j--)
+                    bool Found = false;
+                    for (int J = N - 1; J > I; J--)
                     {
-                        if (Abs(Matrix[j][i]) - miny > 0)
+                        if (Abs(Matrix[J][I]) - Miny > 0)
                         {
-                            List<double> temp = Matrix[i];
-                            Matrix[i] = Matrix[j];
-                            Matrix[j] = temp;
-                            found = true;
-                            j = i;
+                            List<double> Temp = Matrix[I];
+                            Matrix[I] = Matrix[J];
+                            Matrix[J] = Temp;
+                            Found = true;
+                            J = I;
                         }
                     }
-                    if (!found)
+                    if (!Found)
                         throw new Exception("Sorry can't interpolate :(");
                 }
 
-                for (int j = i + 1; j < n; j++)
+                for (int J = I + 1; J < N; J++)
                 {
-                    double koeficjent = Matrix[j][i] / Matrix[i][i];
+                    double Koeficjent = Matrix[J][I] / Matrix[I][I];
 
-                    for (int k = 0; k < n + 1; k++)
+                    for (int K = 0; K < N + 1; K++)
                     {
-                        Matrix[j][k] = Matrix[j][k] - (koeficjent * Matrix[i][k]);
+                        Matrix[J][K] = Matrix[J][K] - (Koeficjent * Matrix[I][K]);
                     }
                 }
             }
@@ -194,29 +192,29 @@ namespace MultyNetHack.MyMath
             #endregion
 
             #region up
-            for (int i = (n - 1); i >= 0; i--)
+            for (int I = (N - 1); I >= 0; I--)
             {
-                for (int j = i - 1; j >= 0; j--)
+                for (int J = I - 1; J >= 0; J--)
                 {
-                    double koeficjent = new double();
-                    koeficjent = Matrix[j][i] / Matrix[i][i];
-                    Matrix[j][i] = 0;
-                    Matrix[j][n] = Matrix[j][n] - koeficjent * Matrix[i][n];
+                    double Koeficjent = new double();
+                    Koeficjent = Matrix[J][I] / Matrix[I][I];
+                    Matrix[J][I] = 0;
+                    Matrix[J][N] = Matrix[J][N] - Koeficjent * Matrix[I][N];
                 }
             }
             #endregion
             #region solve
-            List<double> soluton = new List<double>(n);
-            for (int i = 0; i < n; i++)
+            List<double> Soluton = new List<double>(N);
+            for (int I = 0; I < N; I++)
             {
-                soluton.Add(1);
+                Soluton.Add(1);
             }
-            for (int i = 0; i < n; i++)
+            for (int I = 0; I < N; I++)
             {
-                soluton[Convert.ToInt32(Matrix[i][n + 1])] = Matrix[i][n] / Matrix[i][i];
+                Soluton[Convert.ToInt32(Matrix[I][N + 1])] = Matrix[I][N] / Matrix[I][I];
             }
             #endregion
-            return soluton;
+            return Soluton;
         }
     }
 }
