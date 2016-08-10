@@ -57,8 +57,8 @@ namespace MultyNetHack.Screen
             {
                 if (mMBoundsAroundThisPlayer == null)
                     mMBoundsAroundThisPlayer =
-                        new Rectangle(new Point(mThisPlayer.LocalBounds.X, mThisPlayer.LocalBounds.Y), WantedWidth,
-                            WantedHeight);
+                        new Rectangle(new Point(mThisPlayer.LocalBounds.X, mThisPlayer.LocalBounds.Y), WantedWidth -1,
+                            WantedHeight - 1);
                 else
                 {
                     mMBoundsAroundThisPlayer.X = mThisPlayer.LocalBounds.X;
@@ -71,14 +71,14 @@ namespace MultyNetHack.Screen
 
         private void InitBuffer()
         {
-            mBuff1 = new List<List<char>>(TrueHeight);
-            for (var J = 0; J < TrueHeight; J++)
+            mBuff1 = new List<List<char>>(TrueHeight + 1);
+            for (var J = 0; J <= TrueHeight; J++)
             {
-                mBuff1.Add(new List<char>(TrueWidth));
-                mBuff1[J] = new List<char>(TrueWidth);
+                mBuff1.Add(new List<char>(TrueWidth + 1));
+                mBuff1[J] = new List<char>(TrueWidth + 1);
                 if (J == 0)
                 {
-                    for (var I = 0; I < TrueWidth; I++)
+                    for (var I = 0; I <= TrueWidth; I++)
                     {
                         mBuff1[J].Add(new char());
                     }
@@ -86,7 +86,40 @@ namespace MultyNetHack.Screen
                 else
                     mBuff1[J].AddRange(mBuff1[0]);
             }
+            mUpdated = new List<List<int>>();
+
+            for (var I = 0; I <= TrueHeight; I++)
+            {
+                mUpdated.Add(new List<int>(TrueWidth + 1));
+                if (I == 0)
+                {
+                    for (var J = 0; J < TrueWidth + 1; J++)
+                    {
+                        mUpdated[I].Add(-1);
+                    }
+                }
+                else
+                {
+                    mUpdated[I].AddRange(mUpdated[0]);
+                }
+            }
         }
+
+        private void ResetBuffers()
+        {
+            
+            mUpdated = mUpdated.Select(UpLine => UpLine
+                .Select(UpChar => -1)
+                .ToList())
+                .ToList();
+
+            mBuff1 = mBuff1.Select(BuffLine => BuffLine
+                .Select(BuffChar => BuffChar ==  ' ' ? BuffChar : ' ')
+                .ToList())
+                .ToList();
+            
+        }
+
         private void InitTexture()
         {
             mTexture = new Dictionary<Material, char>();
@@ -248,27 +281,13 @@ namespace MultyNetHack.Screen
         {
             lock (mLockDrawMethode)
             {
-                for (var I = 0; I < TrueHeight; I++)
-                {
-                    mUpdated.Add(new List<int>(TrueWidth));
-                    if (I == 0)
-                    {
-                        for (var J = 0; J < TrueWidth; J++)
-                        {
-                            mUpdated[I].Add(-1);
-                        }
-                    }
-                    else
-                    {
-                        mUpdated[I].AddRange(mUpdated[0]);
-                    }
-                }
-
-                DrawPaths();
+                ResetBuffers();
+                
                 ZBufferUpdate(this);
                 FillBuffer(BoundsAroundThisPlayer, MadeOf, 0);
                 FlushBuffer();
                 ScreenChange();
+
             }
         }
         private void ZBufferUpdate(Component Comp)
@@ -280,13 +299,14 @@ namespace MultyNetHack.Screen
                 ZBufferUpdate(GoodComponent.Value);
             }
             FillBuffer(Comp.GlobalBounds, Comp.MadeOf, Comp.ZValue);
+            DrawPaths(Comp);
         }
         private void FillBuffer(Rectangle TransformdBounds, Material madeOf, int ZLevel)
         {
             var Transformed = BoundsAroundThisPlayer.ToTopLeft(TransformdBounds);
-            for (int I = Transformed.TopBound; I < Transformed.BottomBound; I++)
+            for (int I = Min( Transformed.TopBound, Transformed.BottomBound); I <= Max(Transformed.TopBound, Transformed.BottomBound); I++)
             {
-                for (int J = Transformed.LeftBound; J < Transformed.RightBound; J++)
+                for (int J = Transformed.LeftBound; J <= Transformed.RightBound; J++)
                 {
                     if (mUpdated[I][J] < ZLevel)
                     {
@@ -296,40 +316,33 @@ namespace MultyNetHack.Screen
                 }
             }
         }
-        private void FillBuffer(int X, int Y, int H, int W, Material M, int ZLevle)
-        {
-            var Start = LocalBounds.ToTopLeft(X, Y);
-            var End = LocalBounds.ToTopLeft(X + W, Y - H);
-            for (int I = Min(End.Y, Start.Y); I < Max(Start.Y, End.Y); I++)
-            {
-                for (int J = Min(End.X, Start.X); J < Max(Start.X, End.X); J++)
-                {
-                    if (mUpdated[J][I] < ZLevle)
-                    {
-                        mBuff1[J][I] = mTexture[M];
-                        mUpdated[J][I] = ZLevle;
-                    }
-                }
-            }
-        }
+        
         private void FlushBuffer()
         {
             Clear();
             foreach (var C in mBuff1)
                 VirtualConsoleAddLine(new string(C.ToArray()));
-            ScreenChange();
         }
-        private void DrawPaths()
+        private void DrawPaths(Component ComponentsWithPaths)
         {
-            Controls.Where(I => I.Value.GetType() == typeof(Path)).ToList().ForEach(I =>
+            foreach (var path in ComponentsWithPaths.Controls.Where(I => I.Value.GetType() == typeof(Path)))
             {
-                var Pol = (I.Value as Path).Poly;
-                for (int J = LocalBounds.LeftBound; J < LocalBounds.RightBound; J++)
+                var Component = path.Value as Path;
+                
+                var Pol = Component.Poly;
+
+                for (int J = BoundsAroundThisPlayer.LeftBound; J < BoundsAroundThisPlayer.RightBound; J++)
                 {
-                    FillBuffer(J, ToInt32(Pol.ValueForX(J) + Abs(Pol.DerivativeForX(J))) + 2,
-                        Abs(ToInt32(Pol.DerivativeForX(J))*2) + 4, 1, I.Value.MadeOf, I.Value.ZValue);
+                    var TransformdBounds = new Rectangle(
+                        new Point(J, ToInt32(Pol.ValueForX(J))),
+                        1,
+                        Abs(ToInt32(Pol.DerivativeForX(J)*2)) + 4);
+                    if (TransformdBounds & BoundsAroundThisPlayer)
+                        FillBuffer(TransformdBounds , 
+                                    path.Value.MadeOf, 
+                                    path.Value.ZValue);
                 }
-            });
+            }
         }
     }
 }
