@@ -53,6 +53,7 @@ namespace MultyNetHack
             {
                 {Comands.GenerateOneRoom,     new GenerateRoomsCommand(1)},
                 {Comands.GenerateALotOfRooms, new GenerateRoomsCommand(100)},
+                {Comands.GenerateRandomPath,  new GeneratePathCommand() {NumberOfPaths = 1 } },
                 {Comands.Left,                new MoveCommand(MoveDirection.Left, 1)},
                 {Comands.TenStepsLeft,        new MoveCommand(MoveDirection.Left, 10)},
                 {Comands.Right,               new MoveCommand(MoveDirection.Right, 1)},
