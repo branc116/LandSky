@@ -97,9 +97,24 @@ namespace MultyNetHack.Components
         }
         private Component GetComponentOnLocation(Point Point)
         {
-            var Intersect = this.Controls.Where(I => I.Value.GetType() != typeof(Player) && Point & I.Value.GlobalBounds)
-                .OrderBy(N => -N.Value.ZValue);
-            return Intersect.Any() ? Intersect.First().Value.GetComponentOnLocation(Point) : this;
+            try
+            {
+                var Intersect = this.Controls.Where(
+                    I =>
+                    {
+                        if(I.GetType() == typeof(Wall) || I.GetType() == typeof(Room))
+                            return Point & I.Value.GlobalBounds;
+                        if (I.GetType() == typeof(Path))
+                            return ((Path)I.Value).IsOnPath(Point);
+                        return false;
+                    })
+                    .OrderBy(N => -N.Value.ZValue);
+                return Intersect.Any() ? Intersect.First().Value.GetComponentOnLocation(Point) : this;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
 
@@ -231,11 +246,11 @@ namespace MultyNetHack.Components
         }
         public static bool operator ==(Component One, Component Two)
         {
-            return Two != null && (One != null && (One.LocalBounds.TopBound == Two.LocalBounds.TopBound &&
-                                                   One.LocalBounds.BottomBound == Two.LocalBounds.BottomBound &&
-                                                   One.LocalBounds.LeftBound == Two.LocalBounds.LeftBound &&
-                                                   One.LocalBounds.RightBound == Two.LocalBounds.RightBound &&
-                                                   One.Name == Two.Name));
+            return One.LocalBounds.TopBound == Two.LocalBounds.TopBound &&
+                   One.LocalBounds.BottomBound == Two.LocalBounds.BottomBound &&
+                   One.LocalBounds.LeftBound == Two.LocalBounds.LeftBound &&
+                   One.LocalBounds.RightBound == Two.LocalBounds.RightBound &&
+                   One.Name == Two.Name;
         }
 
         public static bool operator !=(Component One, Component Two)
