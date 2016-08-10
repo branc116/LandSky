@@ -34,8 +34,8 @@ namespace MultyNetHack.Components
 
             int L = Rand.Next(Left, Right);
             int T = Rand.Next(Bottom, Top);
-            int B = Rand.Next(T - 40, T - 15);
-            int R = Rand.Next(L + 7, L + 20);
+            int B = Rand.Next(T - 20, T - 15);
+            int R = Rand.Next(L + 20, L + 70);
             Bounds = new Rectangle(T, R, B, L);
             MadeOf = Material.Air;
         }
@@ -65,10 +65,10 @@ namespace MultyNetHack.Components
         }
         public void GenerateWall()
         {
-            Wall WT = new Wall("TopWall", new Rectangle(new Point(0, this.Height/2 - 1), this.Width, 1));
-            Wall WB = new Wall("BottomWall", new Rectangle(new Point(0, -this.Height/2 + 1), this.Width, 1));
-            Wall WL = new Wall("LeftWall", new Rectangle(new Point(-this.Width/2 - 1, 0), 1, this.Height));
-            Wall WR = new Wall("RightWall", new Rectangle(new Point(this.Width/2, 0), 1, this.Height));
+            Wall WT = new Wall("TopWall", new Rectangle(Bounds.DistaceToTopBound, Bounds.DistaceToRightBound, Bounds.DistaceToTopBound, Bounds.DistaceToLeftBound));
+            Wall WB = new Wall("BottomWall", new Rectangle(Bounds.DistaceToBottomBound, Bounds.DistaceToRightBound, Bounds.DistaceToBottomBound, Bounds.DistaceToLeftBound));
+            Wall WL = new Wall("LeftWall", new Rectangle(Bounds.DistaceToTopBound, Bounds.DistaceToLeftBound, Bounds.DistaceToBottomBound, Bounds.DistaceToLeftBound));
+            Wall WR = new Wall("RightWall", new Rectangle(Bounds.DistaceToTopBound, Bounds.DistaceToRightBound, Bounds.DistaceToBottomBound, Bounds.DistaceToRightBound));
 
             WT.ZValue = ZValue + 1;
             WB.ZValue = ZValue + 1;
