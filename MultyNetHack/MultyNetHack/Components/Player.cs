@@ -11,7 +11,7 @@ namespace MultyNetHack.Components
         public Player(string Name) : base($"Player{Name}")
         {
             this.ZValue = 25;
-            this.Bounds = Rectangle.DefineRectangleByWidthAndHeight(0, 0, 1, 1);
+            this.Bounds = Rectangle.DefineRectangleByWidthAndHeight(0, 0, 0, 0);
 
             MadeOf = Material.Player;
         }
