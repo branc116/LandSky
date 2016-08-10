@@ -211,7 +211,6 @@ namespace MultyNetHack.Screen
                 MScrool = value % VirtualConsoleTop;
             }
         }
-
         /// <summary>
         /// Active screen that are displayed. Push on stack new screen to pause the current screen and display new screen
         /// </summary>
@@ -228,6 +227,7 @@ namespace MultyNetHack.Screen
         /// List of all debug messages. This is used for debugging.
         /// </summary>
         public static List<DebugMessage> AllMessages;
+
         /// <summary>
         /// Commands in screens that extend Screen method.
         /// </summary>
@@ -265,6 +265,7 @@ namespace MultyNetHack.Screen
         /// String that is displayed on the bottom of the screen
         /// </summary>
         protected string FooterString;
+
         /// <summary>
         /// Indicates that virtual console should be redrawn
         /// </summary>
@@ -390,7 +391,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// this is called when the screen stops being on top of the stack
         /// </summary>
-        virtual protected void Pause()
+        protected virtual void Pause()
         {
             foreach (KeyValuePair<Comands, Action<BaseCommand>> Kvp in MLocalCommands)
             {
@@ -401,7 +402,7 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// This is called when screen starts being on top of the stack
         /// </summary>
-        virtual protected void Resume()
+        protected virtual void Resume()
         {
             foreach (KeyValuePair<Comands, Action<BaseCommand>> Kvp in MLocalCommands)
             {
@@ -428,7 +429,7 @@ namespace MultyNetHack.Screen
             Flush();
         }
         
-        virtual protected void GenerateFooter()
+        protected virtual void GenerateFooter()
         {
             string Mid = $"Shown lines from {ActiveFrom + 1} to {ActiveTo} out of {VirtualConsoleTop}";
             GenerateFooter(Mid);
@@ -439,7 +440,7 @@ namespace MultyNetHack.Screen
             FooterString = $"{new string(' ', Max(0, TrueWidth/2 - Mid.Length/2))}{Mid}";
             FooterHeight = 1;
         }
-        virtual protected void GenerateHeader()
+        protected virtual void GenerateHeader()
         {
             HeadString = $"{new string(' ', Max(0, (TrueWidth - Name.Length)/2))}{Name}";
         }
