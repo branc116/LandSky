@@ -125,6 +125,7 @@ namespace MultyNetHack.Screen
                     mBodyString = mBodyString.Remove(I + value);
                 else if (mBodyString.Length != 0)
                     mBodyString += new string(' ', I + value - mBodyString.Length);
+                mIsBodyUpdated = true;
             }
         }
         /// <summary>
@@ -134,7 +135,11 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return mBodyString.Where(I => I == '\n').ToList().Count;
+                if (mIsBodyUpdated) {
+                    mVirtualConsoleTop = mBodyString.Count(mI => mI == '\n');
+                    mIsBodyUpdated = false;
+                }
+                return mVirtualConsoleTop;
             }
             set
             {
@@ -162,6 +167,7 @@ namespace MultyNetHack.Screen
                 {
                     mBodyString = mBodyString.Remove(mBodyString.LastIndexOf('\n') + 1);
                 }
+                mIsBodyUpdated = true;
             }
 
         }
@@ -174,24 +180,35 @@ namespace MultyNetHack.Screen
             {
                 if (mShuldUpdate)
                 {
-                    string S = '+' + new string('-', TrueWidth) + '+' + '\n';
+                    int mActiveFrom = ActiveFrom;
+                    mActiveTo = ActiveTo;
+                    int mTrueWidth = TrueWidth;
+                    int mTrueHeight = TrueHeight;
+
+                    string S = '+' + new string('-', mTrueWidth) + '+' + '\n';
                     HeadString.Split('\n').ToList().ForEach((I) =>
                     {
-                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' +'\n';
+                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' +'\n';
                     });
-                    S += '|' + new string('-', TrueWidth) + '|' + '\n';
-                    List<string> Ss = mBodyString.Split('\n').ToList();
-                    for (int J = ActiveFrom; J < ActiveTo; J++)
+                    S += '|' + new string('-', mTrueWidth) + '|' + '\n';
+                    int CountingEn = -1;
+                    var ActiveBodyLines = mBodyString.Split('\n').Where(i =>
                     {
-                        string I = Ss[J];
-                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' + '\n';
+                        CountingEn++;
+                        return CountingEn >= mActiveFrom && CountingEn < mActiveTo;
+                    });
+                    foreach (var ActiveBodyLine in ActiveBodyLines) {
+                        string I = ActiveBodyLine;
+                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                        if (CountingEn > mActiveTo)
+                            break;
                     }
-                    S += '|' + new string('-', TrueWidth) + '|' + '\n';
+                    S += '|' + new string('-', mTrueWidth) + '|' + '\n';
                     FooterString.Split('\n').ToList().ForEach((I) =>
                     {
-                        S += '|' + I.Substring(0, Min(I.Length, TrueWidth)) + new string(' ', Max(0, TrueWidth - I.Length)) + '|' + '\n';
+                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
                     });
-                    S += '+' + new string('-', TrueWidth) + '+';
+                    S += '+' + new string('-', mTrueWidth) + '+';
                     mVirtualConsole = S;
                     mShuldUpdate = false;
                 }
@@ -249,7 +266,10 @@ namespace MultyNetHack.Screen
         {
             get
             {
-                return Min(VirtualConsoleTop, Min(Scrool + VirtualConsoleTop,Scrool + WantedHeight - HeadHeight*2));
+
+                mVirtualConsoleTop = VirtualConsoleTop;
+                mActiveTo = Min(mVirtualConsoleTop, Min(Scrool + mVirtualConsoleTop, Scrool + WantedHeight - HeadHeight * 2));
+                return mActiveTo;
             }
         }
         protected int MScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHeight, MScreenHeight, MScreenWidth;
@@ -269,14 +289,14 @@ namespace MultyNetHack.Screen
         /// <summary>
         /// Indicates that virtual console should be redrawn
         /// </summary>
-        private bool mShuldUpdate;
+        private bool mShuldUpdate, mIsBodyUpdated;
         private string mVirtualConsole;
         /// <summary>
         /// This is displayed in the middle of the screen
         /// </summary>
         private string mBodyString;
         private object mObjectToLockFlush;
-
+        private int mVirtualConsoleTop, mActiveTo;
         /// <summary>
         /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
@@ -311,6 +331,7 @@ namespace MultyNetHack.Screen
         private void InitProperties(int Top, int Left)
         {
             mBodyString = string.Empty;
+            mIsBodyUpdated = true;
             GlobalLeft = Left;
             GlobalTop = Top;
             WantedWidth = MaxWidth;
@@ -461,6 +482,7 @@ namespace MultyNetHack.Screen
         public void VirtualConsoleAdd(object Obj)
         {
             mBodyString += Obj.ToString();
+            mIsBodyUpdated = true;
         }
         /// <summary>
         /// Add text to the virtual console and add new line to the console
@@ -470,6 +492,7 @@ namespace MultyNetHack.Screen
         {
             VirtualConsoleAdd(Obj);
             mBodyString += '\n';
+            mIsBodyUpdated = true;
         }
         /// <summary>
         /// Only add new line to the virtual console
@@ -477,6 +500,7 @@ namespace MultyNetHack.Screen
         public void VirtualConsoleAddLine()
         {
             mBodyString += '\n';
+            mIsBodyUpdated = true;
         }
         /// <summary>
         /// Print line full of '-' character. Use this to make screen look nicer.
@@ -495,7 +519,8 @@ namespace MultyNetHack.Screen
         {
             string S = Obj.ToString() + '\n';
             VirtualConsoleLeft = 0;
-            mBodyString += new string(' ', TrueWidth / 2 - S.Length / 2) + S + '\n';   
+            mBodyString += new string(' ', TrueWidth / 2 - S.Length / 2) + S + '\n';
+            mIsBodyUpdated = true;
         }
         /// <summary>
         /// Use this when you made changes to the virtual console
@@ -520,6 +545,7 @@ namespace MultyNetHack.Screen
         public void Clear()
         {
             mBodyString = string.Empty;
+            mIsBodyUpdated = true;
         }
     }
 }
