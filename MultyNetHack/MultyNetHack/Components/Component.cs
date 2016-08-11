@@ -102,9 +102,9 @@ namespace MultyNetHack.Components
                 var Intersect = this.Controls.Where(
                     I =>
                     {
-                        if(I.GetType() == typeof(Wall) || I.GetType() == typeof(Room))
+                        if(I.Value.GetType() == typeof(Wall) || I.Value.GetType() == typeof(Room))
                             return Point & I.Value.GlobalBounds;
-                        if (I.GetType() == typeof(Path))
+                        if (I.Value.GetType() == typeof(Path))
                             return ((Path)I.Value).IsOnPath(Point);
                         return false;
                     })
