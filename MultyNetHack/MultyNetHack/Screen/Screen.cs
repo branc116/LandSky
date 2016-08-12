@@ -297,6 +297,7 @@ namespace MultyNetHack.Screen
         private string mBodyString;
         private object mObjectToLockFlush;
         private int mVirtualConsoleTop, mActiveTo;
+
         /// <summary>
         /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method.
         /// </summary>
@@ -351,6 +352,7 @@ namespace MultyNetHack.Screen
             Comand.Add(Comands.ShowHelp, ShowHelp);
             Comand.Add(Comands.ShowDebug, ShowDebug);
             Comand.Add(Comands.LastSceen, PopSceen);
+            Comand.Add(Comands.ToJSON, ScreenToJSON);
         }
         /// <summary>
         /// Destroys current screen and displays the screen below it
@@ -408,6 +410,11 @@ namespace MultyNetHack.Screen
         private void ChangeScene(BaseCommand Bc)
         {
 
+        }
+        private async void ScreenToJSON(BaseCommand Bc)
+        {
+            ScreenToJsonCommand Comm = Bc as ScreenToJsonCommand;
+            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':','_')}.json");
         }
         /// <summary>
         /// this is called when the screen stops being on top of the stack
