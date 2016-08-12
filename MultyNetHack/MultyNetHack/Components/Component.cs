@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
+
+using Newtonsoft.Json;
 
 using MultyNetHack.MyEnums;
 using MultyNetHack.MyMath;
+using MultyNetHack.Screen;
 
 namespace MultyNetHack.Components
 {
+    [JsonObject]
     /// <summary>
     /// Everything should be extended from this
     /// </summary>
@@ -19,7 +24,7 @@ namespace MultyNetHack.Components
         {
             get
             {
-                return LocalBounds.X;
+                return LocalBounds == null ? 0 : LocalBounds.X;
             }
             set
             {
@@ -30,22 +35,22 @@ namespace MultyNetHack.Components
         {
             get
             {
-                return LocalBounds.Y;
+                return LocalBounds == null ? 0 : LocalBounds.Y;
             }
             set
             {
                 LocalBounds.Y = value;
             }
         }
-        public int GlobalX => IsRoot ? 0 : LocalX + Parent.LocalX;
-        public int GlobalY => IsRoot ? 0 : LocalY + Parent.LocalY;
-        public int Height => LocalBounds.Height;
-        public int Width => LocalBounds.Width;
+        public int GlobalX => IsRoot ? 0 : LocalX + (Parent == null ? 0 : Parent.LocalX);
+        public int GlobalY => IsRoot ? 0 : LocalY + (Parent == null ? 0 : Parent.LocalY);
+        public int Height => LocalBounds == null ? 0 : LocalBounds.Height;
+        public int Width => LocalBounds == null ? 0 : LocalBounds.Width;
         public int NumOfRooms => Controls.Count(I => I.Value.GetType() == typeof(Room));
         public int NumOfWalls => Controls.Count(I => I.Value.GetType() == typeof(Wall));
         public int NumOfPaths => Controls.Count(I => I.Value.GetType() == typeof(Path));
         public Rectangle LocalBounds => Bounds;
-        public Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : LocalBounds + Parent.GlobalBounds;
+        public Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : (LocalBounds == null ? new Rectangle(0,0,0,0) : (Parent == null ? LocalBounds : LocalBounds + Parent.GlobalBounds));
 
         public bool IsRoot { get; set; }
         public bool IsPassable { get; set; }
@@ -95,7 +100,7 @@ namespace MultyNetHack.Components
             Point P = new Point(X, Y);
             return GetComponentOnLocation(P);
         }
-        private Component GetComponentOnLocation(Point Point)
+        public Component GetComponentOnLocation(Point Point)
         {
             try
             {
@@ -116,9 +121,7 @@ namespace MultyNetHack.Components
                 throw;
             }
         }
-
-
-        private async Task GenerateRandomPaths(int N, IEnumerable<string> Names)
+        public async Task GenerateRandomPaths(int N, IEnumerable<string> Names)
         {
             List<Path> Range = new List<Path>();
             Task[] Tasks = new Task[N];
@@ -144,7 +147,7 @@ namespace MultyNetHack.Components
             }
 
         }
-        private async Task GenerateRandomPaths(int N)
+        public async Task GenerateRandomPaths(int N)
         {
             List<string> Names = new List<string>();
             for (int I = 0; I < N; I++)
@@ -153,7 +156,7 @@ namespace MultyNetHack.Components
             }
             await GenerateRandomPaths(N, Names);
         }
-        private async Task GenerateRandomRooms(int N, IReadOnlyList<string> Names)
+        public async Task GenerateRandomRooms(int N, IReadOnlyList<string> Names)
         {
             Task[] Tasks = new Task[4];
             List<List<Component>> Quad = new List<List<Component>>();
@@ -219,12 +222,47 @@ namespace MultyNetHack.Components
         {
             return Components.Any(N => N.LocalBounds & NewComponent.LocalBounds && N.ZValue == NewComponent.ZValue);
         }
-        public static bool CheckCollision(Dictionary<string, Component> Components, Component NewComponent)
+        public bool CheckCollision(Dictionary<string, Component> Components, Component NewComponent)
         {
             return Components.Any(N => N.Value.LocalBounds & NewComponent.LocalBounds && N.Value.ZValue == NewComponent.ZValue);
         }
 
-        //check for intersection in two rooms
+        public async Task<string> GimeJSON()
+        {
+            return await Task.Factory.StartNew(() => JsonConvert.SerializeObject(this, this.GetType(), Formatting.Indented, new JsonSerializerSettings()
+            {
+                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                CheckAdditionalContent = true,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                MaxDepth = 5,
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                NullValueHandling = NullValueHandling.Include,
+                StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
+            }));
+        }
+        public async Task SaveStateToDisc(string FileName)
+        {
+            string InvalidChars = @"?:*[];|=,";
+            int count = 0;
+            FileName = new string(FileName.Select(i => {
+                count++;
+                if (count < 5) return i;
+                return InvalidChars.Any(j => i == j) ? '_' : i;
+            }).ToArray());
+            var hss = FileName.Split('\\').ToList();
+            await Task.Factory.StartNew(async () => { File.WriteAllText(hss.Last(), await GimeJSON(), System.Text.Encoding.UTF8); }).ContinueWith((i) =>
+            {
+
+                //finished
+            });
+        }
+        public static async Task<Component> GimeComponentFromJSON(string FileName)
+        {
+             return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<Component>(File.ReadAllText(FileName, System.Text.Encoding.UTF8)));
+        }
+
+        //check for intersection in two Components
         public static bool operator &(Component One, Component Two)
         {
             return (One.LocalBounds.LeftBound <= Two.LocalBounds.RightBound && One.LocalBounds.RightBound >= Two.LocalBounds.LeftBound &&
@@ -246,11 +284,11 @@ namespace MultyNetHack.Components
         }
         public static bool operator ==(Component One, Component Two)
         {
-            return One.LocalBounds.TopBound == Two.LocalBounds.TopBound &&
-                   One.LocalBounds.BottomBound == Two.LocalBounds.BottomBound &&
-                   One.LocalBounds.LeftBound == Two.LocalBounds.LeftBound &&
-                   One.LocalBounds.RightBound == Two.LocalBounds.RightBound &&
-                   One.Name == Two.Name;
+            return One?.LocalBounds?.TopBound == Two?.LocalBounds?.TopBound &&
+                   One?.LocalBounds?.BottomBound == Two?.LocalBounds?.BottomBound &&
+                   One?.LocalBounds?.LeftBound == Two?.LocalBounds?.LeftBound &&
+                   One?.LocalBounds?.RightBound == Two?.LocalBounds?.RightBound &&
+                   One?.Name == Two?.Name;
         }
 
         public static bool operator !=(Component One, Component Two)
@@ -268,7 +306,7 @@ namespace MultyNetHack.Components
         {
             return new Rectangle(C.LocalBounds.TopBound + P.Y, C.LocalBounds.RightBound + P.X, C.LocalBounds.BottomBound + P.Y, C.LocalBounds.LeftBound + P.X);
         }
-        public override bool Equals(object Obj) => Obj.Equals(this);
+        public override bool Equals(object Obj) => Obj is Component ? Obj as Component == this : false ;
         public bool Equals(Component Other)
         {
             return ZValue == Other.ZValue &&
