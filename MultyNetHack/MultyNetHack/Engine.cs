@@ -64,9 +64,6 @@ namespace MultyNetHack
             
             BaseScreen.AllMessages = new List<DebugMessage>();
             BaseScreen.UnreadMessages = new Queue<DebugMessage>();
-
-            Controls.LoadKeyMap();
-            Controls.LoadInvokedBaseCommand();
         }
         /// <summary>
         /// Handels console input
@@ -75,12 +72,12 @@ namespace MultyNetHack
         private Task Initinput()
         {
             var C = Console.ReadKey(true);
-            
+            C = new ConsoleKeyInfo(C.KeyChar, C.Key, false, (ConsoleModifiers.Alt & C.Modifiers) != 0, 0 != (ConsoleModifiers.Control & C.Modifiers));
             while (true)
             {
                 try
                 {
-                    var Cc = Controls.KeyMap[C.KeyChar];
+                    var Cc = Controls.KeyMap[C];
                     var Ss = BaseScreen.Active.Peek();
                     Task.Run(() =>
                     {
@@ -100,6 +97,7 @@ namespace MultyNetHack
                     if (e!=null) e = null;
                 }
                 C = Console.ReadKey(true);
+                C = new ConsoleKeyInfo(C.KeyChar, C.Key, false, (ConsoleModifiers.Alt & C.Modifiers) != 0, 0 != (ConsoleModifiers.Control & C.Modifiers));
             }
 
         }
