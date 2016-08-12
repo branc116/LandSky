@@ -11,45 +11,40 @@ namespace MultyNetHack
     /// </summary>
     class Controls
     {
-        public static Dictionary<char, Comands> KeyMap;
-        public static Dictionary<Comands, BaseCommand> InvokedBaseCommand;
-        public static void LoadKeyMap()
-        {
-            KeyMap = new Dictionary<char, Comands>
+        public static Dictionary<ConsoleKeyInfo, Comands> KeyMap = new Dictionary<ConsoleKeyInfo, Comands>
             {
-                {'h', Comands.Left},
-                {'H', Comands.TenStepsLeft},
-                {'l', Comands.Right},
-                {'L', Comands.TenStepsRight},
-                {'k', Comands.Up},
-                {'K', Comands.TenStepsUp},
-                {'j', Comands.Down},
-                {'J', Comands.TenStepsDown},
-                {'q', Comands.ScrollLeft},
-                {'e', Comands.ScrollRight},
-                {',', Comands.ScrollLeft},
-                {'.', Comands.ScrollRight},
-                {'r', Comands.GenerateOneRoom},
-                {'R', Comands.GenerateALotOfRooms},
-                {'P', Comands.GenerateRandomPath},
-                {'d', Comands.DequeMessage},
-                {Convert.ToChar(27), Comands.LastSceen},
-                {'?', Comands.ShowHelp},
-                {'*', Comands.ShowDebug},
-                {'1', Comands.Option1},
-                {'2', Comands.Option2},
-                {'3', Comands.Option3},
-                {'4', Comands.Option4},
-                {'5', Comands.Option5},
-                {'6', Comands.Option6},
-                {'7', Comands.Option7},
-                {'8', Comands.Option8},
-                {'9', Comands.Option9}
+                {new ConsoleKeyInfo('h',ConsoleKey.H,false,false,false) , Comands.Left},
+                {new ConsoleKeyInfo('H',ConsoleKey.H,false,false,false), Comands.TenStepsLeft},
+                {new ConsoleKeyInfo('l',ConsoleKey.L,false,false,false), Comands.Right},
+                {new ConsoleKeyInfo('L',ConsoleKey.L,false,false,false), Comands.TenStepsRight},
+                {new ConsoleKeyInfo('k',ConsoleKey.K,false,false,false), Comands.Up},
+                {new ConsoleKeyInfo('K',ConsoleKey.K,false,false,false), Comands.TenStepsUp},
+                {new ConsoleKeyInfo('j',ConsoleKey.J,false,false,false), Comands.Down},
+                {new ConsoleKeyInfo('J',ConsoleKey.J,false,false,false), Comands.TenStepsDown},
+                {new ConsoleKeyInfo('q',ConsoleKey.Q,false,false,false), Comands.ScrollLeft},
+                {new ConsoleKeyInfo('e',ConsoleKey.E,false,false,false), Comands.ScrollRight},
+                {new ConsoleKeyInfo(',',ConsoleKey.OemComma,false,false,false), Comands.ScrollLeft},
+                {new ConsoleKeyInfo('.',ConsoleKey.OemPeriod,false,false,false), Comands.ScrollRight},
+                {new ConsoleKeyInfo('r',ConsoleKey.R,false,false,false), Comands.GenerateOneRoom},
+                {new ConsoleKeyInfo('R',ConsoleKey.R,false,false,false), Comands.GenerateALotOfRooms},
+                {new ConsoleKeyInfo('P',ConsoleKey.P,false,false,false), Comands.GenerateRandomPath},
+                {new ConsoleKeyInfo('d',ConsoleKey.D,false,false,false), Comands.DequeMessage},
+
+                {new ConsoleKeyInfo('\0',ConsoleKey.S,false,true,true), Comands.ToJSON },
+                {new ConsoleKeyInfo((char)27,ConsoleKey.Escape,false,false,false), Comands.LastSceen},
+                {new ConsoleKeyInfo('?',ConsoleKey.Oem2,false,false,false), Comands.ShowHelp},
+                {new ConsoleKeyInfo('*',ConsoleKey.OemPlus,false,false,false), Comands.ShowDebug},
+                {new ConsoleKeyInfo('1',ConsoleKey.D1,false,false,false), Comands.Option1},
+                {new ConsoleKeyInfo('2',ConsoleKey.D2,false,false,false), Comands.Option2},
+                {new ConsoleKeyInfo('3',ConsoleKey.D3,false,false,false), Comands.Option3},
+                {new ConsoleKeyInfo('4',ConsoleKey.D4,false,false,false), Comands.Option4},
+                {new ConsoleKeyInfo('5',ConsoleKey.D5,false,false,false), Comands.Option5},
+                {new ConsoleKeyInfo('6',ConsoleKey.D6,false,false,false), Comands.Option6},
+                {new ConsoleKeyInfo('7',ConsoleKey.D7,false,false,false), Comands.Option7},
+                {new ConsoleKeyInfo('8',ConsoleKey.D8,false,false,false), Comands.Option8},
+                {new ConsoleKeyInfo('9',ConsoleKey.D9,false,false,false), Comands.Option9}
             };
-        }
-        public static void LoadInvokedBaseCommand()
-        {
-            InvokedBaseCommand = new Dictionary<Comands, BaseCommand>
+        public static Dictionary<Comands, BaseCommand> InvokedBaseCommand = new Dictionary<Comands, BaseCommand>
             {
                 {Comands.GenerateOneRoom,     new GenerateRoomsCommand(1)},
                 {Comands.GenerateALotOfRooms, new GenerateRoomsCommand(100)},
@@ -66,6 +61,7 @@ namespace MultyNetHack
                 {Comands.ScrollLeft,          new ScrollCommand(-1)},
                 {Comands.ShowHelp,            new BaseCommand()},
                 {Comands.ShowDebug,           new BaseCommand()},
+                {Comands.ToJSON,              new ScreenToJsonCommand(Environment.CurrentDirectory + "ScreenState")},
                 {Comands.Option1,             new BaseCommand()},
                 {Comands.Option2,             new BaseCommand()},
                 {Comands.Option3,             new BaseCommand()},
@@ -77,6 +73,6 @@ namespace MultyNetHack
                 {Comands.Option9,             new BaseCommand()},
                 {Comands.LastSceen,           new BaseCommand()}
             };
-        }
-    } 
+
+    }     
 }
