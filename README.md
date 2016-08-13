@@ -1,6 +1,6 @@
 <h1 align="center"> Land sky </h1>
 
-<h2 align="center">roguelike nethacklike multiplayer game</h4>
+<h2 align="center">Roguelike NetHacklike multiplayer game</h4>
 
 Land sky project is an attempt at building a multiplayer version of roguelike nethacklike game.
 
@@ -15,7 +15,7 @@ Land sky project is an attempt at building a multiplayer version of roguelike ne
 Reason for this is that is easier for new developers to get into, I choose C#.
 
 #### Get started:
-* ``` \>git clone https://github.com/branc116/LandSky ```
+* ``` >git clone https://github.com/branc116/LandSky ```
 * ***Windows***: 
  * Just install [Visual studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx) 
  * open src/LandSky.sln  
@@ -24,8 +24,8 @@ Reason for this is that is easier for new developers to get into, I choose C#.
 * ***Linux and OS X (Maybe, most likely will not work, but I'll try to make it work)***
  * Hack with your favorite C# IDE
  * Install [Mono](http://www.mono-project.com/download/)
- * ``` \>xbuild src/LandSky.sln ```
- * ``` \>mono src/core/bin/Debug/LandSky.exe ```
+ * ``` >xbuild src/LandSky.sln ```
+ * ``` >mono src/core/bin/Debug/LandSky.exe ```
 
 #### Design decisions
 Here are some of the design decisions:
