@@ -1,0 +1,36 @@
+﻿Land sky
+
+
+
+13.8.2016
+-----------------------------------------------------------------------
+MultyNetHack
+--1.8.2016--
+	Fixed stuff
+	Added debug screen (press '*') in any screen to get in to debug screen
+
+
+--31.7.2016-- 
+	Generalization of different screens
+	Added better support for command decoding
+	Added a lot of comments in the code
+	Added Ui components
+
+--01.7.2016--
+	Added path generation
+	Reworked text drawing system
+	Generalize keymaping
+	Better collision detection
+	Now when one starts the game, all controls and functions are displayed
+	Now cmd adjusts Window width and height
+
+--16.6.2016--
+	Added walls when generating rooms
+	Made it a lot faster to render all of the rooms
+	Fixed recursive rendering (Now one can display room inside of a room inside of a room...)
+
+--12.6.2016.--
+	Added message queuing
+	Added option for adding a lot of rooms at a same time
+	Increased performance
+	Fixed bugs

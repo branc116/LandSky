@@ -1,2 +1,2 @@
 language: csharp
-solution: MultyNetHack/MultyNetHack.sln
+solution: src/LandSky.sln

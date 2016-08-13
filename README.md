@@ -1,33 +1,37 @@
-<h1 align="center"> MultyNetHack </h1>
+<h1 align="center"> Land sky </h1>
 
-<h2 align="center">A remake of the Nethack.</h4>
+<h2 align="center">roguelike nethacklike multiplayer game</h4>
 
-MultyNetHack project is an attempt at building multiplayer version of the clasic game Nethack.
+Land sky project is an attempt at building a multiplayer version of roguelike nethacklike game.
+
+[![Build Status](https://travis-ci.org/branc116/LandSky.svg?branch=master)](https://travis-ci.org/branc116/LandSky)
 
 #### Goal include:
-* ***It shuld be multiplayer***
-* ***It shuld be sandbox***
-* ***It shuld be open source***
-* ***It shuld be fun as original game was***
-* ***It shuld be written in statically typed language***. 
-Reason for this is that is easier for new developers to get into.I choose C#.
+* ***It should be multiplayer***
+* ***It should be sandbox***
+* ***It should be open source***
+* ***It should be fun as original game was***
+* ***It should be written in statically typed language***. 
+Reason for this is that is easier for new developers to get into, I choose C#.
 
 #### Get started:
-* \>git clone https://github.com/branc116/MultyNetHack
+* ``` \>git clone https://github.com/branc116/LandSky ```
 * ***Windows***: 
  * Just install [Visual studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx) 
- * open MultyNetHack/MultyNetHack.sln  
+ * open src/LandSky.sln  
  * Build and/or start hacking
-* ***Linux and OS X (Maybe, maybe most likely will not work, but I'll try to make it work)***
+ * Start it inside Visual studio or run ``` src/core/bin/Debug/LandSky.exe ```
+* ***Linux and OS X (Maybe, most likely will not work, but I'll try to make it work)***
  * Hack with your favorite C# IDE
  * Install [Mono](http://www.mono-project.com/download/)
- * \>xbuild MultyNetHack/MultyNetHack.sln
+ * ``` \>xbuild src/LandSky.sln ```
+ * ``` \>mono src/core/bin/Debug/LandSky.exe ```
 
 #### Design decisions
 Here are some of the design decisions:
 * ***Add as many comments as possible***. Just so that other people can jump in code and see what you've done.
 * ***Don't write you name on top of every file you make***. This is team effort, not a competition.
-* ***Naming convention***: Namespaces - CamelCase, classes - CamelCase, public properies - CamelCase, private properies - mCamelCase, other stuff is not really important
+* ***Naming convention***: Namespaces - PascalCase, classes - PascalCase, public properies - PascalCase, private properies - mPascalCase, other stuff is not really important
 * ***JSON***. Whenever you have to serialize object to save it, send it, ... use JSON
 
 #### Current state
@@ -42,15 +46,15 @@ What works:
 
 #### TODO list
 This is the list of stuff that need to be made. I'm always open to suggestions if you have an idea.
-* Implement real time database for multyplayer stuff
-* Implement sql or nosql database for saveing played status and game states
-* Implement more screens
-* Make the drowing process faster
-* Make gameplay features
-* A lot more
+- [ ] Implement real time database for multyplayer stuff
+- [ ] Implement sql or nosql database for saving player status and game states
+- [ ] Implement more screens
+- [ ] Make the drawing process faster
+- [ ] Make gameplay features
+- [ ] A lot more
 
 #### Demo
-![Alt text](imgs/demo.gif)
+![Alt text](imgs/Demo130816_3.jpg)
 
 #### Main author
 * Branimir Ričko
