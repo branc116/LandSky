@@ -42,9 +42,7 @@ namespace LandSky
 
         private void InitConsole(int Width, int Height)
         {
-            Console.WindowWidth = Width + 1;
-            Console.BufferWidth = Width + 1;
-            Console.WindowHeight = Height * 3;
+            Console.SetWindowSize(Width, Height);
             try
             {
                 Console.CursorVisible = false;
