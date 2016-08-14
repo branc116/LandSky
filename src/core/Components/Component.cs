@@ -229,29 +229,46 @@ namespace LandSky.Components
 
         public async Task<string> GimeJSON()
         {
-            return await Task.Factory.StartNew(() => JsonConvert.SerializeObject(this, this.GetType(), Formatting.Indented, new JsonSerializerSettings()
+            return await Task.Factory.StartNew(() =>
             {
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                CheckAdditionalContent = true,
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                MaxDepth = 5,
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Include,
-                StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
-            }));
+                try
+                {
+                    return JsonConvert.SerializeObject(this, this.GetType(), Formatting.Indented, new JsonSerializerSettings()
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                        CheckAdditionalContent = true,
+                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                        MaxDepth = 5,
+                        MissingMemberHandling = MissingMemberHandling.Ignore,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Include,
+                        StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+            );
         }
         public async Task SaveStateToDisc(string FileName)
         {
+            
             string InvalidChars = @"?:*[];|=,";
             int count = 0;
-            FileName = new string(FileName.Select(i => {
-                count++;
-                if (count < 5) return i;
-                return InvalidChars.Any(j => i == j) ? '_' : i;
-            }).ToArray());
-            var hss = FileName.Split('\\').ToList();
-            await Task.Factory.StartNew(async () => { File.WriteAllText(hss.Last(), await GimeJSON(), System.Text.Encoding.UTF8); }).ContinueWith((i) =>
+            await Task.Factory.StartNew(async () => {
+                try
+                {
+                    File.WriteAllText(FileName, await GimeJSON(), System.Text.Encoding.UTF8);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }).ContinueWith((i) =>
             {
 
                 //finished
