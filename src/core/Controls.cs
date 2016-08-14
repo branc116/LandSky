@@ -30,10 +30,13 @@ namespace LandSky
                 {new ConsoleKeyInfo('P',ConsoleKey.P,false,false,false), Comands.GenerateRandomPath},
                 {new ConsoleKeyInfo('d',ConsoleKey.D,false,false,false), Comands.DequeMessage},
 
-                {new ConsoleKeyInfo('\0',ConsoleKey.S,false,true,true), Comands.ToJSON },
+                {new ConsoleKeyInfo('\0',ConsoleKey.S,false,true,true), Comands.ToJSON },//fucking windows....
+                {new ConsoleKeyInfo('s',ConsoleKey.S,false,true,false), Comands.ToJSON },
                 {new ConsoleKeyInfo((char)27,ConsoleKey.Escape,false,false,false), Comands.LastSceen},
                 {new ConsoleKeyInfo('?',ConsoleKey.Oem2,false,false,false), Comands.ShowHelp},
-                {new ConsoleKeyInfo('*',ConsoleKey.OemPlus,false,false,false), Comands.ShowDebug},
+                {new ConsoleKeyInfo('?',0,false,false,false), Comands.ShowHelp},
+                {new ConsoleKeyInfo('*',ConsoleKey.OemPlus,false,false,false), Comands.ShowDebug}, //fucking windows....
+                {new ConsoleKeyInfo('*',ConsoleKey.Multiply,false,false,false), Comands.ShowDebug},
                 {new ConsoleKeyInfo('1',ConsoleKey.D1,false,false,false), Comands.Option1},
                 {new ConsoleKeyInfo('2',ConsoleKey.D2,false,false,false), Comands.Option2},
                 {new ConsoleKeyInfo('3',ConsoleKey.D3,false,false,false), Comands.Option3},
@@ -61,7 +64,7 @@ namespace LandSky
                 {Comands.ScrollLeft,          new ScrollCommand(-1)},
                 {Comands.ShowHelp,            new BaseCommand()},
                 {Comands.ShowDebug,           new BaseCommand()},
-                {Comands.ToJSON,              new ScreenToJsonCommand(Environment.CurrentDirectory + "ScreenState")},
+                {Comands.ToJSON,              new ScreenToJsonCommand("ScreenState")},
                 {Comands.Option1,             new BaseCommand()},
                 {Comands.Option2,             new BaseCommand()},
                 {Comands.Option3,             new BaseCommand()},

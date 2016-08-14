@@ -414,7 +414,7 @@ namespace LandSky.Screen
         private async void ScreenToJSON(BaseCommand Bc)
         {
             ScreenToJsonCommand Comm = Bc as ScreenToJsonCommand;
-            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':','_')}.json");
+            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':','_').Replace('/','_')}.json");
         }
         /// <summary>
         /// this is called when the screen stops being on top of the stack
@@ -542,7 +542,10 @@ namespace LandSky.Screen
                 Console.CursorLeft = GlobalLeft;
                 mShuldUpdate = true;
                 string ThreadSafeShit = VirtualConsole;
-                Console.Clear();
+                if (Environment.OSVersion.Platform.ToString() == "Win32NT")
+                    Console.Clear();
+                else
+                    UnixClearConsole();
                 Console.WriteLine(ThreadSafeShit);
             }
         }
@@ -553,6 +556,18 @@ namespace LandSky.Screen
         {
             mBodyString = string.Empty;
             mIsBodyUpdated = true;
+        }
+        public void UnixClearConsole()
+        {
+            int curTop = Console.CursorTop;
+            int curLeft = Console.CursorLeft;
+            string ws = new string(' ', Console.BufferWidth);
+            for (int h = Console.WindowHeight; h> 0;)
+            {
+                Console.SetCursorPosition(0, 0 + --h);
+                Console.Write(ws);
+            }
+            Console.SetCursorPosition(curLeft, curTop);
         }
     }
 }

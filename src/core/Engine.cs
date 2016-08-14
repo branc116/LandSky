@@ -42,9 +42,7 @@ namespace LandSky
 
         private void InitConsole(int Width, int Height)
         {
-            Console.WindowWidth = Width + 1;
-            Console.BufferWidth = Width + 1;
-            Console.WindowHeight = Height * 3;
+            Console.SetWindowSize(Width, Height);
             try
             {
                 Console.CursorVisible = false;
@@ -76,25 +74,31 @@ namespace LandSky
             {
                 try
                 {
+
                     var Cc = Controls.KeyMap[C];
                     var Ss = BaseScreen.Active.Peek();
-                    Task.Run(() =>
+
+                    try
                     {
-                        try
-                        {
-                            Ss.Comand[Cc](Controls.InvokedBaseCommand[Cc]);
-                        }
-                        catch(Exception Ex)
-                        {
-                            if (Ex != null)
-                                Ex = null;
-                        }
-                    });
+                        Ss.Comand[Cc](Controls.InvokedBaseCommand[Cc]);
+                    }
+                    catch(Exception Ex)
+                    {
+                        throw;
+                        if (Ex != null)
+                            Ex = null;
+                    }
+                    
+
                 }
                 catch(Exception e) {
                     BaseScreen.EnqueMessage(e);
+                    Console.WriteLine(e);
                     if (e!=null) e = null;
                 }
+#if DEBUG
+                Console.WriteLine($"{(string)(((C.Modifiers & ConsoleModifiers.Control) != 0) ? "ctrl +" : string.Empty )} {(string)(((C.Modifiers & ConsoleModifiers.Alt) != 0) ? "alt +" : string.Empty)} {C.KeyChar.ToString()} - { C.Key.ToString()} ");
+#endif
                 C = Console.ReadKey(true);
                 C = new ConsoleKeyInfo(C.KeyChar, C.Key, false, (ConsoleModifiers.Alt & C.Modifiers) != 0, 0 != (ConsoleModifiers.Control & C.Modifiers));
             }
