@@ -34,7 +34,8 @@
         Option6,
         Option7,
         Option8,
-        Option9
+        Option9,
+        Any
     }
     /// <summary>
     /// All supported monoms
@@ -120,5 +121,17 @@
         Active,
         Paused,
         Disposed
+    }
+    public enum SizeMode
+    {
+        Auto,
+        Explicit
+    }
+    public enum InputMode
+    {
+        ControlOnly,
+        ControlFirst,
+        InputOnly,
+        InputFirst
     }
 }
