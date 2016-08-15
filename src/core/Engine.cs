@@ -75,12 +75,12 @@ namespace LandSky
                 try
                 {
 
-                    var Cc = Controls.KeyMap[C];
+                    var Cc = CommandControls.KeyMap.ContainsKey(C) ? CommandControls.KeyMap[C] : MyEnums.Comands.Any;
                     var Ss = BaseScreen.Active.Peek();
 
                     try
                     {
-                        Ss.Comand[Cc](Controls.InvokedBaseCommand[Cc]);
+                        Ss.ParseCommand(Cc, C);
                     }
                     catch(Exception Ex)
                     {

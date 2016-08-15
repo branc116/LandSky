@@ -30,7 +30,7 @@ namespace LandSky.Screen
         }
         private void MPrintCommands(Dictionary<Comands, Action<BaseCommand>> MCommands, int Indent)
         {
-            var Km = LandSky.Controls.KeyMap;
+            var Km = CommandControls.KeyMap;
             foreach(var Command in MCommands)
             {
                 VirtualConsoleAddLine(
