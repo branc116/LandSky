@@ -82,7 +82,7 @@ namespace LandSky.UIComponents
         private bool mForcus = false;
 
         protected Size mSize;
-        protected List<string> mLinesOfText = new List<string>();
+        protected List<string> mLinesOfText = new List<string>() { string.Empty };
         protected string mText = "";
         protected UIComponentBase(string Name)
         {
