@@ -150,7 +150,7 @@ namespace LandSky.Screen
             {
                 if (mShuldUpdate)
                 {
-                    DrawUIElements();
+                    
                     int mActiveFrom = ActiveFrom;
                     mActiveTo = ActiveTo;
                     int mTrueWidth = TrueWidth;
@@ -451,7 +451,7 @@ namespace LandSky.Screen
 
         public void ParseCommand(Comands Command, ConsoleKeyInfo KeyInfo)
         {
-            switch (InputMode) {
+           switch (InputMode) {
                 case InputMode.ControlOnly:
                     try
                     {
@@ -470,10 +470,10 @@ namespace LandSky.Screen
                     }
                     catch (Exception ex)
                     {
-                        if (UIComponents.ParseCommand(KeyInfo))
-                            ScreenChange();
-                        else
+                        if (!UIComponents.ParseCommand(KeyInfo))
                             Console.WriteLine(ex);
+                        else if (this.Name == Active.Peek().Name)
+                            ScreenChange();
                     }
                     return;
                 case InputMode.InputOnly:
@@ -516,8 +516,8 @@ namespace LandSky.Screen
             string s = Obj.ToString();
             var CurLine = mBodyStringLines[mCursorTop];
             var EndOfObj = Min(s.Length + mCursorLeft, TrueWidth - mCursorLeft);
-            var EndPart = (CurLine.Length < EndOfObj ? string.Empty : CurLine.Substring(EndOfObj));
-            var MidPart = s.Substring(0, EndOfObj);
+            var EndPart = ((CurLine.Length < EndOfObj) ? (string.Empty) : (CurLine.Substring(EndOfObj)));
+            var MidPart = s;
             var BeginPart = CurLine.Substring(0, mCursorLeft);
 
             mBodyStringLines[mCursorTop] = $"{BeginPart}{MidPart}{EndPart}";
@@ -574,9 +574,11 @@ namespace LandSky.Screen
                 mObjectToLockFlush = new object();
             lock (mObjectToLockFlush)
             {
+                DrawUIElements();
                 Console.CursorTop = GlobalTop;
                 Console.CursorLeft = GlobalLeft;
                 mShuldUpdate = true;
+                
                 string ThreadSafeShit = VirtualConsole;
                 if (Environment.OSVersion.Platform.ToString() == "Win32NT")
                     Console.Clear();
