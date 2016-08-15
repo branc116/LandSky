@@ -9,7 +9,7 @@ namespace LandSky
     /// <summary>
     /// Contains keymaps, and commandmaps
     /// </summary>
-    class Controls
+    class CommandControls
     {
         public static Dictionary<ConsoleKeyInfo, Comands> KeyMap = new Dictionary<ConsoleKeyInfo, Comands>
             {

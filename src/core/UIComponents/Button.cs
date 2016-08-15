@@ -8,29 +8,29 @@ namespace LandSky.UIComponents
     /// <summary>
     /// Ui element button
     /// </summary>
-    class Button 
+    class Button : UIComponentBase
     {
         public Comands InvokeCommand;
-        public event EventHandler<DateTime> OnPress;
-        public string Name;
-        public string Text;
-        public Button(string Name, Comands Comm)
+        
+        public Button(string Name, string Text, int TabIndex, int Top, int Left, Comands Comm) : base (Name, TabIndex, Top, Left,Text)
         {
             InvokeCommand = Comm;
-            this.Name = Name;
         }
-        public void InvokEvent()
+        public Button(string Name, string Text, Comands Comm) : base(Name,0,0,0,Text)
         {
-            OnPress?.Invoke(this, DateTime.Now);
-        }
-        public void InvokEvent(BaseCommand Bc)
-        {
-            OnPress?.Invoke(this, DateTime.Now);
+            InvokeCommand = Comm;
         }
         public override string ToString()
         {
-            return $"{InvokeCommand.ToString().Replace("Option", string.Empty)}. {Text}";
+            if (Focus == true)
+                return $"->{InvokeCommand.ToString().Replace("Option", string.Empty)}. {Text}";
+            else
+                return $"{InvokeCommand.ToString().Replace("Option", string.Empty)}. {Text}";
         }
 
+        public override bool NewInput(ConsoleKeyInfo c)
+        {
+            return base.NewInput(c);
+        }
     }
 }

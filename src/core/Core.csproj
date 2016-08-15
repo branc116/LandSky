@@ -91,6 +91,7 @@
     <Compile Include="MyMath\Point.cs" />
     <Compile Include="MyMath\Rectangle.cs" />
     <Compile Include="MyMath\Size.cs" />
+    <Compile Include="Screen\ConnectToRemoteServerScreen.cs" />
     <Compile Include="Screen\DebugScreen.cs" />
     <Compile Include="Screen\SandboxMapScreen.cs" />
     <Compile Include="Screen\MainMenuScreen.cs" />
@@ -101,6 +102,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screen\Screen.cs" />
     <Compile Include="UIComponents\Button.cs" />
+    <Compile Include="UIComponents\TextBox.cs" />
+    <Compile Include="UIComponents\UIComponentBase.cs" />
+    <Compile Include="UIComponents\UIComponentsCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
