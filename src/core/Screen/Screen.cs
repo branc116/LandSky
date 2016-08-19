@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using static System.Math;
-
-using LandSky;
-using LandSky.Commands;
+﻿using LandSky.Commands;
 using LandSky.Components;
 using LandSky.DebugItems;
 using LandSky.MyEnums;
 using LandSky.UIComponents;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static System.Math;
 
 /// <summary>
 /// All of default screens are in this namespace
@@ -32,8 +29,9 @@ namespace LandSky.Screen
                 return TrueHeight - HeadHeight - FooterHeight;
             }
         }
+
         /// <summary>
-        /// Maximum Height of screen 
+        /// Maximum Height of screen
         /// </summary>
         public int MaxHeight
         {
@@ -42,6 +40,7 @@ namespace LandSky.Screen
                 return Console.WindowHeight - GlobalTop;
             }
         }
+
         /// <summary>
         /// Maximum Width of screen
         /// </summary>
@@ -52,6 +51,7 @@ namespace LandSky.Screen
                 return Console.WindowWidth - GlobalLeft - 2;
             }
         }
+
         /// <summary>
         /// Minimum value of wanted Height and maximum Height
         /// </summary>
@@ -62,6 +62,7 @@ namespace LandSky.Screen
                 return Min(MaxHeight, MScreenHeight);
             }
         }
+
         /// <summary>
         /// Minimum value of wanted Height and maximum Width
         /// </summary>
@@ -72,6 +73,7 @@ namespace LandSky.Screen
                 return Min(MaxWidth, MScreenWidth) - 1;
             }
         }
+
         /// <summary>
         /// Wanted Height of the screen
         /// </summary>
@@ -87,6 +89,7 @@ namespace LandSky.Screen
                 return MScreenHeight;
             }
         }
+
         /// <summary>
         /// Wanted Width of the screen
         /// </summary>
@@ -102,6 +105,7 @@ namespace LandSky.Screen
                 return MScreenWidth;
             }
         }
+
         /// <summary>
         /// Calculate current position of the cursure in the virtual console
         /// </summary>
@@ -119,6 +123,7 @@ namespace LandSky.Screen
                 mCursorLeft = value;
             }
         }
+
         /// <summary>
         /// Calculate number of lines the body part of the screen has
         /// </summary>
@@ -139,8 +144,8 @@ namespace LandSky.Screen
 
                 mCursorTop = value;
             }
-
         }
+
         /// <summary>
         /// Current text in the virtual console
         /// </summary>
@@ -148,57 +153,58 @@ namespace LandSky.Screen
         {
             get
             {
-                if (mShuldUpdate)
-                {
-                    
-                    int mActiveFrom = ActiveFrom;
-                    mActiveTo = ActiveTo;
-                    int mTrueWidth = TrueWidth;
-                    int mTrueHeight = TrueHeight;
+                int mActiveFrom = ActiveFrom;
+                mActiveTo = ActiveTo;
+                int mTrueWidth = TrueWidth;
+                int mTrueHeight = TrueHeight;
 
-                    string S = '+' + new string('-', mTrueWidth) + '+' + '\n';
-                    HeadString.Split('\n').ToList().ForEach((I) =>
-                    {
-                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                    });
-                    S += '|' + new string('-', mTrueWidth) + '|' + '\n';
-                    for (int i = mActiveFrom; i < mActiveTo; i++)
-                    {
-                        string I = mBodyStringLines[i];
-                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                    }
-                    S += '|' + new string('-', mTrueWidth) + '|' + '\n';
-                    FooterString.Split('\n').ToList().ForEach((I) =>
-                    {
-                        S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                    });
-                    S += '+' + new string('-', mTrueWidth) + '+';
-                    mVirtualConsole = S;
-                    mShuldUpdate = false;
+                string S = '+' + new string('-', mTrueWidth) + '+' + '\n';
+                HeadString.Split('\n').ToList().ForEach((I) =>
+                {
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                });
+                S += '|' + new string('-', mTrueWidth) + '|' + '\n';
+                for (int i = mActiveFrom; i < mActiveTo; i++)
+                {
+                    string I = mBodyStringLines[i];
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
                 }
+                S += '|' + new string('-', mTrueWidth) + '|' + '\n';
+                FooterString.Split('\n').ToList().ForEach((I) =>
+                {
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                });
+                S += '+' + new string('-', mTrueWidth) + '+';
+                mVirtualConsole = S;
                 return mVirtualConsole;
             }
         }
+
         /// <summary>
         /// Position of the body part
         /// </summary>
         public int Scrool { get; set; }
+
         /// <summary>
         /// Active screen that are displayed. Push on stack new screen to pause the current screen and display new screen
         /// </summary>
         public static Stack<BaseScreen> Active = new Stack<BaseScreen>();
+
         /// <summary>
         /// Commands that can be used in the current screen
         /// </summary>
         public Dictionary<Comands, Action<BaseCommand>> Comand;
+
         /// <summary>
         /// Q of unread messages. This is used for debugging.
         /// </summary>
         public static Queue<DebugMessage> UnreadMessages;
+
         /// <summary>
         /// List of all debug messages. This is used for debugging.
         /// </summary>
         public static List<DebugMessage> AllMessages;
+
         public UIComponentsCollection UIComponents = new UIComponentsCollection();
         public InputMode InputMode { get; set; } = InputMode.ControlOnly;
 
@@ -206,8 +212,9 @@ namespace LandSky.Screen
         /// Commands in screens that extend Screen method.
         /// </summary>
         protected Dictionary<Comands, Action<BaseCommand>> MLocalCommands;
+
         /// <summary>
-        /// Determent what line of virtual console should be printed out first 
+        /// Determent what line of virtual console should be printed out first
         /// </summary>
         protected int ActiveFrom
         {
@@ -216,6 +223,7 @@ namespace LandSky.Screen
                 return Scrool;
             }
         }
+
         /// <summary>
         /// Determent what line of virtual console should be printed out last
         /// </summary>
@@ -223,13 +231,14 @@ namespace LandSky.Screen
         {
             get
             {
-
                 mVirtualConsoleTop = VirtualConsoleTop;
                 mActiveTo = Min(mVirtualConsoleTop, Min(Scrool + mVirtualConsoleTop, Scrool + WantedHeight - HeadHeight * 2));
                 return mActiveTo;
             }
         }
+
         protected int MScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHeight, MScreenHeight, MScreenWidth;
+
         ///// <summary>
         ///// Invoke this when something changes
         ///// </summary>
@@ -238,19 +247,19 @@ namespace LandSky.Screen
         /// String that is displayed on top of everything
         /// </summary>
         protected string HeadString;
+
         /// <summary>
         /// String that is displayed on the bottom of the screen
         /// </summary>
         protected string FooterString;
-        /// <summary>
-        /// Indicates that virtual console should be redrawn
-        /// </summary>
-        private bool mShuldUpdate, mIsBodyUpdated;
+
         private string mVirtualConsole;
+
         /// <summary>
         /// This is displayed in the middle of the screen
         /// </summary>
         private string mBodyString;
+
         private List<string> mBodyStringLines = new List<string>() { string.Empty };
         private int mCursorTop = 0, mCursorLeft = 0;
         private object mObjectToLockFlush;
@@ -268,8 +277,8 @@ namespace LandSky.Screen
             InitComands();
             GenerateHeader();
             GenerateFooter();
-            
         }
+
         /// <summary>
         /// Create new base screen. One shouldn't really do this. One should extend new method and then call the constructor for that new method. Name will be "UnNamed"
         /// </summary>
@@ -291,16 +300,14 @@ namespace LandSky.Screen
         private void InitProperties(int Top, int Left)
         {
             mBodyString = string.Empty;
-            mIsBodyUpdated = true;
             GlobalLeft = Left;
             GlobalTop = Top;
             WantedWidth = MaxWidth;
-            WantedHeight = 30;
-            mShuldUpdate = true;
+            WantedHeight = MaxHeight - 10;
             Comand = new Dictionary<Comands, Action<BaseCommand>>();
             MLocalCommands = new Dictionary<Comands, Action<BaseCommand>>();
-            
         }
+
         /// <summary>
         /// This is called when creating new BaseScreen to initiate command mapping
         /// </summary>
@@ -313,6 +320,7 @@ namespace LandSky.Screen
             Comand.Add(Comands.LastSceen, PopSceen);
             Comand.Add(Comands.ToJSON, ScreenToJSON);
         }
+
         /// <summary>
         /// Destroys current screen and displays the screen below it
         /// </summary>
@@ -325,6 +333,7 @@ namespace LandSky.Screen
                 Environment.Exit(0);
             Active.Peek().Resume();
         }
+
         /// <summary>
         /// Show the debug screen on top of current screen
         /// </summary>
@@ -336,6 +345,7 @@ namespace LandSky.Screen
                 Active.Push(new DebugScreen(0, 0, this));
             }
         }
+
         /// <summary>
         /// Show help screen on top of current screen
         /// </summary>
@@ -347,6 +357,7 @@ namespace LandSky.Screen
                 Active.Push(new HelpScreen(GlobalTop, GlobalLeft));
             }
         }
+
         /// <summary>
         /// Scroll the body part down by some number
         /// </summary>
@@ -355,21 +366,22 @@ namespace LandSky.Screen
         {
             ScrollCommand Scroll = Bc as ScrollCommand;
             Scrool += Scroll.N;
-            if (VirtualConsoleTop >0)
+            if (VirtualConsoleTop > 0)
                 Scrool %= VirtualConsoleTop;
             if (Scrool < 0)
                 Scrool = VirtualConsoleTop;
 
             ScreenChange();
         }
+
         /// <summary>
         /// Needs to be implemented
         /// </summary>
         /// <param Name="bc"></param>
         private void ChangeScene(BaseCommand Bc)
         {
-
         }
+
         private void DrawUIElements()
         {
             foreach (var element in UIComponents)
@@ -377,19 +389,19 @@ namespace LandSky.Screen
                 var s = element.ToString();
                 VirtualConsoleTop = element.Top;
 
-                foreach(var line in s.Split(new char[] { '\n' }))
+                foreach (var line in s.Split(new char[] { '\n' }))
                 {
                     VirtualConsoleLeft = element.Left;
                     VirtualConsoleAdd(line);
                     VirtualConsoleTop++;
                 }
-
             }
         }
+
         private async void ScreenToJSON(BaseCommand Bc)
         {
             ScreenToJsonCommand Comm = Bc as ScreenToJsonCommand;
-            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':','_').Replace('/','_')}.json");
+            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':', '_').Replace('/', '_')}.json");
         }
 
         /// <summary>
@@ -403,6 +415,7 @@ namespace LandSky.Screen
             }
             Console.Clear();
         }
+
         /// <summary>
         /// This is called when screen starts being on top of the stack
         /// </summary>
@@ -416,11 +429,11 @@ namespace LandSky.Screen
                 }
                 catch
                 {
-
                 }
             }
             ScreenChange();
         }
+
         /// <summary>
         /// Called when Screen changes
         /// </summary>
@@ -432,26 +445,28 @@ namespace LandSky.Screen
             GenerateHeader();
             Flush();
         }
+
         protected virtual void GenerateFooter()
         {
             string Mid = $"Shown lines from {ActiveFrom + 1} to {ActiveTo} out of {VirtualConsoleTop}";
             GenerateFooter(Mid);
-            
-        }
-        protected void GenerateFooter(string Mid)
-        {
-            FooterString = $"{new string(' ', Max(0, TrueWidth/2 - Mid.Length/2))}{Mid}";
-            FooterHeight = 1;
-        }
-        protected virtual void GenerateHeader()
-        {
-            HeadString = $"{new string(' ', Max(0, (TrueWidth - Name.Length)/2))}{Name}";
         }
 
+        protected void GenerateFooter(string Mid)
+        {
+            FooterString = $"{new string(' ', Max(0, TrueWidth / 2 - Mid.Length / 2))}{Mid}";
+            FooterHeight = 1;
+        }
+
+        protected virtual void GenerateHeader()
+        {
+            HeadString = $"{new string(' ', Max(0, (TrueWidth - Name.Length) / 2))}{Name}";
+        }
 
         public void ParseCommand(Comands Command, ConsoleKeyInfo KeyInfo)
         {
-           switch (InputMode) {
+            switch (InputMode)
+            {
                 case InputMode.ControlOnly:
                     try
                     {
@@ -463,6 +478,7 @@ namespace LandSky.Screen
                         Console.WriteLine(ex);
                     }
                     return;
+
                 case InputMode.ControlFirst:
                     try
                     {
@@ -476,10 +492,12 @@ namespace LandSky.Screen
                             ScreenChange();
                     }
                     return;
+
                 case InputMode.InputOnly:
                     if (UIComponents.ParseCommand(KeyInfo))
                         ScreenChange();
                     return;
+
                 case InputMode.InputFirst:
                     if (!UIComponents.ParseCommand(KeyInfo))
                         try
@@ -495,8 +513,8 @@ namespace LandSky.Screen
                         ScreenChange();
                     return;
             }
-            
         }
+
         /// <summary>
         /// Use this for debugging. When you enqueue message, new message will be added in message Q and message list
         /// </summary>
@@ -507,6 +525,7 @@ namespace LandSky.Screen
             UnreadMessages.Enqueue(DbMsg);
             AllMessages.Add(DbMsg);
         }
+
         /// <summary>
         /// Add text to the virtual console
         /// </summary>
@@ -522,9 +541,8 @@ namespace LandSky.Screen
 
             mBodyStringLines[mCursorTop] = $"{BeginPart}{MidPart}{EndPart}";
             mCursorLeft = 0;
-
-            mIsBodyUpdated = true;
         }
+
         /// <summary>
         /// Add text to the virtual console and add new line to the console
         /// </summary>
@@ -533,8 +551,8 @@ namespace LandSky.Screen
         {
             VirtualConsoleAdd(Obj);
             VirtualConsoleAddLine();
-            mIsBodyUpdated = true;
         }
+
         /// <summary>
         /// Only add new line to the virtual console
         /// </summary>
@@ -544,8 +562,8 @@ namespace LandSky.Screen
                 mBodyStringLines.Add(string.Empty);
             mCursorLeft = 0;
             mCursorTop++;
-            mIsBodyUpdated = true;
         }
+
         /// <summary>
         /// Print line full of '-' character. Use this to make screen look nicer.
         /// </summary>
@@ -554,6 +572,7 @@ namespace LandSky.Screen
             mCursorLeft = 0;
             VirtualConsoleAddLine(new string('-', TrueWidth));
         }
+
         /// <summary>
         /// Prints text in the middle of the line
         /// </summary>
@@ -563,8 +582,8 @@ namespace LandSky.Screen
             var s = Obj.ToString();
             mCursorLeft = (TrueWidth - s.Length) / 2;
             VirtualConsoleAddLine(s);
-            mIsBodyUpdated = true;
         }
+
         /// <summary>
         /// Use this when you made changes to the virtual console
         /// </summary>
@@ -577,8 +596,7 @@ namespace LandSky.Screen
                 DrawUIElements();
                 Console.CursorTop = GlobalTop;
                 Console.CursorLeft = GlobalLeft;
-                mShuldUpdate = true;
-                
+
                 string ThreadSafeShit = VirtualConsole;
                 if (Environment.OSVersion.Platform.ToString() == "Win32NT")
                     Console.Clear();
@@ -588,6 +606,7 @@ namespace LandSky.Screen
                 Console.WriteLine(ThreadSafeShit);
             }
         }
+
         /// <summary>
         /// Delete everything in the virtual consoled
         /// </summary>
@@ -598,14 +617,14 @@ namespace LandSky.Screen
             mBodyStringLines.Add(string.Empty);
             mCursorLeft = 0;
             mCursorTop = 0;
-            mIsBodyUpdated = true;
         }
+
         public void UnixClearConsole()
         {
             int curTop = Console.CursorTop;
             int curLeft = Console.CursorLeft;
             string ws = new string(' ', Console.BufferWidth);
-            for (int h = Console.WindowHeight; h> 0;)
+            for (int h = Console.WindowHeight; h > 0;)
             {
                 Console.SetCursorPosition(0, 0 + --h);
                 Console.Write(ws);

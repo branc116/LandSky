@@ -1,21 +1,21 @@
-﻿using System;
+﻿using LandSky.DebugItems;
+using LandSky.MyMath;
+using LandSky.Screen;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static System.Convert;
 using static System.Math;
-
-using LandSky.Screen;
-using LandSky.DebugItems;
-using LandSky.MyMath;
 
 namespace LandSky
 {
     /// <summary>
     /// This starts everything
     /// </summary>
-    class Engine
+    internal class Engine
     {
         private Size mSceenSize;
+
         /// <summary>
         /// Plays A major
         /// </summary>
@@ -52,16 +52,17 @@ namespace LandSky
                 // ignored
             }
             PlayMajor(2);
-            
         }
-        private void InitProperties(int Width,int Height)
+
+        private void InitProperties(int Width, int Height)
         {
             mSceenSize = new Size(Width, Height);
             BaseScreen.Active = new Stack<BaseScreen>();
-            
+
             BaseScreen.AllMessages = new List<DebugMessage>();
             BaseScreen.UnreadMessages = new Queue<DebugMessage>();
         }
+
         /// <summary>
         /// Handels console input
         /// </summary>
@@ -74,36 +75,25 @@ namespace LandSky
             {
                 try
                 {
-
                     var Cc = CommandControls.KeyMap.ContainsKey(C) ? CommandControls.KeyMap[C] : MyEnums.Comands.Any;
                     var Ss = BaseScreen.Active.Peek();
 
-                    try
-                    {
-                        Ss.ParseCommand(Cc, C);
-                    }
-                    catch(Exception Ex)
-                    {
-                        throw;
-                        if (Ex != null)
-                            Ex = null;
-                    }
-                    
-
+                    Ss.ParseCommand(Cc, C);
                 }
-                catch(Exception e) {
+                catch (Exception e)
+                {
                     BaseScreen.EnqueMessage(e);
                     Console.WriteLine(e);
-                    if (e!=null) e = null;
+                    if (e != null) e = null;
                 }
 #if DEBUG
-                Console.WriteLine($"{(string)(((C.Modifiers & ConsoleModifiers.Control) != 0) ? "ctrl +" : string.Empty )} {(string)(((C.Modifiers & ConsoleModifiers.Alt) != 0) ? "alt +" : string.Empty)} {C.KeyChar.ToString()} - { C.Key.ToString()} ");
+                Console.WriteLine($"{(string)(((C.Modifiers & ConsoleModifiers.Control) != 0) ? "ctrl +" : string.Empty)} {(string)(((C.Modifiers & ConsoleModifiers.Alt) != 0) ? "alt +" : string.Empty)} {C.KeyChar.ToString()} - { C.Key.ToString()} ");
 #endif
                 C = Console.ReadKey(true);
                 C = new ConsoleKeyInfo(C.KeyChar, C.Key, false, (ConsoleModifiers.Alt & C.Modifiers) != 0, 0 != (ConsoleModifiers.Control & C.Modifiers));
             }
-
         }
+
         /// <summary>
         /// Create new engine with main menu as a starting screen
         /// </summary>
@@ -115,7 +105,6 @@ namespace LandSky
             InitProperties(Width, Height);
             BaseScreen.Active.Push(new MainMenuScreen(0, 0));
             Task T = Initinput();
-            
         }
     }
 }

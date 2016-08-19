@@ -85,6 +85,7 @@
     <Compile Include="Components\Room.cs" />
     <Compile Include="Components\Walls.cs" />
     <Compile Include="DebugItems\DebugMessage.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MyEnums\Enums.cs" />
     <Compile Include="MyMath\Interolator.cs" />
     <Compile Include="MyMath\Monom.cs" />

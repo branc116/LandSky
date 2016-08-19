@@ -1,9 +1,8 @@
-﻿using System;
+﻿using LandSky.MyEnums;
+using LandSky.MyMath;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using LandSky.MyMath;
-using LandSky.MyEnums;
 
 namespace LandSky.Components
 {
@@ -22,10 +21,12 @@ namespace LandSky.Components
             Poly = new LinearInterpolator();
             IsPassable = true;
         }
+
         public void GeneratePathThrueLocations(List<Point> Points)
         {
             Poly.Interpolate(Points, KindOfMonom.Line);
         }
+
         public void GeneratePathThrueRandomChildren(Component C)
         {
             if (C.Controls.Count < 3) throw new Exception("You can't generate path in component that has less then 3 children... sorry :(");
@@ -37,7 +38,7 @@ namespace LandSky.Components
             N--;
             while (--N > 0)
             {
-                Points.Add(C.Controls.Where(I => I.Value.GetType() != typeof(Path) && I.Value.GetType() != typeof(Player)) 
+                Points.Add(C.Controls.Where(I => I.Value.GetType() != typeof(Path) && I.Value.GetType() != typeof(Player))
                                      .Where(K => Points.All(J => J.X != K.Value.LocalBounds.Location.X))
                                      .OrderBy(I => Points
                                      .Sum(M => M.AbsDerivative(I.Value.LocalBounds.Location)))
@@ -46,14 +47,15 @@ namespace LandSky.Components
 
             GeneratePathThrueLocations(Points);
         }
+
         public bool CanFindTheSameX(IEnumerable<Point> Points, Point Point)
         {
-            return Points.Any(P => Math.Abs(P.X - Point.X) == 0 || Math.Abs((P.Y - Point.Y)/(P.X - Point.X)) > 2);
+            return Points.Any(P => Math.Abs(P.X - Point.X) == 0 || Math.Abs((P.Y - Point.Y) / (P.X - Point.X)) > 2);
         }
 
         public static bool operator &(Path One, Point Two)
         {
-            return One.Poly.DerivativeForX(Two.X) + One.Poly.ValueForX(Two.X) + 2 > Two.Y && One.Poly.ValueForX(Two.X) - One.Poly.DerivativeForX(Two.X) - 2 < Two.Y; 
+            return One.Poly.DerivativeForX(Two.X) + One.Poly.ValueForX(Two.X) + 2 > Two.Y && One.Poly.ValueForX(Two.X) - One.Poly.DerivativeForX(Two.X) - 2 < Two.Y;
         }
 
         public bool IsOnPath(Point point)
@@ -61,5 +63,4 @@ namespace LandSky.Components
             return this & point;
         }
     }
-
 }

@@ -1,15 +1,12 @@
-﻿using System;
+﻿using LandSky.MyEnums;
+using LandSky.MyMath;
+using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.IO;
-
-using Newtonsoft.Json;
-
-using LandSky.MyEnums;
-using LandSky.MyMath;
-using LandSky.Screen;
 
 namespace LandSky.Components
 {
@@ -19,7 +16,6 @@ namespace LandSky.Components
     /// </summary>
     public abstract class Component : IEnumerable, IDisposable
     {
-
         public int LocalX
         {
             get
@@ -31,6 +27,7 @@ namespace LandSky.Components
                 LocalBounds.X = value;
             }
         }
+
         public int LocalY
         {
             get
@@ -42,6 +39,7 @@ namespace LandSky.Components
                 LocalBounds.Y = value;
             }
         }
+
         public int GlobalX => IsRoot ? 0 : LocalX + (Parent == null ? 0 : Parent.LocalX);
         public int GlobalY => IsRoot ? 0 : LocalY + (Parent == null ? 0 : Parent.LocalY);
         public int Height => LocalBounds == null ? 0 : LocalBounds.Height;
@@ -50,7 +48,7 @@ namespace LandSky.Components
         public int NumOfWalls => Controls.Count(I => I.Value.GetType() == typeof(Wall));
         public int NumOfPaths => Controls.Count(I => I.Value.GetType() == typeof(Path));
         public Rectangle LocalBounds => Bounds;
-        public Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : (LocalBounds == null ? new Rectangle(0,0,0,0) : (Parent == null ? LocalBounds : LocalBounds + Parent.GlobalBounds));
+        public Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : (LocalBounds == null ? new Rectangle(0, 0, 0, 0) : (Parent == null ? LocalBounds : LocalBounds + Parent.GlobalBounds));
 
         public bool IsRoot { get; set; }
         public bool IsPassable { get; set; }
@@ -69,12 +67,23 @@ namespace LandSky.Components
             this.Name = Name;
             IsRoot = false;
         }
+
         public void Dispose()
         {
-            this.Parent.Controls.Remove(this.Name);
-            Controls = null;
-            Parent = null;   
+            Dispose(true);
         }
+
+        protected virtual void Dispose(bool Dispose)
+        {
+            if (Dispose)
+            {
+                this.Parent.Controls.Remove(this.Name);
+                Controls = null;
+                Parent = null;
+                GC.SuppressFinalize(this);
+            }
+        }
+
         public void Insert(Component C)
         {
             if (C.Name == null) throw new Exception("Component must have a Name");
@@ -82,24 +91,25 @@ namespace LandSky.Components
             C.Parent?.Controls.Remove(C.Name);
             C.Parent = this;
         }
+
         public void Delete(string name)
         {
             using (Component C = Controls[name])
             {
-                foreach(var Comp in C.Controls)
+                foreach (var Comp in C.Controls)
                 {
                     Comp.Value.Dispose();
                 }
-                C.Dispose();
             }
             Controls.Remove(name);
-
         }
+
         public Component GetComponentOnLocation(int X, int Y)
         {
             Point P = new Point(X, Y);
             return GetComponentOnLocation(P);
         }
+
         public Component GetComponentOnLocation(Point Point)
         {
             try
@@ -107,7 +117,7 @@ namespace LandSky.Components
                 var Intersect = this.Controls.Where(
                     I =>
                     {
-                        if(I.Value.GetType() == typeof(Wall) || I.Value.GetType() == typeof(Room))
+                        if (I.Value.GetType() == typeof(Wall) || I.Value.GetType() == typeof(Room))
                             return Point & I.Value.GlobalBounds;
                         if (I.Value.GetType() == typeof(Path))
                             return ((Path)I.Value).IsOnPath(Point);
@@ -118,9 +128,11 @@ namespace LandSky.Components
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 throw;
             }
         }
+
         public async Task GenerateRandomPaths(int N, IEnumerable<string> Names)
         {
             List<Path> Range = new List<Path>();
@@ -145,8 +157,8 @@ namespace LandSky.Components
             {
                 this.Insert(Path);
             }
-
         }
+
         public async Task GenerateRandomPaths(int N)
         {
             List<string> Names = new List<string>();
@@ -156,6 +168,7 @@ namespace LandSky.Components
             }
             await GenerateRandomPaths(N, Names);
         }
+
         public async Task GenerateRandomRooms(int N, IReadOnlyList<string> Names)
         {
             Task[] Tasks = new Task[4];
@@ -167,7 +180,8 @@ namespace LandSky.Components
             int Made = 0;
             foreach (Quadrant Q in Quads)
             {
-                Tasks[I] = Task.Run(() => {
+                Tasks[I] = Task.Run(() =>
+                {
                     int Id = Pool++;
                     if (N % 4 > 0)
                     {
@@ -200,15 +214,14 @@ namespace LandSky.Components
                 {
                     if (Room.LocalBounds.Width > 0 && Room.LocalBounds.Height > 0)
                     {
-
                         Room.ZValue = this.ZValue + 3;
                         Room.GenerateWall();
                         this.Insert(Room);
                     }
                 }
             }
-
         }
+
         public async Task GenerateRandomRooms(int N)
         {
             List<string> Names = new List<string>();
@@ -218,10 +231,12 @@ namespace LandSky.Components
             }
             await GenerateRandomRooms(N, Names);
         }
+
         public bool CheckCollision(IEnumerable<Component> Components, Component NewComponent)
         {
             return Components.Any(N => N.LocalBounds & NewComponent.LocalBounds && N.ZValue == NewComponent.ZValue);
         }
+
         public bool CheckCollision(Dictionary<string, Component> Components, Component NewComponent)
         {
             return Components.Any(N => N.Value.LocalBounds & NewComponent.LocalBounds && N.Value.ZValue == NewComponent.ZValue);
@@ -253,30 +268,29 @@ namespace LandSky.Components
             }
             );
         }
+
         public async Task SaveStateToDisc(string FileName)
         {
-            
-            string InvalidChars = @"?:*[];|=,";
-            int count = 0;
-            await Task.Factory.StartNew(async () => {
+            await Task.Factory.StartNew(async () =>
+            {
                 try
                 {
                     File.WriteAllText(FileName, await GimeJSON(), System.Text.Encoding.UTF8);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                     throw;
                 }
             }).ContinueWith((i) =>
             {
-
                 //finished
             });
         }
+
         public static async Task<Component> GimeComponentFromJSON(string FileName)
         {
-             return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<Component>(File.ReadAllText(FileName, System.Text.Encoding.UTF8)));
+            return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<Component>(File.ReadAllText(FileName, System.Text.Encoding.UTF8)));
         }
 
         //check for intersection in two Components
@@ -285,20 +299,24 @@ namespace LandSky.Components
             return (One.LocalBounds.LeftBound <= Two.LocalBounds.RightBound && One.LocalBounds.RightBound >= Two.LocalBounds.LeftBound &&
                 One.LocalBounds.TopBound >= Two.LocalBounds.BottomBound && One.LocalBounds.BottomBound <= Two.LocalBounds.TopBound);
         }
+
         public static bool operator &(Component One, Player Two)
         {
             return (One.LocalBounds.LeftBound <= Two.LocalBounds.RightBound && One.LocalBounds.RightBound >= Two.LocalBounds.LeftBound &&
                 One.LocalBounds.TopBound >= Two.LocalBounds.BottomBound && One.LocalBounds.BottomBound <= Two.LocalBounds.TopBound);
         }
+
         public static bool operator &(Component One, Point Two)
         {
             return (One.LocalBounds.TopBound >= Two.Y && One.LocalBounds.BottomBound < Two.Y && One.LocalBounds.LeftBound <= Two.X && One.LocalBounds.RightBound >= Two.X);
         }
+
         public static bool operator &(Component One, Rectangle Two)
         {
             return (One.LocalBounds.LeftBound < Two.RightBound && One.LocalBounds.RightBound > Two.LeftBound &&
                     One.LocalBounds.TopBound > Two.BottomBound && One.LocalBounds.BottomBound < Two.TopBound);
         }
+
         public static bool operator ==(Component One, Component Two)
         {
             return One?.LocalBounds?.TopBound == Two?.LocalBounds?.TopBound &&
@@ -319,11 +337,14 @@ namespace LandSky.Components
                 return false;
             }
         }
+
         public static Rectangle operator +(Component C, Point P)
         {
             return new Rectangle(C.LocalBounds.TopBound + P.Y, C.LocalBounds.RightBound + P.X, C.LocalBounds.BottomBound + P.Y, C.LocalBounds.LeftBound + P.X);
         }
-        public override bool Equals(object Obj) => Obj is Component ? Obj as Component == this : false ;
+
+        public override bool Equals(object Obj) => Obj is Component ? Obj as Component == this : false;
+
         public bool Equals(Component Other)
         {
             return ZValue == Other.ZValue &&
@@ -336,6 +357,7 @@ namespace LandSky.Components
                 Equals(Bounds, Other.Bounds) &&
                 Equals(Rand, Other.Rand);
         }
+
         public override int GetHashCode()
         {
             unchecked
@@ -352,6 +374,7 @@ namespace LandSky.Components
                 return HashCode;
             }
         }
+
         public IEnumerator GetEnumerator()
         {
             return ((IEnumerable)Controls).GetEnumerator();
