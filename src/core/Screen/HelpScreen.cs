@@ -3,13 +3,14 @@
     /// <summary>
     /// Help screen (need to be implemented)
     /// </summary>
-    public class HelpScreen :BaseScreen    
+    public class HelpScreen : BaseScreen
     {
         public HelpScreen(int Top, int Left) : base(Top, Left, "Help")
         {
             InitText();
             ScreenChange();
         }
+
         private void InitText()
         {
             PrintCenter("This is Land sky");
@@ -22,4 +23,4 @@
             PrintCenter("This is still in early stages so there isn't a lot of gameplay");
         }
     }
-} 
+}

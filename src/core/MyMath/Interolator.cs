@@ -1,9 +1,8 @@
-﻿using System;
+﻿using LandSky.MyEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static System.Math;
-
-using LandSky.MyEnums;
 
 namespace LandSky.MyMath
 {
@@ -17,8 +16,8 @@ namespace LandSky.MyMath
         public LinearInterpolator()
         {
             mPolinom = new List<Monom>();
-
         }
+
         public double ValueForX(double X)
         {
             double Rj = 0;
@@ -28,10 +27,12 @@ namespace LandSky.MyMath
             }
             return Round(Rj, 2);
         }
+
         public double ValueForX(int X)
         {
             return ValueForX(Convert.ToDouble(X));
         }
+
         public double DerivativeForX(double X)
         {
             double Rj = 0;
@@ -41,10 +42,12 @@ namespace LandSky.MyMath
             }
             return Round(Rj, 0);
         }
+
         public double DerivativeForX(int X)
         {
             return DerivativeForX(Convert.ToDouble(X));
         }
+
         private void CheckIfOneCanInterpolate(List<Point> Points)
         {
             foreach (Point P in Points)
@@ -58,12 +61,13 @@ namespace LandSky.MyMath
                 if (N != 1)
                     throw new Exception("Can't interpolate if you have two or more points with the same x, sorry... remove duplicates or use non correct interpolation");
             }
-
         }
+
         public void Interpolate(List<Point> Points, KindOfMonom Monoms)
         {
             Interpolate(Points, Monoms, false);
         }
+
         public void Interpolate(List<Point> Points, KindOfMonom Monoms, bool MustBeCorrect)
         {
             if (MustBeCorrect)
@@ -78,6 +82,7 @@ namespace LandSky.MyMath
             }
             Interpolate(Points, Monomz);
         }
+
         public void Interpolate(List<Point> Points, List<KindOfMonom> Monoms)
         {
             List<List<double>> Matrix = new List<List<double>>(Points.Count);
@@ -93,7 +98,6 @@ namespace LandSky.MyMath
             }
             for (int I = 0; I < Points.Count; I++)
             {
-
                 switch (Monoms[I])
                 {
                     case KindOfMonom.Constant:
@@ -103,6 +107,7 @@ namespace LandSky.MyMath
                             Matrix[J][I] = 1;
                         }
                         break;
+
                     case KindOfMonom.Line:
                         LastLine++;
                         mPolinom.Add(new Monom(KindOfMonom.Line, 1, LastLine));
@@ -112,6 +117,7 @@ namespace LandSky.MyMath
                             Matrix[J][I] = Pow(P.X, LastLine);
                         }
                         break;
+
                     case KindOfMonom.Sine:
                         LastSine++;
                         mPolinom.Add(new Monom(KindOfMonom.Sine, 1, LastSine));
@@ -133,12 +139,14 @@ namespace LandSky.MyMath
                 mPolinom[I].InterpolatedValue = Aas[I];
             }
         }
+
         public void Interpolate(List<Point> Points, List<KindOfMonom> Monoms, bool MustBeCorrect)
         {
             if (MustBeCorrect)
                 CheckIfOneCanInterpolate(Points);
             Interpolate(Points, Monoms);
         }
+
         public override string ToString()
         {
             return mPolinom.Aggregate(string.Empty, (Current, m) => Current + (" " + m.LinearRepresentationOfMonom() + " "));
@@ -148,7 +156,9 @@ namespace LandSky.MyMath
         {
             if (Matrix[0].Count - 2 != Matrix.Count)
                 throw new Exception("One can only interpolate Matrix of size n*n+2\n a*X=BottomBound a:= n*n matrix, BottomBound:= 1*n combination, and 1*n matrix where are saved original indexes of rows");
+
             #region down
+
             int N = Matrix.Count;
             if (Matrix[0].Count - 1 == Matrix.Count)
             {
@@ -189,9 +199,10 @@ namespace LandSky.MyMath
                 }
             }
 
-            #endregion
+            #endregion down
 
             #region up
+
             for (int I = (N - 1); I >= 0; I--)
             {
                 for (int J = I - 1; J >= 0; J--)
@@ -202,8 +213,11 @@ namespace LandSky.MyMath
                     Matrix[J][N] = Matrix[J][N] - Koeficjent * Matrix[I][N];
                 }
             }
-            #endregion
+
+            #endregion up
+
             #region solve
+
             List<double> Soluton = new List<double>(N);
             for (int I = 0; I < N; I++)
             {
@@ -213,7 +227,9 @@ namespace LandSky.MyMath
             {
                 Soluton[Convert.ToInt32(Matrix[I][N + 1])] = Matrix[I][N] / Matrix[I][I];
             }
-            #endregion
+
+            #endregion solve
+
             return Soluton;
         }
     }

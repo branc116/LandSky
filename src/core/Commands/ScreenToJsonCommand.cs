@@ -1,9 +1,9 @@
-﻿
-namespace LandSky.Commands
+﻿namespace LandSky.Commands
 {
-    class ScreenToJsonCommand : BaseCommand
+    internal class ScreenToJsonCommand : BaseCommand
     {
         public string FileName;
+
         public ScreenToJsonCommand(string FileName)
         {
             this.FileName = FileName;

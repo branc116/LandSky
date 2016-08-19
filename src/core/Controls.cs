@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-
-using LandSky.Commands;
+﻿using LandSky.Commands;
 using LandSky.MyEnums;
+using System;
+using System.Collections.Generic;
 
 namespace LandSky
 {
     /// <summary>
     /// Contains keymaps, and commandmaps
     /// </summary>
-    class CommandControls
+    internal class CommandControls
     {
         public static Dictionary<ConsoleKeyInfo, Comands> KeyMap = new Dictionary<ConsoleKeyInfo, Comands>
             {
@@ -47,6 +46,7 @@ namespace LandSky
                 {new ConsoleKeyInfo('8',ConsoleKey.D8,false,false,false), Comands.Option8},
                 {new ConsoleKeyInfo('9',ConsoleKey.D9,false,false,false), Comands.Option9}
             };
+
         public static Dictionary<Comands, BaseCommand> InvokedBaseCommand = new Dictionary<Comands, BaseCommand>
             {
                 {Comands.GenerateOneRoom,     new GenerateRoomsCommand(1)},
@@ -76,6 +76,5 @@ namespace LandSky
                 {Comands.Option9,             new BaseCommand()},
                 {Comands.LastSceen,           new BaseCommand()}
             };
-
-    }     
+    }
 }

@@ -37,6 +37,7 @@
         Option9,
         Any
     }
+
     /// <summary>
     /// All supported monoms
     /// </summary>
@@ -46,12 +47,15 @@
         /// a*x^BottomBound
         /// </summary>
         Line,
+
         /// <summary>
         /// a*Sin(BottomBound*x)
         /// </summary>
         Sine,
+
         Constant
     }
+
     /// <summary>
     /// All supported material that can be displayed
     /// </summary>
@@ -69,6 +73,7 @@
         Air,
         Darknes
     }
+
     /// <summary>
     /// All of different game screens that can be displayed
     /// </summary>
@@ -76,6 +81,7 @@
     {
         Game
     }
+
     /// <summary>
     /// Different menu screens that can be displayed
     /// </summary>
@@ -89,6 +95,7 @@
         Message,
         Debug
     }
+
     /// <summary>
     /// Directions the player can move
     /// </summary>
@@ -103,6 +110,7 @@
         Left,
         UpLeft
     }
+
     /// <summary>
     /// Cartesian coordinate system quadrants
     /// </summary>
@@ -113,6 +121,7 @@
         Third,
         Fourth
     }
+
     /// <summary>
     /// Supported states of the screen
     /// </summary>
@@ -122,11 +131,13 @@
         Paused,
         Disposed
     }
+
     public enum SizeMode
     {
         Auto,
         Explicit
     }
+
     public enum InputMode
     {
         ControlOnly,

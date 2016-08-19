@@ -12,11 +12,13 @@ namespace LandSky.DebugItems
     {
         public DateTime CreateTime;
         public string Message;
+
         public DebugMessage(string Message)
         {
             this.Message = Message;
             CreateTime = DateTime.Now;
         }
+
         public override string ToString()
         {
             return $"({CreateTime})>{Message}";

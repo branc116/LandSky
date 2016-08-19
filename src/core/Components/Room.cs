@@ -1,9 +1,8 @@
-﻿using System;
+﻿using LandSky.MyEnums;
+using LandSky.MyMath;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using LandSky.MyEnums;
-using LandSky.MyMath;
 
 namespace LandSky.Components
 {
@@ -12,13 +11,13 @@ namespace LandSky.Components
     /// </summary>
     public class Room : Component
     {
-
         public Room(string Name) : base(Name)
         {
             Rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
             IsPassable = true;
             Controls = new Dictionary<string, Component>();
         }
+
         public void GenerateRandom(int Top, int Left, int Bottom, int Right)
         {
             if (Top < Bottom)
@@ -39,6 +38,7 @@ namespace LandSky.Components
             Bounds = new Rectangle(T, R, B, L);
             MadeOf = Material.Air;
         }
+
         public void GenerateRandom(Quadrant Quadrant, int Bound)
         {
             switch (Quadrant)
@@ -46,23 +46,29 @@ namespace LandSky.Components
                 case Quadrant.First:
                     GenerateRandom(Bound, 0, 0, Bound);
                     break;
+
                 case Quadrant.Second:
                     GenerateRandom(Bound, -Bound, 0, 0);
                     break;
+
                 case Quadrant.Third:
                     GenerateRandom(0, -Bound, -Bound, 0);
                     break;
+
                 case Quadrant.Fourth:
                     GenerateRandom(0, 0, -Bound, Bound);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Quadrant), Quadrant, null);
             }
         }
+
         public bool CollisionCheck(Room R)
         {
             return this.Parent.Controls.Any(N => N.Value.GetType() != typeof(Path) && N.Value.LocalBounds & R.LocalBounds);
         }
+
         public void GenerateWall()
         {
             Wall WT = new Wall("TopWall", new Rectangle(Bounds.DistaceToTopBound, Bounds.DistaceToRightBound, Bounds.DistaceToTopBound, Bounds.DistaceToLeftBound));

@@ -1,5 +1,4 @@
-﻿
-namespace LandSky.MyMath
+﻿namespace LandSky.MyMath
 {
     /// <summary>
     /// Size class
@@ -7,11 +6,11 @@ namespace LandSky.MyMath
     public class Size
     {
         public int Height, Width;
+
         public Size(int Width, int Height)
         {
             this.Height = Height;
             this.Width = Width;
         }
-
     }
 }

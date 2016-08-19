@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using static System.Math;
-using static System.Convert;
-
-using LandSky.Commands;
+﻿using LandSky.Commands;
 using LandSky.Components;
 using LandSky.MyEnums;
 using LandSky.MyMath;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using static System.Convert;
+using static System.Math;
 
 namespace LandSky.Screen
 {
@@ -21,22 +20,29 @@ namespace LandSky.Screen
         ///     Current state of the game instance
         /// </summary>
         private List<List<char>> mBuff1;
+
         private bool mGhost;
         private readonly object mLockDrawMethode = new object();
+
         /// <summary>
         ///     The bounds in the Cartesian coordinate system
         /// </summary>
         private Rectangle mMBoundsAroundThisPlayer;
+
         private int mSpeed;
+
         /// <summary>
         ///     Textures for the materials
         /// </summary>
         private Dictionary<Material, char> mTexture;
+
         private Player mThisPlayer;
+
         /// <summary>
         ///     Matrix for zbuffering
         /// </summary>
         private List<List<int>> mUpdated;
+
         /// <summary>
         ///     Create new Engine Screen
         /// </summary>
@@ -51,13 +57,14 @@ namespace LandSky.Screen
             InitControls();
             EngineConsoleDraw();
         }
+
         public Rectangle BoundsAroundThisPlayer
         {
             get
             {
                 if (mMBoundsAroundThisPlayer == null)
                     mMBoundsAroundThisPlayer =
-                        new Rectangle(new Point(mThisPlayer.LocalBounds.X, mThisPlayer.LocalBounds.Y), WantedWidth -1,
+                        new Rectangle(new Point(mThisPlayer.LocalBounds.X, mThisPlayer.LocalBounds.Y), WantedWidth - 1,
                             WantedHeight - 1);
                 else
                 {
@@ -67,6 +74,7 @@ namespace LandSky.Screen
                 return mMBoundsAroundThisPlayer;
             }
         }
+
         public event EventHandler<string> Message;
 
         private void InitBuffer()
@@ -107,17 +115,15 @@ namespace LandSky.Screen
 
         private void ResetBuffers()
         {
-            
             mUpdated = mUpdated.Select(UpLine => UpLine
                 .Select(UpChar => -1)
                 .ToList())
                 .ToList();
 
             mBuff1 = mBuff1.Select(BuffLine => BuffLine
-                .Select(BuffChar => BuffChar ==  ' ' ? BuffChar : ' ')
+                .Select(BuffChar => BuffChar == ' ' ? BuffChar : ' ')
                 .ToList())
                 .ToList();
-            
         }
 
         private void InitTexture()
@@ -135,6 +141,7 @@ namespace LandSky.Screen
             mTexture.Add(Material.Water, '}');
             mTexture.Add(Material.Darknes, ' ');
         }
+
         private void InitControls()
         {
             MLocalCommands.Add(Comands.Left, GeneralMove);
@@ -153,6 +160,7 @@ namespace LandSky.Screen
                 Comand.Add(Comm.Key, Comm.Value);
             }
         }
+
         private void InitProperties()
         {
             WantedWidth = MaxWidth;
@@ -167,9 +175,11 @@ namespace LandSky.Screen
             mSpeed = 50; // steep = 1/speed
             IsRoot = true;
         }
+
         private void InitEvents()
         {
         }
+
         public void MyDispose()
         {
             foreach (var Comm in MLocalCommands)
@@ -195,6 +205,7 @@ namespace LandSky.Screen
                 EngineConsoleDraw();
             }, GenerateRoomsCommand.CancelGenerting);
         }
+
         /// <summary>
         ///     Generate new paths in this instance of the game
         /// </summary>
@@ -211,6 +222,7 @@ namespace LandSky.Screen
             }
             EngineConsoleDraw();
         }
+
         /// <summary>
         ///     Move played in current game instance
         /// </summary>
@@ -265,6 +277,7 @@ namespace LandSky.Screen
                 }
             }, MoveCommand.CancleMove);
         }
+
         protected override void GenerateFooter()
         {
             try
@@ -277,19 +290,20 @@ namespace LandSky.Screen
                 base.GenerateFooter();
             }
         }
+
         private void EngineConsoleDraw()
         {
             lock (mLockDrawMethode)
             {
                 ResetBuffers();
-                
+
                 ZBufferUpdate(this);
                 FillBuffer(BoundsAroundThisPlayer, MadeOf, 0);
                 FlushBuffer();
                 ScreenChange();
-
             }
         }
+
         private void ZBufferUpdate(Component Comp)
         {
             var GoodComponents = Comp.Controls.Where(I => I.Value.GetType() != typeof(Path) &&
@@ -301,10 +315,11 @@ namespace LandSky.Screen
             FillBuffer(Comp.GlobalBounds, Comp.MadeOf, Comp.ZValue);
             DrawPaths(Comp);
         }
+
         private void FillBuffer(Rectangle TransformdBounds, Material madeOf, int ZLevel)
         {
             var Transformed = BoundsAroundThisPlayer.ToTopLeft(TransformdBounds);
-            for (int I = Min( Transformed.TopBound, Transformed.BottomBound); I <= Max(Transformed.TopBound, Transformed.BottomBound); I++)
+            for (int I = Min(Transformed.TopBound, Transformed.BottomBound); I <= Max(Transformed.TopBound, Transformed.BottomBound); I++)
             {
                 for (int J = Transformed.LeftBound; J <= Transformed.RightBound; J++)
                 {
@@ -316,19 +331,20 @@ namespace LandSky.Screen
                 }
             }
         }
-        
+
         private void FlushBuffer()
         {
             Clear();
             foreach (var C in mBuff1)
                 VirtualConsoleAddLine(new string(C.ToArray()));
         }
+
         private void DrawPaths(Component ComponentsWithPaths)
         {
             foreach (var path in ComponentsWithPaths.Controls.Where(I => I.Value.GetType() == typeof(Path)))
             {
                 var Component = path.Value as Path;
-                
+
                 var Pol = Component.Poly;
 
                 for (int J = BoundsAroundThisPlayer.LeftBound; J < BoundsAroundThisPlayer.RightBound; J++)
@@ -336,10 +352,10 @@ namespace LandSky.Screen
                     var TransformdBounds = new Rectangle(
                         new Point(J, ToInt32(Pol.ValueForX(J))),
                         1,
-                        Abs(ToInt32(Pol.DerivativeForX(J)*2)) + 4);
+                        Abs(ToInt32(Pol.DerivativeForX(J) * 2)) + 4);
                     if (TransformdBounds & BoundsAroundThisPlayer)
-                        FillBuffer(TransformdBounds , 
-                                    path.Value.MadeOf, 
+                        FillBuffer(TransformdBounds,
+                                    path.Value.MadeOf,
                                     path.Value.ZValue);
                 }
             }
