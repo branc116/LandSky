@@ -1,0 +1,27 @@
+{
+  "title": "LandSky",
+  "description": "Roguelike",
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    }
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "core.Portable": {
+          "target": "project",
+          "include": "all"
+        }
+      },
+      "imports": "dnxcore50"
+    }
+  }
+}

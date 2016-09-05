@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "exports": {
+    "core.Portable/1.0.0": {
+      "type": "project",
+      "framework": ".NETStandard,Version=v1.1",
+      "compile": {
+        "bin/Debug/LandSky.dll": {}
+      },
+      "runtime": {
+        "bin/Debug/LandSky.dll": {}
+      },
+      "contentFiles": {
+        "bin/Debug/LandSky.pdb": {
+          "buildAction": "None",
+          "codeLanguage": "any",
+          "copyToOutput": true
+        }
+      }
+    }
+  }
+}
