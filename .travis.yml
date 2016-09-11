@@ -41,9 +41,9 @@ install:
       exit 1;
     fi
   # Restore dependencies and build core
-   - dotnet restore core.Portable;
-   - dotnet build core.Portable;
+   - dotnet restore src/core.Portable;
+   - dotnet build src/core.Portable;
   # Restore dependencies and build Console game
-   - dotnet restore Game.Console
-   - dotnet build Game.Console
+   - dotnet restore src/Game.Console
+   - dotnet build src/Game.Console
   
