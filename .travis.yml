@@ -49,16 +49,17 @@ install:
     if [ $? -eq 0 ]; then
       echo "Using dotnet:";
       dotnet --info;
+      ls -all
     else
       echo "dotnet.exe not found"
       exit 1;
     fi
   # Restore dependencies and build core
-  - cd core.Portable
-  - dotnet restore
-  - dotnet build
+    cd core.Portable;
+    dotnet restore;
+    dotnet build;
   # Restore dependencies and build Console game
-  - cd ../Game.Console
-  - dotnet restore
-  - dotnet build
+    cd ../Game.Console
+    dotnet restore
+    dotnet build
   
