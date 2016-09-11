@@ -7,6 +7,7 @@ using LandSky.MyEventArgs;
 using LandSky.UIComponents;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static System.Math;
 
 /// <summary>
@@ -38,7 +39,7 @@ namespace LandSky.Screen
         {
             get
             {
-                return MScreenHeight;
+                return ScreenHeight;
             }
         }
 
@@ -49,7 +50,7 @@ namespace LandSky.Screen
         {
             get
             {
-                return MScreenWidth - 1;
+                return ScreenWidth - 1;
             }
         }
 
@@ -60,12 +61,12 @@ namespace LandSky.Screen
         {
             set
             {
-                MScreenHeight = value;
+                ScreenHeight = value;
                 ScreenChange();
             }
             get
             {
-                return MScreenHeight;
+                return ScreenHeight;
             }
         }
 
@@ -76,12 +77,12 @@ namespace LandSky.Screen
         {
             set
             {
-                MScreenWidth = value;
+                ScreenWidth = value;
                 ScreenChange();
             }
             get
             {
-                return MScreenWidth;
+                return ScreenWidth;
             }
         }
 
@@ -138,21 +139,21 @@ namespace LandSky.Screen
                 int mTrueHeight = TrueHeight;
 
                 string S = '+' + new string('-', mTrueWidth) + '+' + '\n';
-                //HeadString.Split('\n').ToList().ForEach((I) =>
-                //{
-                //    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                //});
-                //S += '|' + new string('-', mTrueWidth) + '|' + '\n';
-                //for (int i = mActiveFrom; i < mActiveTo; i++)
-                //{
-                //    string I = mBodyStringLines[i];
-                //    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                //}
-                //S += '|' + new string('-', mTrueWidth) + '|' + '\n';
-                //FooterString.Split('\n').ToList().ForEach((I) =>
-                //{
-                //    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
-                //});
+                foreach (var I in HeadString.Split('\n'))
+                {
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                }
+                S += '|' + new string('-', mTrueWidth) + '|' + '\n';
+                for (int i = mActiveFrom; i < mActiveTo; i++)
+                {
+                    string I = mBodyStringLines[i];
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                }
+                S += '|' + new string('-', mTrueWidth) + '|' + '\n';
+                foreach (var I in FooterString.Split('\n'))
+                {
+                    S += '|' + I.Substring(0, Min(I.Length, mTrueWidth)) + new string(' ', Max(0, mTrueWidth - I.Length)) + '|' + '\n';
+                }
                 S += '+' + new string('-', mTrueWidth) + '+';
                 mVirtualConsole = S;
                 return mVirtualConsole;
@@ -223,7 +224,7 @@ namespace LandSky.Screen
             }
         }
 
-        protected int MScrool, GlobalLeft, GlobalTop, HeadHeight, FooterHeight, MScreenHeight, MScreenWidth;
+        protected int GlobalLeft, GlobalTop, HeadHeight, FooterHeight, ScreenHeight, ScreenWidth;
 
         ///// <summary>
         ///// Invoke this when something changes
@@ -238,6 +239,8 @@ namespace LandSky.Screen
         /// String that is displayed on the bottom of the screen
         /// </summary>
         protected string FooterString;
+
+        protected Component ActiveComponent;
 
         private string mVirtualConsole;
 
@@ -515,6 +518,20 @@ namespace LandSky.Screen
                     return true;
             }
             return false;
+        }
+
+        public bool ParseCommand(string Subject, Comands Command, MyConsoleKeyInfo KeyInfo)
+        {
+            if (!this.Controls.ContainsKey(Subject))
+                throw new ArgumentOutOfRangeException("Subject");
+            ActiveComponent = this.Controls[Subject];
+            return ParseCommand(Command, KeyInfo);
+        }
+
+        public bool ParseCommand(Component Subject, Comands Command, MyConsoleKeyInfo KeyInfo)
+        {
+            ActiveComponent = Subject;
+            return ParseCommand(Command, KeyInfo);
         }
 
         /// <summary>

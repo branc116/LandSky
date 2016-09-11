@@ -35,7 +35,7 @@ namespace LandSky.Screen
         /// </summary>
         private Dictionary<Material, char> mTexture;
 
-        private Component _ActiveComponent;
+        
 
         /// <summary>
         ///     Matrix for zbuffering
@@ -61,8 +61,8 @@ namespace LandSky.Screen
         {
             get
             {
-                if (_ActiveComponent.IsRoot != true)
-                    return new Rectangle(new Point(_ActiveComponent.LocalBounds.X, _ActiveComponent.LocalBounds.Y), WantedWidth - 1, WantedHeight - 1);
+                if (ActiveComponent.IsRoot != true)
+                    return new Rectangle(new Point(ActiveComponent.LocalBounds.X, ActiveComponent.LocalBounds.Y), WantedWidth - 1, WantedHeight - 1);
                 return new Rectangle(new Point(0, 0), WantedWidth, WantedHeight);
             }
         }
@@ -157,7 +157,7 @@ namespace LandSky.Screen
         {
             WantedWidth = 50;
             WantedHeight = 20;
-            _ActiveComponent = this;
+            ActiveComponent = this;
             //Insert(_ActiveComponent);
             mBuff1 = new List<List<char>>();
             mUpdated = new List<List<int>>();
@@ -236,36 +236,36 @@ namespace LandSky.Screen
                     if (Move.Direction == MoveDirection.Down || Move.Direction == MoveDirection.DownLeft ||
                         Move.Direction == MoveDirection.DownRight)
                     {
-                        if (GetComponentOnLocation(_ActiveComponent.LocalX, _ActiveComponent.LocalY - 1).IsPassable || mGhost)
+                        if (GetComponentOnLocation(ActiveComponent.LocalX, ActiveComponent.LocalY - 1).IsPassable || mGhost)
                         {
-                            _ActiveComponent.LocalY--;
+                            ActiveComponent.LocalY--;
                             Steps--;
                         }
                     }
                     if (Move.Direction == MoveDirection.Up || Move.Direction == MoveDirection.UpLeft ||
                         Move.Direction == MoveDirection.UpRight)
                     {
-                        if (GetComponentOnLocation(_ActiveComponent.LocalX, _ActiveComponent.LocalY + 1).IsPassable || mGhost)
+                        if (GetComponentOnLocation(ActiveComponent.LocalX, ActiveComponent.LocalY + 1).IsPassable || mGhost)
                         {
-                            _ActiveComponent.LocalY++;
+                            ActiveComponent.LocalY++;
                             Steps--;
                         }
                     }
                     if (Move.Direction == MoveDirection.Left || Move.Direction == MoveDirection.UpLeft ||
                         Move.Direction == MoveDirection.DownLeft)
                     {
-                        if (GetComponentOnLocation(_ActiveComponent.LocalX + 1, _ActiveComponent.LocalY).IsPassable || mGhost)
+                        if (GetComponentOnLocation(ActiveComponent.LocalX + 1, ActiveComponent.LocalY).IsPassable || mGhost)
                         {
-                            _ActiveComponent.LocalX--;
+                            ActiveComponent.LocalX--;
                             Steps--;
                         }
                     }
                     if (Move.Direction == MoveDirection.Right || Move.Direction == MoveDirection.UpRight ||
                         Move.Direction == MoveDirection.DownRight)
                     {
-                        if (GetComponentOnLocation(_ActiveComponent.LocalX - 1, _ActiveComponent.LocalY).IsPassable || mGhost)
+                        if (GetComponentOnLocation(ActiveComponent.LocalX - 1, ActiveComponent.LocalY).IsPassable || mGhost)
                         {
-                            _ActiveComponent.LocalX++;
+                            ActiveComponent.LocalX++;
                             Steps--;
                         }
                     }
@@ -279,7 +279,7 @@ namespace LandSky.Screen
         {
             try
             {
-                string Mid = $"({_ActiveComponent.LocalX},{_ActiveComponent.LocalY}) - {GetComponentOnLocation(_ActiveComponent.LocalX, _ActiveComponent.LocalY).Name}";
+                string Mid = $"({ActiveComponent.LocalX},{ActiveComponent.LocalY}) - {GetComponentOnLocation(ActiveComponent.LocalX, ActiveComponent.LocalY).Name}";
                 GenerateFooter(Mid);
             }
             catch
@@ -294,7 +294,7 @@ namespace LandSky.Screen
         {
             lock (LockChangeActiveComponent)
             {
-                _ActiveComponent = this.Controls.First(i => i.Value.Name == NewActiveComponent).Value;
+                ActiveComponent = this.Controls.First(i => i.Value.Name == NewActiveComponent).Value;
                 WantedWidth = NewWidth;
                 WantedHeight = NewHeight;
                 EngineConsoleDraw();

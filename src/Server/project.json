@@ -15,12 +15,12 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Swashbuckle": "6.0.0-beta902",
-    "CoreCore": "1.0.0-*",
     "Microsoft.AspNetCore.WebSockets.Server": "0.1.0",
     "Microsoft.AspNetCore.WebUtilities": "1.0.0",
     "Microsoft.AspNetCore.WebSockets.Protocol": "0.1.0",
-    "System.Net.Sockets": "4.1.0",
-    "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*"
+    "Microsoft.AspNetCore.SignalR.Server": "0.2.0-alpha1-22118",
+    "Microsoft.AspNetCore.Antiforgery" : "1.0.0"
+
   },
 
   "tools": {
@@ -29,6 +29,11 @@
 
   "frameworks": {
     "netcoreapp1.0": {
+      "dependencies": {
+        "core.Portable": {
+          "target": "project"
+        }
+      },
       "imports": [
         "dotnet5.6",
         "portable-net45+win8"

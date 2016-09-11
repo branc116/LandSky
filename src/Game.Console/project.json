@@ -17,8 +17,7 @@
     "netcoreapp1.0": {
       "dependencies": {
         "core.Portable": {
-          "target": "project",
-          "include": "all"
+          "target": "project"
         }
       },
       "imports": "dnxcore50"
