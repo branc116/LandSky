@@ -42,8 +42,14 @@ namespace LandSky
         public bool InputNextCommand(MyConsoleKeyInfo Info)
         {
             var Cc = CommandControls.KeyMap.ContainsKey(Info) ? CommandControls.KeyMap[Info] : MyEnums.Comands.Any;
-            return ActiveScreen.ParseCommand(Cc, Info);
+            return ActiveScreen.ParseCommand(_name, Cc, Info);
         }
+        public bool InputNextCommand(MyConsoleKeyInfo Info, string NameOfSubject)
+        {
+            var Cc = CommandControls.KeyMap.ContainsKey(Info) ? CommandControls.KeyMap[Info] : MyEnums.Comands.Any;
+            return ActiveScreen.ParseCommand(NameOfSubject, Cc, Info);
+        }
+
 
         /// <summary>
         /// Isn't working..

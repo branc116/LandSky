@@ -1,6 +1,7 @@
 ﻿using LandSky;
 using LandSky.Commands;
 using LandSky.Components;
+using LandSky.DotNetExt;
 using LandSky.Screen;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Hubs;
@@ -15,7 +16,7 @@ namespace Server.Controllers
     public class Players// : IEnumerable<KeyValuePair<string, Player>>
     {
         static private SortedList<string, Player> _Users = new SortedList<string, Player>();
-        static private Engine _Engine = new Engine();
+        static private Engine _Engine = new Engine("myEngine");
         static private Random _Rand = new Random();
         static private SandboxMap _Map = new SandboxMap(0, 0);
 
@@ -131,11 +132,10 @@ namespace Server.Controllers
         public void ParseControl(string caller, bool ctrl, bool alt, string character)
         {
             Player p = _Users[caller];
-            _Engine.RenderAroundComponent(p, 2, 3);
             ConsoleKey ck;
 
             Enum.TryParse(character.ToUpper(), out ck);
-            _Engine.InputNextCommand(new ConsoleKeyInfo(character[0], ck, false, alt, ctrl));
+            _Engine.InputNextCommand( new MyConsoleKeyInfo(character[0], alt, ctrl), p.Name);
         }
     }
 
@@ -151,9 +151,9 @@ namespace Server.Controllers
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            var a = ((Connection)((Microsoft.AspNetCore.SignalR.Hubs.SignalProxy)((HubConnectionContext)this.Clients).Caller).Connection).Identity;
+            var a = base.Context.ConnectionId;
             Task tt;
-            if (_players.Remove(base.Clients.Caller))
+            if (_players.Remove(a))
                 tt = updateForAll();
             return base.OnDisconnected(stopCalled);
         }
@@ -165,7 +165,7 @@ namespace Server.Controllers
 
         public void InsertNew(string Name)
         {
-            var a = ((Connection)((Microsoft.AspNetCore.SignalR.Hubs.SignalProxy)((HubConnectionContext)this.Clients).Caller).Connection).Identity;
+            var a = base.Context.ConnectionId;
             var Ok = _players.Add(a, new Player(Name));
             if (Ok == true)
             {
@@ -192,7 +192,7 @@ namespace Server.Controllers
 
         public void Input(bool ctrl, bool alt, string Character)
         {
-            var a = ((Connection)((Microsoft.AspNetCore.SignalR.Hubs.SignalProxy)((HubConnectionContext)this.Clients).Caller).Connection).Identity;
+            var a = base.Context.ConnectionId;
             _players.ParseControl(a, ctrl, alt, Character);
             Task t = updateForAll(a);
         }

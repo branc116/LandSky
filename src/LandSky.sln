@@ -3,19 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "core\Core.csproj", "{1CA03B87-1F96-4F35-8A08-DA400B04050D}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CoreCore", "CoreCore\CoreCore.xproj", "{92B479F3-6670-4EAF-BEBB-31487564DB3E}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Server", "Server\Server.xproj", "{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SignalR", "SignalR", "{6C8AD4FC-6A99-4E9B-A0B8-E42154686FB9}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.SignalR.Sources", "..\..\SignalR-Server\src\Microsoft.AspNetCore.SignalR.Sources\Microsoft.AspNetCore.SignalR.Sources.xproj", "{C41C7A05-ADC3-4771-8F8D-18B86CE7FACC}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.SignalR.Server", "..\..\SignalR-Server\src\Microsoft.AspNetCore.SignalR.Server\Microsoft.AspNetCore.SignalR.Server.xproj", "{1E7F548C-CB60-46A1-B431-D67825A32698}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.SignalR.Messaging", "..\..\SignalR-Server\src\Microsoft.AspNetCore.SignalR.Messaging\Microsoft.AspNetCore.SignalR.Messaging.xproj", "{1A8EEF26-BA42-496D-9CAE-722581F9777C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{92B6A376-61FA-4BC4-99D2-B68D988F7544}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,18 +23,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1CA03B87-1F96-4F35-8A08-DA400B04050D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1CA03B87-1F96-4F35-8A08-DA400B04050D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92B479F3-6670-4EAF-BEBB-31487564DB3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92B479F3-6670-4EAF-BEBB-31487564DB3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C41C7A05-ADC3-4771-8F8D-18B86CE7FACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C41C7A05-ADC3-4771-8F8D-18B86CE7FACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E7F548C-CB60-46A1-B431-D67825A32698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E7F548C-CB60-46A1-B431-D67825A32698}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A8EEF26-BA42-496D-9CAE-722581F9777C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A8EEF26-BA42-496D-9CAE-722581F9777C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,10 +37,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{C41C7A05-ADC3-4771-8F8D-18B86CE7FACC} = {6C8AD4FC-6A99-4E9B-A0B8-E42154686FB9}
-		{1E7F548C-CB60-46A1-B431-D67825A32698} = {6C8AD4FC-6A99-4E9B-A0B8-E42154686FB9}
-		{1A8EEF26-BA42-496D-9CAE-722581F9777C} = {6C8AD4FC-6A99-4E9B-A0B8-E42154686FB9}
 	EndGlobalSection
 EndGlobal
