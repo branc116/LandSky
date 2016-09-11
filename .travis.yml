@@ -1,5 +1,4 @@
 language: generic
-sudo: required
 addons:
   apt:
     packages:
@@ -10,22 +9,10 @@ addons:
     - libunwind8
     - zlib1g
 
-matrix:
-  include:
-    - os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: required
-      env: CONFIGURATION=Debug FRAMEWORK=netcoreapp1.0
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: CONFIGURATION=Release FRAMEWORK=netcoreapp1.0
-    - os: osx
-      osx_image: xcode7.2 # macOS 10.11
-      env: CONFIGURATION=Debug FRAMEWORK=netcoreapp1.0
-    - os: osx
-      osx_image: xcode7.2
-      env: CONFIGURATION=Release FRAMEWORK=netcoreapp1.0
+os: linux
+dist: trusty # Ubuntu 14.04
+sudo: required
+env: CONFIGURATION=Debug FRAMEWORK=netcoreapp1.0
 
 before_install:
   # Install OpenSSL
@@ -45,7 +32,7 @@ before_install:
   - export PATH="$DOTNET_INSTALL_DIR:$PATH"
 install:
   # Display dotnet version info
-  - which dotnet;
+   - which dotnet;
     if [ $? -eq 0 ]; then
       echo "Using dotnet:";
       dotnet --info;
@@ -55,11 +42,11 @@ install:
       exit 1;
     fi
   # Restore dependencies and build core
-    cd core.Portable;
-    dotnet restore;
-    dotnet build;
+   - cd core.Portable;
+   - dotnet restore;
+   - dotnet build;
   # Restore dependencies and build Console game
-    cd ../Game.Console
-    dotnet restore
-    dotnet build
+   - cd ../Game.Console
+   - dotnet restore
+   - dotnet build
   
