@@ -16,6 +16,14 @@ namespace LandSky.Components
             IsPassable = true;
         }
 
+        public Room(string Name, Rectangle Bounds) : base(Name)
+        {
+            this.Bounds = Bounds;
+            Rand = new Random(DateTime.Now.Millisecond + DateTime.Now.Second * 7187 + DateTime.Now.Minute * 8167);
+            IsPassable = true;
+            GenerateWall();
+        }
+
         public void GenerateRandom(int Top, int Left, int Bottom, int Right)
         {
             if (Top < Bottom)
@@ -64,7 +72,7 @@ namespace LandSky.Components
 
         public bool CollisionCheck(Room R)
         {
-            return this.Parent.Controls.Any(N => N.Value.GetType() != typeof(Path) && N.Value.LocalBounds & R.LocalBounds);
+            return this.Parent.Controls.Any(N => N.Value.GetType() != typeof(Path) && N.Value & R);
         }
 
         public void GenerateWall()

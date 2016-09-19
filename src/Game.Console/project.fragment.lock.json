@@ -5,13 +5,13 @@
       "type": "project",
       "framework": ".NETStandard,Version=v1.1",
       "compile": {
-        "bin/Debug/LandSky.dll": {}
+        "bin/Release/LandSky.dll": {}
       },
       "runtime": {
-        "bin/Debug/LandSky.dll": {}
+        "bin/Release/LandSky.dll": {}
       },
       "contentFiles": {
-        "bin/Debug/LandSky.pdb": {
+        "bin/Release/LandSky.pdb": {
           "buildAction": "None",
           "codeLanguage": "any",
           "copyToOutput": true

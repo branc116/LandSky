@@ -7,7 +7,6 @@ using LandSky.MyEventArgs;
 using LandSky.UIComponents;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static System.Math;
 
 /// <summary>
@@ -393,7 +392,7 @@ namespace LandSky.Screen
         private async void ScreenToJSON(BaseCommand Bc)
         {
             ScreenToJsonCommand Comm = Bc as ScreenToJsonCommand;
-            await SaveStateToDisc($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':', '_').Replace('/', '_')}.json");
+            await SaveState($"{Comm.FileName}_{DateTime.Now.ToString().Replace(':', '_').Replace('/', '_')}.json");
         }
 
         /// <summary>

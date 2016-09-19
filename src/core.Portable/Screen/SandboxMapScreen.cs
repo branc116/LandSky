@@ -35,8 +35,6 @@ namespace LandSky.Screen
         /// </summary>
         private Dictionary<Material, char> mTexture;
 
-        
-
         /// <summary>
         ///     Matrix for zbuffering
         /// </summary>
@@ -62,7 +60,7 @@ namespace LandSky.Screen
             get
             {
                 if (ActiveComponent.IsRoot != true)
-                    return new Rectangle(new Point(ActiveComponent.LocalBounds.X, ActiveComponent.LocalBounds.Y), WantedWidth - 1, WantedHeight - 1);
+                    return new Rectangle(new Point(ActiveComponent.LocalX, ActiveComponent.LocalY), WantedWidth - 1, WantedHeight - 1);
                 return new Rectangle(new Point(0, 0), WantedWidth, WantedHeight);
             }
         }
@@ -297,8 +295,13 @@ namespace LandSky.Screen
                 ActiveComponent = this.Controls.First(i => i.Value.Name == NewActiveComponent).Value;
                 WantedWidth = NewWidth;
                 WantedHeight = NewHeight;
-                EngineConsoleDraw();
+                //EngineConsoleDraw();
             }
+        }
+
+        public string ReginToString()
+        {
+            return ReginToString(ActiveComponent, WantedWidth, WantedHeight);
         }
 
         private void EngineConsoleDraw()
@@ -316,14 +319,14 @@ namespace LandSky.Screen
 
         private void ZBufferUpdate(Component Comp)
         {
-            var GoodComponents = Comp.Controls.Where(I => I.Value.GetType() != typeof(Path) &&
-                                                          I.Value.GlobalBounds & BoundsAroundThisPlayer);
-            foreach (var GoodComponent in GoodComponents)
-            {
-                ZBufferUpdate(GoodComponent.Value);
-            }
-            FillBuffer(Comp.GlobalBounds, Comp.MadeOf, Comp.ZValue);
-            DrawPaths(Comp);
+            //var GoodComponents = Comp.Controls.Where(I => I.Value.GetType() != typeof(Path) &&
+            //                                              I.Value.GlobalBounds & BoundsAroundThisPlayer);
+            //foreach (var GoodComponent in GoodComponents)
+            //{
+            //    ZBufferUpdate(GoodComponent.Value);
+            //}
+            //FillBuffer(Comp.GlobalBounds, Comp.MadeOf, Comp.ZValue);
+            //DrawPaths(Comp);
         }
 
         private void FillBuffer(Rectangle TransformdBounds, Material madeOf, int ZLevel)
