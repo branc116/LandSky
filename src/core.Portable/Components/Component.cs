@@ -39,18 +39,33 @@ namespace LandSky.Components
             }
         }
 
+        public Point LocalLocation
+        {
+            get
+            {
+                return LocalBounds.Location;
+            }
+            set
+            {
+                LocalX = value.X;
+                LocalY = value.Y;
+            }
+        }
+
         public int GlobalX => IsRoot ? 0 : LocalX + (Parent == null ? 0 : Parent.LocalX);
         public int GlobalY => IsRoot ? 0 : LocalY + (Parent == null ? 0 : Parent.LocalY);
+        public Point GlobalLocation => GlobalBounds.Location;
         public int Height => LocalBounds == null ? 0 : LocalBounds.Height;
         public int Width => LocalBounds == null ? 0 : LocalBounds.Width;
         public int NumOfRooms => Controls.Count(I => I.Value.GetType() == typeof(Room));
         public int NumOfWalls => Controls.Count(I => I.Value.GetType() == typeof(Wall));
         public int NumOfPaths => Controls.Count(I => I.Value.GetType() == typeof(Path));
-        public Rectangle LocalBounds => Bounds;
-        public Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : (LocalBounds == null ? new Rectangle(0, 0, 0, 0) : (Parent == null ? LocalBounds : LocalBounds + Parent.GlobalBounds));
+        private Rectangle LocalBounds => Bounds;
+        private Rectangle GlobalBounds => this.IsRoot ? new Rectangle(0, 0, 0, 0) : (LocalBounds == null ? new Rectangle(0, 0, 0, 0) : (Parent == null ? LocalBounds : LocalBounds + Parent.GlobalBounds));
 
         public bool IsRoot { get; set; }
         public bool IsPassable { get; set; }
+        public bool IsInfinity { get; set; } = false;
         public int ZValue { get; set; }
         public string Name { get; }
         public Material MadeOf { get; set; }
@@ -228,6 +243,55 @@ namespace LandSky.Components
             await GenerateRandomRooms(N, Names);
         }
 
+        public virtual Cell[][] GetRegin(Rectangle Rec)
+        {
+            Cell[][] Area = new Cell[Rec.Height][];
+            Area[0] = new Cell[Rec.Width];
+            for (int i = 0; i < Rec.Width; i++)
+            {
+                Area[0][i] = new Cell(AsciiTexture.AsciiTextures[MadeOf]) { Priority = ZValue };
+            }
+            for (int j = 1; j < Rec.Height; j++)
+            {
+                Area[j] = new Cell[Rec.Width];
+                Area[0].CopyTo(Area[j], 0);
+            }
+            foreach (var comp in Controls.Where(i => i.Value.IsInfinity || i.Value.GlobalBounds & Rec))
+            {
+                Rectangle Intersection = comp.Value.IsInfinity ? Rec : comp.Value.GlobalBounds - Rec;
+                Cell[][] NewTexture = comp.Value.GetRegin(Intersection);
+                Rectangle topleft = Rec.ToTopLeft(Intersection);
+                for (int j = 0; j < NewTexture.Length; j++)
+                {
+                    for (int k = 0; k < NewTexture[j].Length; k++)
+                    {
+                        Area[j + topleft.TopBound][k + topleft.LeftBound] = NewTexture[j][k] + Area[j + topleft.TopBound][k + topleft.LeftBound];
+                    }
+                }
+            }
+            return Area;
+        }
+
+        public virtual string ReginToString(Rectangle Rec)
+        {
+            var Area = GetRegin(Rec);
+            string outstring = string.Empty;
+            for (int i = 0; i < Area.Length; i++)
+            {
+                for (int j = 0; j < Area[i].Length; j++)
+                {
+                    outstring += Area[i][j].ToString();
+                }
+                outstring += Environment.NewLine;
+            }
+            return outstring;
+        }
+
+        public virtual string ReginToString(Component RegionAroundComponent, int Width, int Height)
+        {
+            return ReginToString(new Rectangle(RegionAroundComponent.GlobalLocation, Width, Height));
+        }
+
         public bool CheckCollision(IEnumerable<Component> Components, Component NewComponent)
         {
             return Components.Any(N => N.LocalBounds & NewComponent.LocalBounds && N.ZValue == NewComponent.ZValue);
@@ -264,7 +328,7 @@ namespace LandSky.Components
             );
         }
 
-        public async Task SaveStateToDisc(string FileName)
+        public async Task SaveState(string FileName)
         {
             //await Task.Factory.StartNew(async () =>
             //{
@@ -338,6 +402,8 @@ namespace LandSky.Components
         {
             return new Rectangle(C.LocalBounds.TopBound + P.Y, C.LocalBounds.RightBound + P.X, C.LocalBounds.BottomBound + P.Y, C.LocalBounds.LeftBound + P.X);
         }
+
+        public static Rectangle operator -(Component one, Component two) => one.GlobalBounds - two.GlobalBounds;
 
         public override bool Equals(object Obj) => Obj is Component ? Obj as Component == this : false;
 

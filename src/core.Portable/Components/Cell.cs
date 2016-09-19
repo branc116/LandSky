@@ -6,7 +6,9 @@ namespace LandSky.Components
     {
         public DateTime LastUsed;
 
-        public bool Value
+        public int Priority { get; set; } = 0;
+
+        public char Value
         {
             get
             {
@@ -20,9 +22,9 @@ namespace LandSky.Components
             }
         }
 
-        private bool _value;
+        private char _value;
 
-        public Cell(bool Value)
+        public Cell(char Value)
         {
             this.Value = Value;
         }
@@ -33,5 +35,12 @@ namespace LandSky.Components
                 return (LastUsed).CompareTo((obj as Cell).LastUsed);
             throw new ArgumentException("obj needs to be Cell", "obj");
         }
+
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
+
+        public static Cell operator +(Cell a, Cell b) => b.Priority > a.Priority ? b : a;
     }
 }

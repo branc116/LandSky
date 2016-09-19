@@ -1,5 +1,7 @@
-﻿using LandSky.MyMath;
+﻿using LandSky.MyEnums;
+using LandSky.MyMath;
 using System.Collections.Generic;
+using static LandSky.AsciiTexture;
 
 namespace LandSky.Components
 {
@@ -12,15 +14,31 @@ namespace LandSky.Components
         public InfinitePlane(string Seed, string Name) : base(Name)
         {
             _seed = new Seeds(Seed);
+            IsInfinity = true;
         }
 
-        public bool GetPoint(Point Location)
+        public Cell GetPoint(Point Location)
         {
             if (_table.ContainsKey(Location))
-                return _table[Location].Value;
-            var resoult = new Cell(_seed.IsOver(Location.X, Location.Y));
+                return _table[Location];
+            var resoult = new Cell(_seed.IsOver(Location.X, Location.Y) ? AsciiTextures[Material.Air] : AsciiTextures[Material.Darknes]);
+            resoult.Priority = ZValue;
             _table.Add(Location, resoult);
-            return resoult.Value;
+            return resoult;
+        }
+
+        public override Cell[][] GetRegin(Rectangle Rec)
+        {
+            Cell[][] Area = new Cell[Rec.Height][];
+            for (int i = 0; i < Rec.Height; i++)
+            {
+                Area[i] = new Cell[Rec.Width];
+                for (int j = 0; j < Rec.Width; j++)
+                {
+                    Area[i][j] = GetPoint(new Point(j + Rec.LeftBound, Rec.TopBound - i));
+                }
+            }
+            return Area;
         }
     }
 
