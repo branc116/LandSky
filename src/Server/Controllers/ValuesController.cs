@@ -4,8 +4,6 @@ using LandSky.Components;
 using LandSky.DotNetExt;
 using LandSky.Screen;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Hubs;
-using Microsoft.AspNetCore.SignalR.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,7 +133,7 @@ namespace Server.Controllers
             ConsoleKey ck;
 
             Enum.TryParse(character.ToUpper(), out ck);
-            _Engine.InputNextCommand( new MyConsoleKeyInfo(character[0], alt, ctrl), p.Name);
+            _Engine.InputNextCommand(new MyConsoleKeyInfo(character[0], alt, ctrl), p.Name);
         }
     }
 
