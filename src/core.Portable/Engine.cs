@@ -16,7 +16,7 @@ namespace LandSky
     {
         private string _name;
 
-        private BaseScreen ActiveScreen
+        private BaseScreen _activeScreen
         {
             get
             {
@@ -28,7 +28,7 @@ namespace LandSky
         {
             get
             {
-                return ActiveScreen?.Controls?[Name];
+                return _activeScreen?.Controls?[Name];
             }
         }
 
@@ -42,14 +42,14 @@ namespace LandSky
         public bool InputNextCommand(MyConsoleKeyInfo Info)
         {
             var Cc = CommandControls.KeyMap.ContainsKey(Info) ? CommandControls.KeyMap[Info] : MyEnums.Comands.Any;
-            return ActiveScreen.ParseCommand(_name, Cc, Info);
+            return _activeScreen.ParseCommand(_name, Cc, Info);
         }
+
         public bool InputNextCommand(MyConsoleKeyInfo Info, string NameOfSubject)
         {
             var Cc = CommandControls.KeyMap.ContainsKey(Info) ? CommandControls.KeyMap[Info] : MyEnums.Comands.Any;
-            return ActiveScreen.ParseCommand(NameOfSubject, Cc, Info);
+            return _activeScreen.ParseCommand(NameOfSubject, Cc, Info);
         }
-
 
         /// <summary>
         /// Isn't working..
@@ -85,7 +85,7 @@ namespace LandSky
         /// <returns></returns>
         public string CurrentFrame()
         {
-            return ActiveScreen.CurrentStateOfTheScreen.StateOfConsole;
+            return _activeScreen.CurrentStateOfTheScreen.StateOfConsole;
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace LandSky
         /// <returns></returns>
         public IEnumerable<Component> AllComponentsOnScreen()
         {
-            foreach (var comp in ActiveScreen.Controls)
+            foreach (var comp in _activeScreen.Controls)
             {
                 yield return comp.Value;
             }
@@ -102,7 +102,7 @@ namespace LandSky
 
         public IEnumerable<UIComponentBase> AllUIComponentsOnScreen()
         {
-            foreach (var ui in ActiveScreen.UIComponents)
+            foreach (var ui in _activeScreen.UIComponents)
             {
                 yield return ui;
             }
@@ -117,28 +117,48 @@ namespace LandSky
         {
             if (Component == null)
                 throw new Exception("cant hadel it component is null");
-            if (Component?.Name == null || ActiveScreen.Controls.Any(i => i.Value.Name == Component.Name))
+            if (Component?.Name == null || _activeScreen.Controls.Any(i => i.Value.Name == Component.Name))
                 throw new Exception($"Component can't have that name... {Component?.Name} sorry bro");
-            ActiveScreen.Controls.Add(Component.Name, Component);
+            _activeScreen.Controls.Add(Component.Name, Component);
         }
 
         public void RemoveComponentFromActiveScreen(Component Component)
         {
-            ActiveScreen.Delete(Component.Name);
+            _activeScreen.Delete(Component.Name);
         }
 
         public void RemoveComponentFromActiveScreen(string ComponentName)
         {
-            ActiveScreen.Delete(ComponentName);
+            _activeScreen.Delete(ComponentName);
+        }
+
+        public void SetActiveComponent(Component NewActive, int NewWidth, int NewHeight)
+        {
+            if (_activeScreen is SandboxMap)
+            {
+                (_activeScreen as SandboxMap).ChangeActiveComponent(NewActive.Name, NewWidth, NewHeight);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("NewActive");
+            }
         }
 
         public string RenderAroundComponent(Component Component, int Width, int Height)
         {
-            if (ActiveScreen is SandboxMap)
+            if (_activeScreen is SandboxMap)
             {
-                SandboxMap Map = ActiveScreen as SandboxMap;
-                Map.ChangeActiveComponent(Component.Name, Width, Height);
-                return CurrentFrame();
+                SandboxMap Map = _activeScreen as SandboxMap;
+                return Map.ReginToString(Component, Width, Height);
+            }
+            return "Sorry cant find active game :(";
+        }
+
+        public string RenderAroundComponent()
+        {
+            if (_activeScreen is SandboxMap)
+            {
+                return (_activeScreen as SandboxMap).ReginToString();
             }
             return "Sorry cant find active game :(";
         }

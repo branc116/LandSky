@@ -35,6 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AsciiTexture.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GeneratePathCommand.cs" />
     <Compile Include="Commands\GenerateRoomsCommand.cs" />
