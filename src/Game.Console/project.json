@@ -15,6 +15,11 @@
 
   "frameworks": {
     "netcoreapp1.0": {
+      "dependencies": {
+        "core.Portable": {
+          "target": "project"
+        }
+      },
       "imports": "dnxcore50"
     }
   }
