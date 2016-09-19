@@ -1,12 +1,11 @@
-﻿using LandSky;
-using LandSky.Components;
+﻿using LandSky.Components;
 using LandSky.DotNetExt;
-using LandSky.MyMath;
 using LandSky.Screen;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Game.Cns
+namespace LandSky.Game.Cns
 {
     public class Program
     {
@@ -21,36 +20,34 @@ namespace Game.Cns
             Engine.PushNewComponentOnActiveScreen(Me);
             var InfPlain = new InfinitePlane(seed, "MyPlayn");
             Engine.PushNewComponentOnActiveScreen(InfPlain);
-            Engine.RenderAroundComponent(Me, 2, 2);
-            Task.Factory.StartNew(async () =>
+            Task.Factory.StartNew(() =>
             {
-                var Render = new Render();
                 while (true)
                 {
-                    try
-                    {
-                        Console.CursorVisible = false;
-                    }
-                    catch { }
-                    Console.Clear();
-                    try
-                    {
-                        var threadSafely = Render.RenderSandBoxMap(Engine.AllComponentsOnScreen(), Me, new Size(Console.WindowWidth - 10, Console.WindowHeight - 10));
-                        System.Console.Clear();
-                        System.Console.WriteLine(threadSafely);
-                        await Task.Delay(100);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
+                    var a = System.Console.ReadKey(true);
+                    Engine.InputNextCommand(new MyConsoleKeyInfo(a.KeyChar), "Branimir");
                 }
             });
-            while (true)
+
+            try
             {
-                var a = System.Console.ReadKey(true);
-                Engine.InputNextCommand(new MyConsoleKeyInfo(a.KeyChar));
+                Console.CursorVisible = false;
             }
+            catch { }
+            Console.Clear();
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Engine.SetActiveComponent(Me, Console.WindowWidth - 10, Console.WindowHeight - 10);
+
+                    var threadSafely = Engine.RenderAroundComponent();
+                    System.Console.Clear();
+                    System.Console.Write(threadSafely);
+                    Thread.Sleep(100);
+                }
+            });
+            Thread.Sleep(int.MaxValue);
         }
     }
 }
