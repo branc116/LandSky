@@ -22,5 +22,17 @@ namespace LandSky.MyMath
         {
             return (int)Math.Round(Double);
         }
+
+        /// <summary>
+        /// Returns true if this Num is inside this range [LowerBound, UpperBound>
+        /// </summary>
+        /// <param name="Num"></param>
+        /// <param name="UpperBound"></param>
+        /// <param name="LowerBound"></param>
+        /// <returns></returns>
+        public static bool IsInside(int Num, int LowerBound, int UpperBound)
+        {
+            return LowerBound <= Num && Num < UpperBound;
+        }
     }
 }

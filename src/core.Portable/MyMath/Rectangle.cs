@@ -131,6 +131,18 @@ namespace LandSky.MyMath
             };
         }
 
+        public static Rectangle RectangleZero() => new Rectangle(0, 0, 0, 0);
+
+        public static Rectangle operator -(Rectangle one, Rectangle two)
+        {
+            if (!(one & two))
+                return RectangleZero();
+            return new Rectangle(Min(one.TopBound, two.TopBound),
+                                 Min(one.RightBound, two.RightBound),
+                                 Max(one.BottomBound, two.BottomBound),
+                                 Max(one.LeftBound, two.LeftBound));
+        }
+
         public static Rectangle operator -(Rectangle Rc, Point P)
         {
             return new Rectangle(Rc.TopBound - P.Y, Rc.RightBound - P.X, Rc.BottomBound - P.Y, Rc.LeftBound - P.X);

@@ -59,7 +59,7 @@ namespace LandSky.Screen
         {
             foreach (var Wall in MWalls)
             {
-                VirtualConsoleAddLine(string.Format("{0}Wall {1} is localy located on ({2},{3}) and globaly on ({4},{5}), width = {6}, height = {7}", new object[] { new string(' ', Indent * 2), Wall.Value.Name, Wall.Value.LocalX, Wall.Value.LocalY, Wall.Value.GlobalX, Wall.Value.GlobalY, Wall.Value.LocalBounds.Width, Wall.Value.LocalBounds.Height }));
+                VirtualConsoleAddLine(string.Format("{0}Wall {1} is localy located on ({2},{3}) and globaly on ({4},{5}), width = {6}, height = {7}", new object[] { new string(' ', Indent * 2), Wall.Value.Name, Wall.Value.LocalX, Wall.Value.LocalY, Wall.Value.GlobalX, Wall.Value.GlobalY, Wall.Value.Width, Wall.Value.Height }));
                 if (Wall.Value.Controls.Count > 0)
                     VirtualConsoleAddLine(
                         $"{new string(' ', Indent * 2)}Wall contains {Wall.Value.NumOfRooms} Rooms, {Wall.Value.NumOfPaths} Paths, {Wall.Value.NumOfWalls} walls");
@@ -89,7 +89,7 @@ namespace LandSky.Screen
             foreach (var Room in MRooms)
             {
                 VirtualConsoleAddLine(
-                    $"{new string(' ', Indent * 2)}Room {Room.Name} is located on ({Room.LocalX},{Room.LocalY}), width = {Room.LocalBounds.Width}, height = {Room.LocalBounds.Height}");
+                    $"{new string(' ', Indent * 2)}Room {Room.Name} is located on ({Room.LocalX},{Room.LocalY}), width = {Room.Width}, height = {Room.Height}");
                 if (Room.Controls.Count > 0)
                     VirtualConsoleAddLine(
                         $"{new string(' ', Indent * 2)}Room contains {Room.NumOfRooms} Rooms, {Room.NumOfPaths} Paths, {Room.NumOfWalls} walls");
@@ -106,7 +106,7 @@ namespace LandSky.Screen
             foreach (var Room in MRooms)
             {
                 VirtualConsoleAddLine(
-                    $"{new string(' ', Indent * 2)}Room {Room.Value.Name} is located on ({Room.Value.LocalX},{Room.Value.LocalY}), width = {Room.Value.LocalBounds.Width}, height = {Room.Value.LocalBounds.Height}");
+                    $"{new string(' ', Indent * 2)}Room {Room.Value.Name} is located on ({Room.Value.LocalX},{Room.Value.LocalY}), width = {Room.Value.Width}, height = {Room.Value.Height}");
                 if (Room.Value.Controls.Count > 0)
                     VirtualConsoleAddLine(
                         $"{new string(' ', Indent * 2)}Room contains {Room.Value.NumOfRooms} Rooms, {Room.Value.NumOfPaths} Paths, {Room.Value.NumOfWalls} walls");
