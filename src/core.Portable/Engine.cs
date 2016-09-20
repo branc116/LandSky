@@ -2,7 +2,7 @@
 using LandSky.DotNetExt;
 using LandSky.Screen;
 using LandSky.UIComponents;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,17 +57,18 @@ namespace LandSky
         /// <returns></returns>
         public string StateToJSON()
         {
-            return JsonConvert.SerializeObject(BaseScreen.Active, BaseScreen.Active.GetType(), Formatting.Indented, new JsonSerializerSettings()
-            {
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                CheckAdditionalContent = true,
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                MaxDepth = 5,
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Include,
-                StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
-            });
+            //return JsonConvert.SerializeObject(BaseScreen.Active, BaseScreen.Active.GetType(), Formatting.Indented, new JsonSerializerSettings()
+            //{
+            //    MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+            //    CheckAdditionalContent = true,
+            //    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            //    MaxDepth = 5,
+            //    MissingMemberHandling = MissingMemberHandling.Ignore,
+            //    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            //    NullValueHandling = NullValueHandling.Include,
+            //    StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
+            //});
+            return "Isn't working";
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace LandSky
         /// <param name="StackOfActiveScreens"></param>
         public void LoadFromJSON(string StackOfActiveScreens)
         {
-            BaseScreen.Active = JsonConvert.DeserializeObject<Stack<BaseScreen>>(StackOfActiveScreens);
+            //BaseScreen.Active = JsonConvert.DeserializeObject<Stack<BaseScreen>>(StackOfActiveScreens);
         }
 
         /// <summary>
@@ -161,6 +162,16 @@ namespace LandSky
                 return (_activeScreen as SandboxMap).ReginToString();
             }
             return "Sorry cant find active game :(";
+        }
+
+        public Cell[][] CellArrayAroundComponent()
+        {
+
+            if (_activeScreen is SandboxMap)
+            {
+                return (_activeScreen as SandboxMap).GetRegin();
+            }
+            throw new MissingMemberException("No Active Screen, use PushNewScreenOnTop method");
         }
     }
 }

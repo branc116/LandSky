@@ -1,6 +1,6 @@
 ﻿using LandSky.MyEnums;
 using LandSky.MyMath;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LandSky.Components
 {
-    [JsonObject]
+    //[JsonObject]
     /// <summary>
     /// Everything should be extended from this
     /// </summary>
@@ -306,24 +306,25 @@ namespace LandSky.Components
         {
             return await Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    return JsonConvert.SerializeObject(this, this.GetType(), Formatting.Indented, new JsonSerializerSettings()
-                    {
-                        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                        CheckAdditionalContent = true,
-                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                        MaxDepth = 5,
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Include,
-                        StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
-                    });
-                }
-                catch
-                {
-                    throw;
-                }
+                //try
+                //{
+                //    return JsonConvert.SerializeObject(this, this.GetType(), Formatting.Indented, new JsonSerializerSettings()
+                //    {
+                //        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                //        CheckAdditionalContent = true,
+                //        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                //        MaxDepth = 5,
+                //        MissingMemberHandling = MissingMemberHandling.Ignore,
+                //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                //        NullValueHandling = NullValueHandling.Include,
+                //        StringEscapeHandling = StringEscapeHandling.EscapeNonAscii
+                //    });
+                //}
+                //catch
+                //{
+                //    throw;
+                //}
+                return "hey";
             }
             );
         }

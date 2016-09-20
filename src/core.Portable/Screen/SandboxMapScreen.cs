@@ -304,6 +304,10 @@ namespace LandSky.Screen
             return ReginToString(ActiveComponent, WantedWidth, WantedHeight);
         }
 
+        public Cell[][] GetRegin()
+        {
+            return GetRegin(BoundsAroundThisPlayer);
+        }
         private void EngineConsoleDraw()
         {
             lock (mLockDrawMethode)
