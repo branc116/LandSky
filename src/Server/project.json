@@ -61,7 +61,10 @@
     ]
   },
 
-    "scripts": {
-      "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
-    }
+  "scripts": {
+    "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
+  },
+  "configurations": {
+    "DebugConsoleAndServer": {}
+  }
   }

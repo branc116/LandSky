@@ -5,22 +5,25 @@
   "buildOptions": {
     "emitEntryPoint": true
   },
-
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "include": "all"
     }
   },
-
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
+      "imports": "netcore45",
       "dependencies": {
         "core.Portable": {
           "target": "project"
-        }
-      },
-      "imports": "dnxcore50"
+        },
+        "Microsoft.NETCore.Portable.Compatibility": "1.0.1-rc2-24027"
+      }
     }
+  },
+  "configurations": {
+    "DebugConsoleAndServer": {}
   }
 }

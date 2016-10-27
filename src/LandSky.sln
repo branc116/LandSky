@@ -17,23 +17,37 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Game.Console", "Game.Consol
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC} = {661DC64D-6282-422C-A6AF-60E3C8A63BCC}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Server", "Game.Server\Game.Server.csproj", "{38666445-B638-4DC6-A2E5-FA1D84FD92A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugConsoleAndServer|Any CPU = DebugConsoleAndServer|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.DebugConsoleAndServer|Any CPU.ActiveCfg = DebugConsoleAndServer|Any CPU
 		{DCDF1ECD-9066-4D42-AAFE-E5BACE8F1590}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.DebugConsoleAndServer|Any CPU.ActiveCfg = Debug|Any CPU
+		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.DebugConsoleAndServer|Any CPU.Build.0 = Debug|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{661DC64D-6282-422C-A6AF-60E3C8A63BCC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.DebugConsoleAndServer|Any CPU.ActiveCfg = DebugConsoleAndServer|Any CPU
+		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.DebugConsoleAndServer|Any CPU.Build.0 = DebugConsoleAndServer|Any CPU
 		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{520FC5C5-4EA6-4FF7-B008-EA72E256A539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.DebugConsoleAndServer|Any CPU.ActiveCfg = DebugConsoleAndServer|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.DebugConsoleAndServer|Any CPU.Build.0 = DebugConsoleAndServer|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38666445-B638-4DC6-A2E5-FA1D84FD92A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

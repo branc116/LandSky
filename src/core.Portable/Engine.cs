@@ -6,16 +6,30 @@ using LandSky.UIComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LandSky.MyEnums;
+using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client.Transports;
+
+namespace System.Runtime.Serialization.Formatters
+{
+    enum FormatterAssemblyStyle
+    {
+        Simple,
+        Full
+    }
+}
 
 namespace LandSky
 {
+    
     /// <summary>
     /// This starts everything
     /// </summary>
-    public sealed class Engine
+    public sealed class Engine : IServer
     {
         private string _name;
-
+        private HubConnection _hub;
+        private IHubProxy _http;
         private BaseScreen _activeScreen
         {
             get
@@ -49,6 +63,14 @@ namespace LandSky
         {
             var Cc = CommandControls.KeyMap.ContainsKey(Info) ? CommandControls.KeyMap[Info] : MyEnums.Comands.Any;
             return _activeScreen.ParseCommand(NameOfSubject, Cc, Info);
+        }
+
+        public bool InputNextCommand(Comands Command, string NameOfTheSubject)
+        {
+            var comm = CommandControls.KeyMap.FirstOrDefault(command => command.Value == Command);
+            if (comm.Key == null)
+                return false;
+            return InputNextCommand(comm.Key, NameOfTheSubject);
         }
 
         /// <summary>
@@ -172,6 +194,47 @@ namespace LandSky
                 return (_activeScreen as SandboxMap).GetRegin();
             }
             throw new MissingMemberException("No Active Screen, use PushNewScreenOnTop method");
+        }
+
+        public void Connect(string Url)
+        {
+            _hub = new HubConnection("127.0.0.1:52062");
+            
+            _http = _hub.CreateHubProxy("ServerHub");
+            _http.On<SandboxMap>("InitMap", map => this.PushNewScreenOnTop(map));
+            _http.On<Comands, string>("Update", (comm, ObjName) => this.InputNextCommand(comm, ObjName));
+            _http.On<string>("CallBack", Message => System.Diagnostics.Debug.WriteLine(Message));
+           
+        }
+        public void Register(string Mail, string Password, string Username)
+        {
+            CheckHub();
+            _http?.Invoke("Register", Mail, Password, Username);
+        }
+
+        public void Login(string MailOrUsername, string Password)
+        {
+            CheckHub();
+            _http?.Invoke("Login", MailOrUsername, Password);
+        }
+
+        public void NewCommand(Comands Command, string Token)
+        {
+            CheckHub();
+            _http?.Invoke("NewCommand", Command, Token);
+        }
+
+        public void Logout()
+        {
+            CheckHub();
+            _http?.Invoke("Logout");
+        }
+
+        private void CheckHub()
+        {
+
+            if (_http == null || _hub== null)
+                throw new HubException("IHubProxy is null", _http);
         }
     }
 }
