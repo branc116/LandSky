@@ -21,6 +21,7 @@
 bld/
 [Bb]in/
 [Oo]bj/
+GameXenko/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -246,3 +247,4 @@ ModelManifest.xml
 /src/.build
 /libs/.build
 /libs/SignalR-Server/
+/src/Game.Server/scripts
