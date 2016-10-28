@@ -3,15 +3,15 @@
   "exports": {
     "core.Portable/1.0.0": {
       "type": "project",
-      "framework": ".NETStandard,Version=v1.1",
+      "framework": ".NETStandard,Version=v1.3",
       "compile": {
-        "bin/Release/LandSky.dll": {}
+        "bin/Debug/LandSky.dll": {}
       },
       "runtime": {
-        "bin/Release/LandSky.dll": {}
+        "bin/Debug/LandSky.dll": {}
       },
       "contentFiles": {
-        "bin/Release/LandSky.pdb": {
+        "bin/Debug/LandSky.pdb": {
           "buildAction": "None",
           "codeLanguage": "any",
           "copyToOutput": true

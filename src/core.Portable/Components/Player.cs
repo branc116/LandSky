@@ -12,7 +12,7 @@ namespace LandSky.Components
 
         public Player(string Name) : base($"{Name}")
         {
-            this.ZValue = 25;
+            this.ZValue = 5;
             this.Bounds = Rectangle.DefineRectangleByWidthAndHeight(0, 0, 0, 0);
 
             MadeOf = Material.Player;

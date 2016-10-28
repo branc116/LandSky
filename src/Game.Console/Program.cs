@@ -15,11 +15,14 @@ namespace LandSky.Game.Cns
             var seed = Console.ReadLine();
             var Map = new SandboxMap(0, 0);
             var Engine = new Engine("MyEngine");
-            Engine.PushNewScreenOnTop(Map);
             var Me = new Player("Branimir");
-            Engine.PushNewComponentOnActiveScreen(Me);
             var InfPlain = new InfinitePlane(seed, "MyPlayn");
+
+            Engine.Connect("localhost:52062");
+            Engine.PushNewScreenOnTop(Map);
+            Engine.PushNewComponentOnActiveScreen(Me);
             Engine.PushNewComponentOnActiveScreen(InfPlain);
+
             Task.Factory.StartNew(() =>
             {
                 while (true)

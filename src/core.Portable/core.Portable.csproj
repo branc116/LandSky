@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugConsoleAndServer|AnyCPU'">
+    <OutputPath>bin\DebugConsoleAndServer\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="AsciiTexture.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
@@ -54,6 +57,8 @@
     <Compile Include="DotNetExt\ConsoleKeyInfo.cs" />
     <Compile Include="DotNetExt\IMyConsoleKeyInfo.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="IClient.cs" />
+    <Compile Include="IServer.cs" />
     <Compile Include="MyEnums\Enums.cs" />
     <Compile Include="MyEventArgs\ScreenChangedArgs.cs" />
     <Compile Include="MyMath\FastMath.cs" />
